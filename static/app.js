@@ -19,7 +19,7 @@ let isRunning = false;
 let sessionStartTime = 0;
 
 // Telemetry & State Cache
-let currentGaze = { x: 0.5, y: 0.5, detected: false };
+let currentGaze = { rawX: 0.5, rawY: 0.5, screenX: 0.5, screenY: 0.5, pitch: 0.0, yaw: 0.0, detected: false };
 let isSpeaking = false;
 let lipMoving = false;
 let currentScore = 0.0;
@@ -190,39 +190,76 @@ const lipTracker = new BrowserLipTracker();
 const audioTracker = new BrowserAudioTracker();
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Eye Gaze Extraction (Head-Pose Normalized)
+// Eye Gaze Extraction (Exact Replica of OpenCV Local Detector with Blink Guard)
 // ─────────────────────────────────────────────────────────────────────────────
+const EYE_L = { inner: 133, outer: 33, top: 159, bot: 145 };
+const EYE_R = { inner: 362, outer: 263, top: 386, bot: 374 };
+
+function getEyeGaze(lm, irisIdx, eye) {
+  const iris = lm[irisIdx];
+  const inner = lm[eye.inner];
+  const outer = lm[eye.outer];
+  const top = lm[eye.top];
+  const bot = lm[eye.bot];
+
+  const leftX = Math.min(inner.x, outer.x);
+  const rightX = Math.max(inner.x, outer.x);
+  const topY = Math.min(top.y, bot.y);
+  const botY = Math.max(top.y, bot.y);
+
+  const w = rightX - leftX;
+  const h = botY - topY;
+  if (w < 1e-5 || h < 1e-5) return null;
+
+  const hr = (iris.x - leftX) / w;   // 0..1 left-to-right in camera image
+  const vr = (iris.y - topY) / h;    // 0..1 top-to-bottom
+  const op = h / Math.max(w, 1e-5);  // Eyelid openness
+  return { hr, vr, op };
+}
+
 function extractGaze(lm) {
+  if (!lm || lm.length < 478) {
+    return { detected: false, rawX: 0.5, rawY: 0.5, screenX: 0.5, screenY: 0.5, pitch: 0.0, yaw: 0.0 };
+  }
   try {
-    // Left eye (iris: 468, inner: 133, outer: 33, top: 159, bot: 145)
-    const leftIris = lm[468];
-    const leftInner = lm[133], leftOuter = lm[33];
-    const lLeftX = Math.min(leftInner.x, leftOuter.x);
-    const lRightX = Math.max(leftInner.x, leftOuter.x);
-    const lW = Math.max(lRightX - lLeftX, 1e-4);
-    const leftHR = (leftIris.x - lLeftX) / lW;
+    const le = getEyeGaze(lm, 468, EYE_L);
+    const re = getEyeGaze(lm, 473, EYE_R);
+    if (!le || !re) {
+      return { detected: false, rawX: 0.5, rawY: 0.5, screenX: 0.5, screenY: 0.5, pitch: 0.0, yaw: 0.0 };
+    }
 
-    // Right eye (iris: 473, inner: 362, outer: 263, top: 386, bot: 374)
-    const rightIris = lm[473];
-    const rightInner = lm[362], rightOuter = lm[263];
-    const rLeftX = Math.min(rightInner.x, rightOuter.x);
-    const rRightX = Math.max(rightInner.x, rightOuter.x);
-    const rW = Math.max(rRightX - rLeftX, 1e-4);
-    const rightHR = (rightIris.x - rLeftX) / rW;
+    // Blink & eyelid occlusion guard (exact parity with anti_cheat_detector.py line 328)
+    if (le.op < 0.18 || re.op < 0.18) {
+      return { detected: false, rawX: 0.5, rawY: 0.5, screenX: 0.5, screenY: 0.5, pitch: 0.0, yaw: 0.0 };
+    }
 
-    const avgHR = (leftHR + rightHR) / 2.0;
+    const rawX = (le.hr + re.hr) / 2.0;
+    const rawY = (le.vr + re.vr) / 2.0;
 
-    // Head yaw adjustment (nose-tip relative to mid-eye)
-    const midEyeX = (leftInner.x + rightInner.x) / 2.0;
-    const noseX = lm[1].x;
-    const yawOffset = (noseX - midEyeX) * 2.0;
+    // Head pose estimation in degrees (pitch, yaw)
+    const midEyeX = (lm[33].x + lm[263].x) / 2.0;
+    const midEyeY = (lm[33].y + lm[263].y) / 2.0;
+    const faceW = Math.max(Math.abs(lm[263].x - lm[33].x), 1e-4);
+    const faceH = Math.max(Math.abs(lm[152].y - midEyeY), 1e-4);
 
-    const gazeX = Math.max(0.05, Math.min(0.95, avgHR + yawOffset * 0.35));
-    const gazeY = (leftIris.y + rightIris.y) / 2.0;
+    const yaw = ((lm[1].x - midEyeX) / faceW) * 55.0;
+    const pitch = ((lm[1].y - (midEyeY + faceH * 0.45)) / faceH) * 55.0;
 
-    return { x: gazeX, y: gazeY, detected: true };
+    // Physical screen coordinates (1.0 - rawX so reading Left->Right across screen increases screenX)
+    const screenX = Math.max(0.0, Math.min(1.0, 1.0 - rawX));
+    const screenY = Math.max(0.0, Math.min(1.0, rawY));
+
+    return {
+      detected: true,
+      rawX: rawX,
+      rawY: rawY,
+      screenX: screenX,
+      screenY: screenY,
+      pitch: pitch,
+      yaw: yaw
+    };
   } catch (e) {
-    return { x: 0.5, y: 0.5, detected: false };
+    return { detected: false, rawX: 0.5, rawY: 0.5, screenX: 0.5, screenY: 0.5, pitch: 0.0, yaw: 0.0 };
   }
 }
 
@@ -259,8 +296,8 @@ function getAudioRMS() {
 function drawProctoringHUD(ctx, width, height, t, testName) {
   // 1. Draw Gaze Reticle at (gx, gy)
   if (currentGaze.detected) {
-    const gx_px = (1.0 - currentGaze.x) * width;
-    const gy_px = currentGaze.y * height;
+    const gx_px = currentGaze.screenX * width;
+    const gy_px = currentGaze.screenY * height;
 
     // Glowing cyan/yellow reticle
     ctx.beginPath();
@@ -477,20 +514,27 @@ async function startSession() {
       el.systemStatusText.textContent = "Proctoring Armed";
       el.speechStateTag.textContent = "HUD Live";
 
-      // 4. Send telemetry stream every 50ms (20 FPS) — only 80 bytes!
+      // 4. Send telemetry stream every 40ms (25 FPS) — only 80 bytes!
       telemetryInterval = setInterval(() => {
         if (!isRunning || ws.readyState !== WebSocket.OPEN) return;
+        if (!currentGaze.detected) return; // Suppress during blinks!
+
         const t = Math.max(0.001, (Date.now() - sessionStartTime) / 1000);
 
         ws.send(JSON.stringify({
           action: "telemetry",
           t: t,
-          gaze_x: currentGaze.x,
-          gaze_y: currentGaze.y,
+          raw_x: currentGaze.rawX,
+          raw_y: currentGaze.rawY,
+          gaze_x: currentGaze.screenX,
+          gaze_y: currentGaze.screenY,
+          pitch: currentGaze.pitch,
+          yaw: currentGaze.yaw,
           is_speaking: isSpeaking,
           lip_moving: lipMoving,
+          detected: true,
         }));
-      }, 50);
+      }, 40);
 
       // 5. Run continuous camera detection loop
       async function processCamera() {

@@ -30,6 +30,7 @@ from anti_cheat_detector import (
     ReadingPatternEngine,
     LipMotionTracker,
     extract_gaze,
+    normalize_angle_diff,
     fmt_time,
     save_session_deliverables,
     setup_model,
@@ -160,13 +161,36 @@ async def websocket_session(websocket: WebSocket):
                         break
 
                     if action == "telemetry" or "gaze_x" in msg:
+                        detected = bool(msg.get("detected", True))
+                        if not detected:
+                            continue
+
                         t = float(msg.get("t", time.perf_counter() - start_time))
                         t = max(0.001, t)
-                        gx = float(msg.get("gaze_x", 0.5))
-                        gy = float(msg.get("gaze_y", 0.5))
+                        raw_x = float(msg.get("raw_x", msg.get("gaze_x", 0.5)))
+                        raw_y = float(msg.get("raw_y", msg.get("gaze_y", 0.5)))
+                        pitch = float(msg.get("pitch", 0.0))
+                        yaw = float(msg.get("yaw", 0.0))
                         is_speaking = bool(msg.get("is_speaking", False))
 
-                        n_cheat, score, status, label, tel = engine.update(t, gx, gy, is_speaking)
+                        if t < engine.warmup:
+                            engine.record_warmup_pose(pitch, yaw)
+
+                        if engine.base_pose is not None:
+                            bp, by = engine.base_pose
+                            dy = normalize_angle_diff(yaw, by)
+                            dp = normalize_angle_diff(pitch, bp)
+                            K_YAW = 0.004
+                            K_PITCH = 0.004
+                            corr_x = raw_x - dy * K_YAW
+                            corr_y = raw_y - dp * K_PITCH
+                        else:
+                            corr_x, corr_y = raw_x, raw_y
+
+                        screen_x = float(np.clip(1.0 - corr_x, 0.0, 1.0))
+                        screen_y = float(np.clip(corr_y, 0.0, 1.0))
+
+                        n_cheat, score, status, label, tel = engine.update(t, screen_x, screen_y, is_speaking)
                         streak = tel.get("streak", 0)
                         drift = tel.get("drift_x", 0.0)
                         if np.isnan(drift): drift = 0.0
