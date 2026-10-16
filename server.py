@@ -160,6 +160,7 @@ async def websocket_session(websocket: WebSocket):
                         break
 
                     if "frame" in msg:
+                        seq = int(msg.get("seq", 0))
                         base64_str = msg.get("frame", "")
                         if "," in base64_str:
                             base64_str = base64_str.split(",", 1)[1]
@@ -287,11 +288,12 @@ async def websocket_session(websocket: WebSocket):
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.42, (210, 210, 210), 1, cv2.LINE_AA)
 
                         # Encode annotated disp frame to JPEG
-                        ok, buf = cv2.imencode(".jpg", disp, [int(cv2.IMWRITE_JPEG_QUALITY), 75])
+                        ok, buf = cv2.imencode(".jpg", disp, [int(cv2.IMWRITE_JPEG_QUALITY), 70])
                         annotated_b64 = "data:image/jpeg;base64," + base64.b64encode(buf).decode("utf-8") if ok else ""
 
                         await websocket.send_json({
                             "type": "frame",
+                            "seq": seq,
                             "frame": annotated_b64,
                             "elapsed_formatted": time_str,
                             "score": round(score, 4),

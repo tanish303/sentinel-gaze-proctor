@@ -115,18 +115,26 @@ async function startSession() {
     const displayCtx = el.cameraCanvas.getContext("2d");
     const captureCtx = el.captureCanvas.getContext("2d");
 
-    // Local mirroring fallback loop: ensures canvas NEVER appears black or frozen
+    // Sequence & flow control state
+    let frameSeq = 0;
+    let highestRenderedSeq = 0;
+    let isFrameInFlight = false;
+    let lastFrameSentTime = 0;
+
+    // Local mirroring fallback: ONLY runs before the very first server frame arrives,
+    // or if the server completely stalls for > 1200ms. Eliminates HUD/webcam flickering!
     localRenderInterval = setInterval(() => {
       if (!isRunning) return;
-      // If server frame hasn't arrived within 300ms, keep drawing mirrored local webcam
-      if (Date.now() - lastServerFrameTime > 300 && el.webcam.videoWidth > 0) {
-        displayCtx.save();
-        displayCtx.translate(640, 0);
-        displayCtx.scale(-1, 1);
-        displayCtx.drawImage(el.webcam, 0, 0, 640, 480);
-        displayCtx.restore();
+      if (lastServerFrameTime === 0 || Date.now() - lastServerFrameTime > 1200) {
+        if (el.webcam.videoWidth > 0) {
+          displayCtx.save();
+          displayCtx.translate(640, 0);
+          displayCtx.scale(-1, 1);
+          displayCtx.drawImage(el.webcam, 0, 0, 640, 480);
+          displayCtx.restore();
+        }
       }
-    }, 40);
+    }, 50);
 
     // 2. Open WebSocket connection to Python backend
     const protocol = location.protocol === "https:" ? "wss:" : "ws:";
@@ -154,32 +162,61 @@ async function startSession() {
         el.timerDisplay.textContent = `${mm}:${ss}`;
       }, 500);
 
-      // 3. Start sending frames at ~18 FPS (55ms interval)
+      // 3. Adaptive Stream Loop: Only send when ready (zero queue backlog, locked 18-20 FPS)
       frameInterval = setInterval(() => {
         if (!isRunning || ws.readyState !== WebSocket.OPEN) return;
         if (el.webcam.videoWidth === 0) return;
 
+        // Flow control: don't pile up frames if previous frame is still processing (with 140ms timeout)
+        if (isFrameInFlight && (Date.now() - lastFrameSentTime < 140)) {
+          return;
+        }
+
+        // Don't send if network socket buffer is already filled
+        if (ws.bufferedAmount > 65536) {
+          return;
+        }
+
         try {
           captureCtx.drawImage(el.webcam, 0, 0, 640, 480);
-          const base64Data = el.captureCanvas.toDataURL("image/jpeg", 0.65);
+          const base64Data = el.captureCanvas.toDataURL("image/jpeg", 0.52);
           const rms = getAudioRMS();
 
-          ws.send(JSON.stringify({ frame: base64Data, rms: rms }));
+          frameSeq++;
+          isFrameInFlight = true;
+          lastFrameSentTime = Date.now();
+
+          ws.send(JSON.stringify({ frame: base64Data, rms: rms, seq: frameSeq }));
         } catch (e) {
-          // Keep running smoothly even if a single frame drops
+          isFrameInFlight = false;
         }
-      }, 55);
+      }, 45);
     };
 
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
         if (data.type === "frame") {
+          isFrameInFlight = false;
           lastServerFrameTime = Date.now();
+
+          // Monotonic sequence guarantee: drop stale frames so video never replays old
+          const incomingSeq = data.seq || 0;
+          if (incomingSeq > 0 && incomingSeq < highestRenderedSeq) {
+            return;
+          }
+          if (incomingSeq > 0) {
+            highestRenderedSeq = incomingSeq;
+          }
+
           if (data.frame) {
+            const currentSeq = incomingSeq;
             const img = new Image();
             img.onload = () => {
-              displayCtx.drawImage(img, 0, 0, 640, 480);
+              // Only draw if this image is still the newest frame decoded
+              if (currentSeq >= highestRenderedSeq) {
+                displayCtx.drawImage(img, 0, 0, 640, 480);
+              }
             };
             img.src = data.frame;
           }
