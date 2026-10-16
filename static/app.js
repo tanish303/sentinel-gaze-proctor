@@ -13,7 +13,10 @@ let audioCtx = null;
 let analyser = null;
 let audioDataArray = null;
 let frameInterval = null;
+let localRenderInterval = null;
+let timerInterval = null;
 let isRunning = false;
+let lastServerFrameTime = 0;
 
 // Elements
 const el = {
@@ -26,7 +29,7 @@ const el = {
   speechStateTag: document.getElementById("speechStateTag"),
 
   webcam: document.getElementById("webcam"),
-  cameraFeed: document.getElementById("cameraFeed"),
+  cameraCanvas: document.getElementById("cameraCanvas"),
   videoPlaceholder: document.getElementById("videoPlaceholder"),
   captureCanvas: document.getElementById("captureCanvas"),
 
@@ -99,12 +102,31 @@ async function startSession() {
     el.webcam.srcObject = mediaStream;
     initAudioAnalyser(mediaStream);
 
-    // Wait until video has actually started playing
-    await new Promise((resolve) => {
-      el.webcam.onloadedmetadata = () => {
-        el.webcam.play().then(resolve).catch(resolve);
-      };
-    });
+    try {
+      await el.webcam.play();
+    } catch (e) {
+      console.log("Webcam play notice:", e);
+    }
+
+    // Show canvas immediately and hide placeholder
+    el.cameraCanvas.style.display = "block";
+    el.videoPlaceholder.style.display = "none";
+
+    const displayCtx = el.cameraCanvas.getContext("2d");
+    const captureCtx = el.captureCanvas.getContext("2d");
+
+    // Local mirroring fallback loop: ensures canvas NEVER appears black or frozen
+    localRenderInterval = setInterval(() => {
+      if (!isRunning) return;
+      // If server frame hasn't arrived within 300ms, keep drawing mirrored local webcam
+      if (Date.now() - lastServerFrameTime > 300 && el.webcam.videoWidth > 0) {
+        displayCtx.save();
+        displayCtx.translate(640, 0);
+        displayCtx.scale(-1, 1);
+        displayCtx.drawImage(el.webcam, 0, 0, 640, 480);
+        displayCtx.restore();
+      }
+    }, 40);
 
     // 2. Open WebSocket connection to Python backend
     const protocol = location.protocol === "https:" ? "wss:" : "ws:";
@@ -121,22 +143,30 @@ async function startSession() {
       el.systemStatusBadge.className = "status-badge";
       el.systemStatusText.textContent = "Proctoring Armed";
       el.speechStateTag.textContent = "HUD Live";
-      el.videoPlaceholder.style.display = "none";
-      el.cameraFeed.style.display = "block";
+
+      // Live timer (ticks smoothly every second)
+      const sessionStart = Date.now();
+      timerInterval = setInterval(() => {
+        if (!isRunning) return;
+        const totalSec = Math.floor((Date.now() - sessionStart) / 1000);
+        const mm = String(Math.floor(totalSec / 60)).padStart(2, "0");
+        const ss = String(totalSec % 60).padStart(2, "0");
+        el.timerDisplay.textContent = `${mm}:${ss}`;
+      }, 500);
 
       // 3. Start sending frames at ~18 FPS (55ms interval)
-      const ctx = el.captureCanvas.getContext("2d");
       frameInterval = setInterval(() => {
         if (!isRunning || ws.readyState !== WebSocket.OPEN) return;
+        if (el.webcam.videoWidth === 0) return;
 
         try {
-          ctx.drawImage(el.webcam, 0, 0, 640, 480);
+          captureCtx.drawImage(el.webcam, 0, 0, 640, 480);
           const base64Data = el.captureCanvas.toDataURL("image/jpeg", 0.65);
           const rms = getAudioRMS();
 
           ws.send(JSON.stringify({ frame: base64Data, rms: rms }));
         } catch (e) {
-          // Keep running even if single frame capture drops
+          // Keep running smoothly even if a single frame drops
         }
       }, 55);
     };
@@ -145,9 +175,13 @@ async function startSession() {
       try {
         const data = JSON.parse(event.data);
         if (data.type === "frame") {
-          // Display the exact local OpenCV HUD frame returned from server
+          lastServerFrameTime = Date.now();
           if (data.frame) {
-            el.cameraFeed.src = data.frame;
+            const img = new Image();
+            img.onload = () => {
+              displayCtx.drawImage(img, 0, 0, 640, 480);
+            };
+            img.src = data.frame;
           }
           updateTelemetry(data);
         } else if (data.type === "report") {
@@ -163,7 +197,10 @@ async function startSession() {
     };
 
     ws.onclose = () => {
-      console.log("WebSocket closed");
+      console.log("WebSocket connection finalized");
+      if (isRunning) {
+        el.systemStatusText.textContent = "Connection Closed";
+      }
     };
 
   } catch (err) {
@@ -182,10 +219,18 @@ function stopSession() {
   el.stopBtn.disabled = true;
   el.stopBtn.innerHTML = `<span>Finalizing...</span>`;
 
-  // Stop frame capture loop
+  // Stop frame capture loops & timer
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
   if (frameInterval) {
     clearInterval(frameInterval);
     frameInterval = null;
+  }
+  if (localRenderInterval) {
+    clearInterval(localRenderInterval);
+    localRenderInterval = null;
   }
 
   // Request final report from server
@@ -216,7 +261,7 @@ function stopSession() {
   el.stopBtn.style.display = "none";
   el.testNameInput.disabled = false;
   el.videoPlaceholder.style.display = "flex";
-  el.cameraFeed.style.display = "none";
+  el.cameraCanvas.style.display = "none";
 
   el.systemStatusText.textContent = "Completed";
   el.speechStateTag.textContent = "Camera Idle";

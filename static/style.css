@@ -268,6 +268,13 @@ body {
   transform: scaleX(-1); /* mirror */
 }
 
+.video-wrapper canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+}
+
 .video-placeholder {
   position: absolute;
   color: var(--text-dim);

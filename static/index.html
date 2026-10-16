@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="/static/style.css?v=3" />
 </head>
 <body>
   <!-- Off-screen canvas for frame capture -->
@@ -71,8 +71,8 @@
         </div>
 
         <div class="video-wrapper">
-          <video id="webcam" autoplay playsinline muted style="display:none;"></video>
-          <img id="cameraFeed" alt="Proctoring Camera HUD" style="width:100%; height:100%; object-fit:contain; display:none;" />
+          <video id="webcam" autoplay playsinline muted style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none;"></video>
+          <canvas id="cameraCanvas" width="640" height="480" style="width:100%; height:100%; object-fit:contain; display:none; border-radius: 8px;"></canvas>
           <div class="video-placeholder" id="videoPlaceholder">
             <p>Click <strong>Start Assessment</strong> to activate camera &amp; proctoring HUD</p>
           </div>
@@ -235,6 +235,6 @@
 
   </div>
 
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=3"></script>
 </body>
 </html>

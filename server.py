@@ -185,10 +185,6 @@ async def websocket_session(websocket: WebSocket):
                     disp = cv2.flip(frame, 1)
                     h, w, _ = frame.shape
 
-                    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    mp_img = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
-                    result = lmk.detect_for_video(mp_img, ts_)
-
                     score = engine.score
                     n_cheat = len(engine.cheating_lines)
                     n_clean = len(engine.clean_speaking)
@@ -198,26 +194,34 @@ async def websocket_session(websocket: WebSocket):
                     lip_moving = False
                     lip_mar = 0.0
                     gaze_x, gaze_y = 0.5, 0.5
+                    is_speaking = False
 
-                    if result.face_landmarks:
-                        lms = result.face_landmarks[0]
-                        lip_moving, lip_mar = lip_tracker.update(lms, t)
-                        is_speaking = audio_tracker.evaluate_speech(lip_moving, t)
+                    try:
+                        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                        mp_img = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+                        result = lmk.detect_for_video(mp_img, ts_)
 
-                        gaze, (pitch, yaw) = extract_gaze(lms, w, h, engine.base_pose)
-                        if t < engine.warmup:
-                            engine.record_warmup_pose(pitch, yaw)
-                        if gaze is not None:
-                            gaze_x, gaze_y = gaze
-                            n_cheat, score, status, label, tel = engine.update(t, gaze_x, gaze_y, is_speaking)
+                        if result and result.face_landmarks:
+                            lms = result.face_landmarks[0]
+                            lip_moving, lip_mar = lip_tracker.update(lms, t)
+                            is_speaking = audio_tracker.evaluate_speech(lip_moving, t)
 
-                            # Draw Gaze crosshairs on flipped image (1.0 - gaze_x mirrors to disp)
-                            gx_px = int((1.0 - gaze_x) * w)
-                            gy_px = int(gaze_y * h)
-                            cv2.circle(disp, (gx_px, gy_px), 10, (0, 220, 255), 2, cv2.LINE_AA)
-                            cv2.circle(disp, (gx_px, gy_px), 3, (0, 220, 255), -1, cv2.LINE_AA)
-                    else:
-                        is_speaking = audio_tracker.evaluate_speech(False, t)
+                            gaze, (pitch, yaw) = extract_gaze(lms, w, h, engine.base_pose)
+                            if t < engine.warmup:
+                                engine.record_warmup_pose(pitch, yaw)
+                            if gaze is not None:
+                                gaze_x, gaze_y = gaze
+                                n_cheat, score, status, label, tel = engine.update(t, gaze_x, gaze_y, is_speaking)
+
+                                # Draw Gaze crosshairs on flipped image (1.0 - gaze_x mirrors to disp)
+                                gx_px = int((1.0 - gaze_x) * w)
+                                gy_px = int(gaze_y * h)
+                                cv2.circle(disp, (gx_px, gy_px), 10, (0, 220, 255), 2, cv2.LINE_AA)
+                                cv2.circle(disp, (gx_px, gy_px), 3, (0, 220, 255), -1, cv2.LINE_AA)
+                        else:
+                            is_speaking = audio_tracker.evaluate_speech(False, t)
+                    except Exception as proc_err:
+                        print(f"[PROC ERR] {proc_err}", file=sys.stderr)
 
                     # ── Status colour (exact same as local anti_cheat_detector.py) ─────
                     if score >= 0.70:
