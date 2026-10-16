@@ -2,7 +2,8 @@
  * Sentinel Gaze // Minimalist In-Browser Proctoring Controller
  * - Captures webcam and mic directly in the candidate's browser
  * - Streams frames & audio RMS to server via WebSocket
- * - Displays instant feedback, results, and persistent audit vault
+ * - Displays EXACT local OpenCV Proctoring HUD (details like mic, lips, gaze, score)
+ * - Persistent audit vault & report generation
  */
 
 // Application State
@@ -25,10 +26,9 @@ const el = {
   speechStateTag: document.getElementById("speechStateTag"),
 
   webcam: document.getElementById("webcam"),
+  cameraFeed: document.getElementById("cameraFeed"),
   videoPlaceholder: document.getElementById("videoPlaceholder"),
   captureCanvas: document.getElementById("captureCanvas"),
-  confidenceBar: document.getElementById("confidenceBar"),
-  confidencePill: document.getElementById("confidencePill"),
 
   liveSpeechVal: document.getElementById("liveSpeechVal"),
   liveLipsVal: document.getElementById("liveLipsVal"),
@@ -88,7 +88,7 @@ async function startSession() {
 
   try {
     el.startBtn.disabled = true;
-    el.startBtn.innerHTML = `<span>Requesting Camera...</span>`;
+    el.startBtn.innerHTML = `<span>Activating Camera...</span>`;
 
     // 1. Capture Candidate's local camera & microphone directly in browser
     mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -97,8 +97,14 @@ async function startSession() {
     });
 
     el.webcam.srcObject = mediaStream;
-    el.videoPlaceholder.style.display = "none";
     initAudioAnalyser(mediaStream);
+
+    // Wait until video has actually started playing
+    await new Promise((resolve) => {
+      el.webcam.onloadedmetadata = () => {
+        el.webcam.play().then(resolve).catch(resolve);
+      };
+    });
 
     // 2. Open WebSocket connection to Python backend
     const protocol = location.protocol === "https:" ? "wss:" : "ws:";
@@ -113,39 +119,51 @@ async function startSession() {
       el.testNameInput.disabled = true;
 
       el.systemStatusBadge.className = "status-badge";
-      el.systemStatusText.textContent = "Analyzing Gaze";
-      el.speechStateTag.textContent = "Proctoring Live";
+      el.systemStatusText.textContent = "Proctoring Armed";
+      el.speechStateTag.textContent = "HUD Live";
+      el.videoPlaceholder.style.display = "none";
+      el.cameraFeed.style.display = "block";
 
-      // 3. Start sending frames at 15 FPS (~66ms interval)
+      // 3. Start sending frames at ~18 FPS (55ms interval)
       const ctx = el.captureCanvas.getContext("2d");
       frameInterval = setInterval(() => {
         if (!isRunning || ws.readyState !== WebSocket.OPEN) return;
-        
-        ctx.drawImage(el.webcam, 0, 0, 640, 480);
-        const base64Data = el.captureCanvas.toDataURL("image/jpeg", 0.55);
-        const rms = getAudioRMS();
 
-        ws.send(JSON.stringify({ frame: base64Data, rms: rms }));
-      }, 66);
+        try {
+          ctx.drawImage(el.webcam, 0, 0, 640, 480);
+          const base64Data = el.captureCanvas.toDataURL("image/jpeg", 0.65);
+          const rms = getAudioRMS();
+
+          ws.send(JSON.stringify({ frame: base64Data, rms: rms }));
+        } catch (e) {
+          // Keep running even if single frame capture drops
+        }
+      }, 55);
     };
 
     ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === "telemetry") {
-        updateTelemetry(data);
-      } else if (data.type === "report") {
-        displayReport(data);
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === "frame") {
+          // Display the exact local OpenCV HUD frame returned from server
+          if (data.frame) {
+            el.cameraFeed.src = data.frame;
+          }
+          updateTelemetry(data);
+        } else if (data.type === "report") {
+          displayReport(data);
+        }
+      } catch (e) {
+        console.error("Frame parse error:", e);
       }
     };
 
     ws.onerror = (err) => {
-      console.error("WebSocket error:", err);
-      alert("Lost connection to proctoring server.");
-      stopSession();
+      console.warn("WebSocket status:", err);
     };
 
     ws.onclose = () => {
-      if (isRunning) stopSession();
+      console.log("WebSocket closed");
     };
 
   } catch (err) {
@@ -156,7 +174,7 @@ async function startSession() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Stop Assessment Session
+// Stop Assessment Session (Explicitly on user click)
 // ─────────────────────────────────────────────────────────────────────────────
 function stopSession() {
   if (!isRunning && (!ws || ws.readyState !== WebSocket.OPEN)) return;
@@ -164,7 +182,7 @@ function stopSession() {
   el.stopBtn.disabled = true;
   el.stopBtn.innerHTML = `<span>Finalizing...</span>`;
 
-  // Stop frame loop
+  // Stop frame capture loop
   if (frameInterval) {
     clearInterval(frameInterval);
     frameInterval = null;
@@ -198,6 +216,7 @@ function stopSession() {
   el.stopBtn.style.display = "none";
   el.testNameInput.disabled = false;
   el.videoPlaceholder.style.display = "flex";
+  el.cameraFeed.style.display = "none";
 
   el.systemStatusText.textContent = "Completed";
   el.speechStateTag.textContent = "Camera Idle";
@@ -209,26 +228,13 @@ function stopSession() {
 function updateTelemetry(data) {
   el.timerDisplay.textContent = data.elapsed_formatted || "00:00";
 
-  const score = data.score || 0.0;
-  const scorePct = `${(score * 100).toFixed(0)}%`;
-  el.confidenceBar.style.width = `${Math.min(100, Math.max(0, score * 100))}%`;
-  el.confidencePill.textContent = `Score: ${scorePct}`;
-
-  if (score >= 0.70) {
-    el.confidenceBar.style.background = "var(--accent-red)";
-  } else if (score >= 0.40) {
-    el.confidenceBar.style.background = "var(--accent-amber)";
-  } else {
-    el.confidenceBar.style.background = "var(--accent-green)";
-  }
-
   // Speech & Lips
   el.liveSpeechVal.textContent = data.is_speaking ? "Talking" : "Silent";
   el.liveSpeechVal.style.color = data.is_speaking ? "var(--accent-blue)" : "var(--text-muted)";
   el.liveLipsVal.textContent = data.lip_moving ? "Active" : "Still";
   el.liveLinesVal.textContent = data.n_cheat || 0;
 
-  // Highlight active reading sentence
+  // Highlight active reading sentence in teleprompter
   highlightSentence(data.flow_streak);
 }
 
@@ -357,7 +363,6 @@ async function loadHistory() {
       el.historyTableBody.appendChild(tr);
     });
 
-    // Attach inspect buttons
     document.querySelectorAll(".btn-inspect").forEach((btn) => {
       btn.addEventListener("click", () => inspectPastTest(btn.dataset.test));
     });
@@ -385,7 +390,6 @@ function init() {
   el.startBtn.addEventListener("click", startSession);
   el.stopBtn.addEventListener("click", stopSession);
 
-  // Set default suggested test name
   const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
   const timeStr = new Date().toTimeString().slice(0, 5).replace(/:/g, "");
   el.testNameInput.placeholder = `manager_eval_${todayStr}_${timeStr}`;

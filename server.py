@@ -1,11 +1,11 @@
 """
 FastAPI Server for Remote & Internet-Deployed Anti-Cheat Proctoring
-Supports:
+Provides:
+  - Exact OpenCV Proctoring HUD streamed directly to candidate browser
   - In-browser camera and microphone via navigator.mediaDevices.getUserMedia
   - Real-time WebSocket frame & audio streaming (/ws/session)
   - Processing candidate frames with MediaPipe Face Landmarker & ReadingPatternEngine
   - Instant session persistence to results/ (*_report.json, *_graph.png, *_summary.txt)
-  - Simple, minimalist, executive web UI
 """
 
 import sys
@@ -40,7 +40,7 @@ import mediapipe as mp
 from mediapipe.tasks import python as mp_python
 from mediapipe.tasks.python import vision
 
-app = FastAPI(title="Minimalist Gaze Proctor Server")
+app = FastAPI(title="Sentinel Gaze Proctor Server")
 
 app.add_middleware(
     CORSMiddleware,
@@ -53,6 +53,7 @@ app.add_middleware(
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 STATIC_DIR = Path(__file__).parent / "static"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Remote Audio Tracker (processes RMS computed directly in candidate's browser)
@@ -105,13 +106,12 @@ class RemoteAudioTracker:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Real-Time WebSocket Proctoring Endpoint
+# Real-Time WebSocket Proctoring Endpoint with Exact Local OpenCV HUD
 # ─────────────────────────────────────────────────────────────────────────────
 @app.websocket("/ws/session")
 async def websocket_session(websocket: WebSocket):
     await websocket.accept()
-    
-    # Query parameters
+
     test_name_param = websocket.query_params.get("test_name", "")
     clean_name = test_name_param.strip().replace(" ", "_") if test_name_param else ""
     if not clean_name:
@@ -140,7 +140,6 @@ async def websocket_session(websocket: WebSocket):
                 action = msg.get("action")
 
                 if action == "stop":
-                    # Finalize session
                     duration = time.perf_counter() - start_time
                     rpt, json_path, txt_path, graph_path, verdict, risk = save_session_deliverables(
                         clean_name, duration, engine
@@ -160,12 +159,11 @@ async def websocket_session(websocket: WebSocket):
                     break
 
                 if "frame" in msg:
-                    # Decode base64 frame from browser
-                    base64_str = msg["frame"]
-                    if "," in base64_str:
-                        base64_str = base64_str.split(",", 1)[1]
-                    
                     try:
+                        base64_str = msg["frame"]
+                        if "," in base64_str:
+                            base64_str = base64_str.split(",", 1)[1]
+
                         img_bytes = base64.b64decode(base64_str)
                         np_arr = np.frombuffer(img_bytes, np.uint8)
                         frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
@@ -179,11 +177,14 @@ async def websocket_session(websocket: WebSocket):
                     ts_ = max(int(t * 1000), last_ts + 1)
                     last_ts = ts_
 
-                    # Update Audio RMS
+                    # Update audio RMS from candidate browser mic
                     rms = float(msg.get("rms", 0.0))
                     audio_tracker.update_rms(rms)
 
+                    # Mirror frame horizontally for user view (just like OpenCV local)
+                    disp = cv2.flip(frame, 1)
                     h, w, _ = frame.shape
+
                     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     mp_img = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
                     result = lmk.detect_for_video(mp_img, ts_)
@@ -209,28 +210,90 @@ async def websocket_session(websocket: WebSocket):
                         if gaze is not None:
                             gaze_x, gaze_y = gaze
                             n_cheat, score, status, label, tel = engine.update(t, gaze_x, gaze_y, is_speaking)
+
+                            # Draw Gaze crosshairs on flipped image (1.0 - gaze_x mirrors to disp)
+                            gx_px = int((1.0 - gaze_x) * w)
+                            gy_px = int(gaze_y * h)
+                            cv2.circle(disp, (gx_px, gy_px), 10, (0, 220, 255), 2, cv2.LINE_AA)
+                            cv2.circle(disp, (gx_px, gy_px), 3, (0, 220, 255), -1, cv2.LINE_AA)
                     else:
                         is_speaking = audio_tracker.evaluate_speech(False, t)
 
+                    # ── Status colour (exact same as local anti_cheat_detector.py) ─────
+                    if score >= 0.70:
+                        scol = (0, 0, 255)
+                    elif score >= 0.40:
+                        scol = (0, 215, 255)
+                    elif tel.get("pending", False) or n_cheat >= 1:
+                        scol = (0, 255, 255)
+                    else:
+                        scol = (0, 220, 0)
+
+                    # ── Exact OpenCV HUD (matching lines 998-1044) ────────────────────
+                    cv2.rectangle(disp, (0, 0), (w, 115), (16, 16, 16), -1)
+                    cv2.line(disp, (0, 115), (w, 115), (55, 55, 55), 1)
+
+                    # Row 1: test name and live clock [MM:SS]
+                    cv2.putText(disp, f"TEST: {clean_name}  [{fmt_time(t)}]", (16, 24),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.55, (170, 170, 170), 1, cv2.LINE_AA)
+
+                    # Row 2: Status
+                    cv2.putText(disp, f"STATUS: {status}", (16, 52),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.52, scol, 2, cv2.LINE_AA)
+
+                    # Row 3: line counts + telemetry
+                    streak = tel.get("streak", 0)
+                    row3 = (f"Cheat-lines: {n_cheat}  |  Clean-speak: {n_clean}  |  "
+                            f"Flow: {streak}L  |  Drift: +{tel.get('drift_x', 0.0):.3f}  |  {label}")
+                    cv2.putText(disp, row3, (16, 78),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.38, (200, 200, 200), 1, cv2.LINE_AA)
+
+                    # Row 4: Speech & Lip VAD status (bottom row)
+                    vad_col = (0, 240, 255) if is_speaking else (160, 160, 160)
+                    vad_str = "TALKING" if is_speaking else "SILENT"
+                    lip_str = "ACTIVE" if lip_moving else "STILL"
+                    cv2.putText(disp, f"SPEECH: {vad_str} [LIPS: {lip_str} | MIC: {audio_tracker.current_rms:.3f}/{audio_tracker.sensitive_threshold:.3f}]",
+                                (16, 102), cv2.FONT_HERSHEY_SIMPLEX, 0.38, vad_col, 1, cv2.LINE_AA)
+
+                    # Audio RMS bar
+                    bx, by, bw, bh = 320, 93, 105, 10
+                    cv2.rectangle(disp, (bx, by), (bx + bw, by + bh), (40, 40, 40), -1)
+                    fr = int(bw * float(np.clip(audio_tracker.current_rms / 0.050, 0, 1)))
+                    cv2.rectangle(disp, (bx, by), (bx + fr, by + bh), vad_col, -1)
+                    tx = int(bx + bw * float(np.clip(audio_tracker.sensitive_threshold / 0.050, 0, 1)))
+                    cv2.line(disp, (tx, by - 2), (tx, by + bh + 2), (0, 0, 255), 2)
+                    cv2.putText(disp, "[-/+] Sens", (bx + bw + 6, 102),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.33, (120, 120, 120), 1)
+
+                    # Confidence bar (top-right)
+                    cbw = 175; cbx = w - cbw - 20; cby = 16
+                    cv2.rectangle(disp, (cbx, cby), (cbx + cbw, cby + 16), (40, 40, 40), -1)
+                    fc = int(cbw * float(np.clip(score, 0, 1)))
+                    mc = (0, 0, 255) if score >= 0.70 else ((0, 215, 255) if score >= 0.40 else (0, 220, 0))
+                    cv2.rectangle(disp, (cbx, cby), (cbx + fc, cby + 16), mc, -1)
+
+                    state_tag = "FROZEN" if not is_speaking else ("ALERT" if "READING_CONFIRMED" in label else ("COOLING" if "SPEAKING_NATURAL" in label else ""))
+                    tag_str = f" [{state_tag}]" if state_tag else ""
+                    cv2.putText(disp, f"Confidence: {score*100:.0f}%{tag_str}", (cbx, cby + 33),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.42, (210, 210, 210), 1, cv2.LINE_AA)
+
+                    # Encode annotated disp frame to JPEG
+                    ok, buf = cv2.imencode(".jpg", disp, [int(cv2.IMWRITE_JPEG_QUALITY), 75])
+                    annotated_b64 = "data:image/jpeg;base64," + base64.b64encode(buf).decode("utf-8") if ok else ""
+
                     await websocket.send_json({
-                        "type": "telemetry",
+                        "type": "frame",
+                        "frame": annotated_b64,
                         "elapsed_formatted": fmt_time(t),
-                        "elapsed_seconds": round(t, 2),
                         "score": round(score, 4),
                         "score_pct": f"{score*100:.1f}%",
                         "status": status,
                         "label": label,
-                        "flow_streak": tel.get("streak", 0),
+                        "flow_streak": streak,
                         "n_cheat": n_cheat,
                         "n_clean": n_clean,
                         "is_speaking": bool(is_speaking),
                         "lip_moving": bool(lip_moving),
-                        "lip_mar": round(float(lip_mar), 4),
-                        "mic_rms": round(float(rms), 4),
-                        "mic_threshold": round(float(audio_tracker.sensitive_threshold), 4),
-                        "gaze_x": round(float(gaze_x), 3),
-                        "gaze_y": round(float(gaze_y), 3),
-                        "step": round(float(tel.get("step", 0.0)), 3),
                     })
 
     except WebSocketDisconnect:
@@ -244,7 +307,6 @@ async def websocket_session(websocket: WebSocket):
 # ─────────────────────────────────────────────────────────────────────────────
 @app.get("/api/sessions")
 def api_list_sessions():
-    """Returns metadata for all persisted sessions stored in RESULTS_DIR."""
     sessions = []
     for report_file in RESULTS_DIR.glob("*_report.json"):
         test_name = report_file.name.replace("_report.json", "")
@@ -314,9 +376,8 @@ def read_root():
 if __name__ == "__main__":
     import uvicorn
     print("\n" + "="*70)
-    print("   MINIMALIST GAZE PROCTOR SERVER (INTERNET READY)")
+    print("   SENTINEL GAZE // EXACT LOCAL HUD STREAMING SERVER")
     print("="*70)
-    print("   Local Address: http://127.0.0.1:8000")
     port = int(os.environ.get("PORT", 8000))
     print(f"   Listening on port: {port}")
     uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")

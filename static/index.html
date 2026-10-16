@@ -71,16 +71,11 @@
         </div>
 
         <div class="video-wrapper">
-          <video id="webcam" autoplay playsinline muted></video>
+          <video id="webcam" autoplay playsinline muted style="display:none;"></video>
+          <img id="cameraFeed" alt="Proctoring Camera HUD" style="width:100%; height:100%; object-fit:contain; display:none;" />
           <div class="video-placeholder" id="videoPlaceholder">
-            <p>Click <strong>Start Assessment</strong> to activate camera</p>
+            <p>Click <strong>Start Assessment</strong> to activate camera &amp; proctoring HUD</p>
           </div>
-
-          <!-- Thin top confidence bar -->
-          <div class="confidence-bar-track">
-            <div class="confidence-bar-fill" id="confidenceBar"></div>
-          </div>
-          <div class="confidence-pill" id="confidencePill">Score: 0%</div>
         </div>
 
         <div class="camera-footer">
