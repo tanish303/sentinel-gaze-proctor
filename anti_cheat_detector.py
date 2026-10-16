@@ -61,8 +61,8 @@ AUDIO_AVAILABLE = False
 try:
     import sounddevice as sd
     AUDIO_AVAILABLE = True
-except ImportError:
-    pass
+except (ImportError, OSError, Exception):
+    AUDIO_AVAILABLE = False
 
 
 def fmt_time(seconds):
