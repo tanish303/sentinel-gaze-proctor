@@ -1,9 +1,9 @@
 /**
- * Sentinel Gaze // Minimalist In-Browser Proctoring Controller
- * - Captures webcam and mic directly in the candidate's browser
- * - Streams frames & audio RMS to server via WebSocket
- * - Displays EXACT local OpenCV Proctoring HUD (details like mic, lips, gaze, score)
- * - Persistent audit vault & report generation
+ * Sentinel Gaze // In-Browser MediaPipe 60 FPS Proctoring Controller
+ * - Runs MediaPipe FaceMesh directly in candidate/manager browser via WebGL/WASM (0ms video lag!)
+ * - Direct 60 FPS hardware-accelerated Canvas HUD (Mic levels, lip aperture, gaze crosshair, confidence bar)
+ * - Streams lightweight 80-byte telemetry JSON to server over WebSocket
+ * - Server runs ReadingPatternEngine with full mathematical accuracy and generates forensic charts
  */
 
 // Application State
@@ -12,11 +12,23 @@ let mediaStream = null;
 let audioCtx = null;
 let analyser = null;
 let audioDataArray = null;
-let frameInterval = null;
-let localRenderInterval = null;
-let timerInterval = null;
+let faceMesh = null;
+let cameraLoop = null;
+let telemetryInterval = null;
 let isRunning = false;
-let lastServerFrameTime = 0;
+let sessionStartTime = 0;
+
+// Telemetry & State Cache
+let currentGaze = { x: 0.5, y: 0.5, detected: false };
+let isSpeaking = false;
+let lipMoving = false;
+let currentScore = 0.0;
+let currentStatus = "Calibrating posture...";
+let currentLabel = "CALIBRATING";
+let flowStreak = 0;
+let driftX = 0.0;
+let nCheat = 0;
+let nClean = 0;
 
 // Elements
 const el = {
@@ -31,7 +43,6 @@ const el = {
   webcam: document.getElementById("webcam"),
   cameraCanvas: document.getElementById("cameraCanvas"),
   videoPlaceholder: document.getElementById("videoPlaceholder"),
-  captureCanvas: document.getElementById("captureCanvas"),
 
   liveSpeechVal: document.getElementById("liveSpeechVal"),
   liveLipsVal: document.getElementById("liveLipsVal"),
@@ -55,7 +66,168 @@ const el = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Audio RMS Calculator
+// In-Browser Visual Lip Motion Tracker (Visual VAD)
+// ─────────────────────────────────────────────────────────────────────────────
+class BrowserLipTracker {
+  constructor() {
+    this.rawBuf = [];
+    this.historyInner = [];
+    this.hangoverUntil = 0;
+    this.isMoving = false;
+    this.innerRatio = 0;
+  }
+
+  update(lm, t) {
+    if (!lm) {
+      this.isMoving = false;
+      return false;
+    }
+    try {
+      const mouthW = Math.max(Math.abs(lm[291].x - lm[61].x), 1e-4);
+      const innerH = (Math.abs(lm[14].y - lm[13].y) * 0.50 +
+                      Math.abs(lm[87].y - lm[82].y) * 0.25 +
+                      Math.abs(lm[317].y - lm[312].y) * 0.25);
+      const rawInner = innerH / mouthW;
+
+      this.rawBuf.push(rawInner);
+      if (this.rawBuf.length > 5) this.rawBuf.shift();
+
+      const sorted = [...this.rawBuf].sort((a, b) => a - b);
+      const smoothedInner = sorted[Math.floor(sorted.length / 2)];
+      this.innerRatio = smoothedInner;
+
+      this.historyInner.push(smoothedInner);
+      if (this.historyInner.length > 24) this.historyInner.shift();
+
+      if (this.historyInner.length >= 6) {
+        const vals = this.historyInner;
+        let sumDiff = 0;
+        for (let i = vals.length - 5; i < vals.length; i++) {
+          sumDiff += Math.abs(vals[i] - vals[i - 1]);
+        }
+        const marVel = sumDiff / 5;
+        const recent = vals.slice(-10);
+        const dynRange = Math.max(...recent) - Math.min(...recent);
+
+        const speakingOpened = (smoothedInner >= 0.055 && (marVel >= 0.0030 || dynRange >= 0.020));
+        const mouthWide = (smoothedInner >= 0.090);
+        const syllableActive = (dynRange >= 0.045 && marVel >= 0.0040 && smoothedInner >= 0.035);
+
+        const active = speakingOpened || mouthWide || syllableActive;
+        if (active) {
+          this.hangoverUntil = t + 0.35;
+          this.isMoving = true;
+        } else {
+          this.isMoving = (t < this.hangoverUntil);
+        }
+      } else {
+        this.isMoving = false;
+      }
+    } catch (e) {
+      this.isMoving = false;
+    }
+    return this.isMoving;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// In-Browser Audio RMS & Multimodal VAD Fusion Tracker
+// ─────────────────────────────────────────────────────────────────────────────
+class BrowserAudioTracker {
+  constructor() {
+    this.ambient = 0.007;
+    this.margin = 0.003;
+    this.calSamples = [];
+    this.noiseBuf = [];
+    this.calibrated = false;
+    this.isSpeaking = false;
+    this.hangoverUntil = 0;
+    this.currentRms = 0;
+  }
+
+  get sensitiveThreshold() {
+    return Math.max(0.006, this.ambient + this.margin);
+  }
+
+  updateRms(rms) {
+    this.currentRms = rms;
+    this.noiseBuf.push(rms);
+    if (this.noiseBuf.length > 30) this.noiseBuf.shift();
+
+    if (!this.calibrated) {
+      this.calSamples.push(rms);
+      if (this.calSamples.length >= 15) {
+        const sorted = [...this.calSamples].sort((a, b) => a - b);
+        this.ambient = sorted[Math.floor(sorted.length * 0.20)];
+        this.calibrated = true;
+      }
+      return;
+    }
+
+    if (this.noiseBuf.length >= 20) {
+      const sorted = [...this.noiseBuf].sort((a, b) => a - b);
+      const p15 = sorted[Math.floor(sorted.length * 0.15)];
+      this.ambient = Math.min(0.025, Math.max(0.001, 0.98 * this.ambient + 0.02 * p15));
+    }
+  }
+
+  evaluateSpeech(lipMoving, t) {
+    if (!lipMoving) {
+      if (t > this.hangoverUntil) this.isSpeaking = false;
+      return this.isSpeaking;
+    }
+    if (this.currentRms >= this.sensitiveThreshold) {
+      this.isSpeaking = true;
+      this.hangoverUntil = t + 0.40;
+    } else if (t > this.hangoverUntil) {
+      this.isSpeaking = false;
+    }
+    return this.isSpeaking;
+  }
+}
+
+const lipTracker = new BrowserLipTracker();
+const audioTracker = new BrowserAudioTracker();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Eye Gaze Extraction (Head-Pose Normalized)
+// ─────────────────────────────────────────────────────────────────────────────
+function extractGaze(lm) {
+  try {
+    // Left eye (iris: 468, inner: 133, outer: 33, top: 159, bot: 145)
+    const leftIris = lm[468];
+    const leftInner = lm[133], leftOuter = lm[33];
+    const lLeftX = Math.min(leftInner.x, leftOuter.x);
+    const lRightX = Math.max(leftInner.x, leftOuter.x);
+    const lW = Math.max(lRightX - lLeftX, 1e-4);
+    const leftHR = (leftIris.x - lLeftX) / lW;
+
+    // Right eye (iris: 473, inner: 362, outer: 263, top: 386, bot: 374)
+    const rightIris = lm[473];
+    const rightInner = lm[362], rightOuter = lm[263];
+    const rLeftX = Math.min(rightInner.x, rightOuter.x);
+    const rRightX = Math.max(rightInner.x, rightOuter.x);
+    const rW = Math.max(rRightX - rLeftX, 1e-4);
+    const rightHR = (rightIris.x - rLeftX) / rW;
+
+    const avgHR = (leftHR + rightHR) / 2.0;
+
+    // Head yaw adjustment (nose-tip relative to mid-eye)
+    const midEyeX = (leftInner.x + rightInner.x) / 2.0;
+    const noseX = lm[1].x;
+    const yawOffset = (noseX - midEyeX) * 2.0;
+
+    const gazeX = Math.max(0.05, Math.min(0.95, avgHR + yawOffset * 0.35));
+    const gazeY = (leftIris.y + rightIris.y) / 2.0;
+
+    return { x: gazeX, y: gazeY, detected: true };
+  } catch (e) {
+    return { x: 0.5, y: 0.5, detected: false };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Audio Context Initialization
 // ─────────────────────────────────────────────────────────────────────────────
 function initAudioAnalyser(stream) {
   try {
@@ -82,7 +254,128 @@ function getAudioRMS() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Start Assessment Session
+// 60 FPS Canvas HUD Renderer (Exact OpenCV Proctoring HUD Replica)
+// ─────────────────────────────────────────────────────────────────────────────
+function drawProctoringHUD(ctx, width, height, t, testName) {
+  // 1. Draw Gaze Reticle at (gx, gy)
+  if (currentGaze.detected) {
+    const gx_px = (1.0 - currentGaze.x) * width;
+    const gy_px = currentGaze.y * height;
+
+    // Glowing cyan/yellow reticle
+    ctx.beginPath();
+    ctx.arc(gx_px, gy_px, 12, 0, 2 * Math.PI);
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = "#00dcf5";
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(gx_px, gy_px, 3.5, 0, 2 * Math.PI);
+    ctx.fillStyle = "#00dcf5";
+    ctx.fill();
+  }
+
+  // 2. Top HUD Bar Background
+  ctx.fillStyle = "rgba(16, 16, 16, 0.94)";
+  ctx.fillRect(0, 0, width, 115);
+
+  ctx.strokeStyle = "rgba(70, 70, 70, 0.9)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, 115);
+  ctx.lineTo(width, 115);
+  ctx.stroke();
+
+  // 3. Status Color Logic
+  let scol = "#00dc00"; // Green
+  if (currentScore >= 0.70) {
+    scol = "#ff3333"; // Red
+  } else if (currentScore >= 0.40) {
+    scol = "#ffd700"; // Yellow
+  } else if (nCheat >= 1 || currentLabel.includes("ALERT") || currentLabel.includes("PENDING")) {
+    scol = "#ffff00";
+  }
+
+  // Row 1: Test Name & Live Clock [MM:SS.s]
+  const sec = Math.max(0, t);
+  const mm = String(Math.floor(sec / 60)).padStart(2, "0");
+  const ss = String((sec % 60).toFixed(1)).padStart(4, "0");
+  const timeStr = `${mm}:${ss}`;
+
+  ctx.fillStyle = "#aaaaaa";
+  ctx.font = "bold 13px 'JetBrains Mono', monospace";
+  ctx.fillText(`TEST: ${testName}  [${timeStr}]`, 16, 24);
+
+  // Row 2: Status
+  ctx.fillStyle = scol;
+  ctx.font = "bold 14px 'Inter', sans-serif";
+  ctx.fillText(`STATUS: ${currentStatus}`, 16, 52);
+
+  // Row 3: Telemetry Line
+  ctx.fillStyle = "#cccccc";
+  ctx.font = "11px 'JetBrains Mono', monospace";
+  ctx.fillText(
+    `Cheat-lines: ${nCheat}  |  Clean-speak: ${nClean}  |  Flow: ${flowStreak}L  |  Drift: +${driftX.toFixed(3)}  |  ${currentLabel}`,
+    16,
+    78
+  );
+
+  // Row 4: Speech & Lip VAD status
+  const vadCol = isSpeaking ? "#00f0ff" : "#a0a0a0";
+  const vadStr = isSpeaking ? "TALKING" : "SILENT";
+  const lipStr = lipMoving ? "ACTIVE" : "STILL";
+  const cRms = audioTracker.currentRms || 0.0;
+  const sThr = audioTracker.sensitiveThreshold || 0.015;
+
+  ctx.fillStyle = vadCol;
+  ctx.font = "11px 'JetBrains Mono', monospace";
+  ctx.fillText(
+    `SPEECH: ${vadStr} [LIPS: ${lipStr} | MIC: ${cRms.toFixed(3)}/${sThr.toFixed(3)}]`,
+    16,
+    102
+  );
+
+  // Audio RMS VU Meter Bar
+  const bx = 325, by = 93, bw = 105, bh = 10;
+  ctx.fillStyle = "#282828";
+  ctx.fillRect(bx, by, bw, bh);
+
+  const fr = Math.min(bw, Math.max(0, bw * (cRms / 0.050)));
+  ctx.fillStyle = isSpeaking ? "#00f0ff" : "#888888";
+  ctx.fillRect(bx, by, fr, bh);
+
+  const tx = Math.min(bw, Math.max(0, bw * (sThr / 0.050)));
+  ctx.strokeStyle = "#ff2222";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(bx + tx, by - 2);
+  ctx.lineTo(bx + tx, by + bh + 2);
+  ctx.stroke();
+
+  // Confidence Bar (top-right)
+  const cbw = 175;
+  const cbx = width - cbw - 20;
+  const cby = 16;
+
+  ctx.fillStyle = "#282828";
+  ctx.fillRect(cbx, cby, cbw, 16);
+
+  const fc = Math.min(cbw, Math.max(0, cbw * currentScore));
+  let mcol = "#00dc00";
+  if (currentScore >= 0.70) mcol = "#ff3333";
+  else if (currentScore >= 0.40) mcol = "#ffd700";
+
+  ctx.fillStyle = mcol;
+  ctx.fillRect(cbx, cby, fc, 16);
+
+  ctx.fillStyle = "#dcdcdc";
+  ctx.font = "12px 'Inter', sans-serif";
+  const stateTag = !isSpeaking ? " [FROZEN]" : (currentLabel.includes("READING") ? " [ALERT]" : "");
+  ctx.fillText(`Confidence: ${(currentScore * 100).toFixed(0)}%${stateTag}`, cbx, cby + 33);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Start Assessment Session (Direct In-Browser 60 FPS)
 // ─────────────────────────────────────────────────────────────────────────────
 async function startSession() {
   const defaultName = `eval_${new Date().toISOString().slice(0, 10).replace(/-/g, "")}_${new Date().toTimeString().slice(0, 5).replace(/:/g, "")}`;
@@ -91,9 +384,9 @@ async function startSession() {
 
   try {
     el.startBtn.disabled = true;
-    el.startBtn.innerHTML = `<span>Activating Camera...</span>`;
+    el.startBtn.innerHTML = `<span>Loading Camera...</span>`;
 
-    // 1. Capture Candidate's local camera & microphone directly in browser
+    // 1. Capture Candidate's local camera & microphone directly
     mediaStream = await navigator.mediaDevices.getUserMedia({
       video: { width: 640, height: 480 },
       audio: true,
@@ -104,44 +397,77 @@ async function startSession() {
 
     try {
       await el.webcam.play();
-    } catch (e) {
-      console.log("Webcam play notice:", e);
-    }
+    } catch (e) {}
 
     // Show canvas immediately and hide placeholder
     el.cameraCanvas.style.display = "block";
     el.videoPlaceholder.style.display = "none";
 
     const displayCtx = el.cameraCanvas.getContext("2d");
-    const captureCtx = el.captureCanvas.getContext("2d");
 
-    // Sequence & flow control state
-    let frameSeq = 0;
-    let highestRenderedSeq = 0;
-    let isFrameInFlight = false;
-    let lastFrameSentTime = 0;
+    // 2. Initialize in-browser FaceMesh engine
+    el.startBtn.innerHTML = `<span>Initializing Vision...</span>`;
+    if (!faceMesh) {
+      faceMesh = new FaceMesh({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
+      });
+      faceMesh.setOptions({
+        maxNumFaces: 1,
+        refineLandmarks: true,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5,
+      });
 
-    // Local initial mirror: ONLY runs before the very first server frame arrives
-    localRenderInterval = setInterval(() => {
-      if (!isRunning) return;
-      if (lastServerFrameTime === 0) {
-        if (el.webcam.videoWidth > 0) {
-          displayCtx.save();
-          displayCtx.translate(640, 0);
-          displayCtx.scale(-1, 1);
-          displayCtx.drawImage(el.webcam, 0, 0, 640, 480);
-          displayCtx.restore();
+      faceMesh.onResults((results) => {
+        if (!isRunning) return;
+
+        const t = Math.max(0.001, (Date.now() - sessionStartTime) / 1000);
+        const rms = getAudioRMS();
+        audioTracker.updateRms(rms);
+
+        // Mirror video frame directly to canvas at full 60 FPS
+        displayCtx.save();
+        displayCtx.translate(640, 0);
+        displayCtx.scale(-1, 1);
+        displayCtx.drawImage(results.image, 0, 0, 640, 480);
+        displayCtx.restore();
+
+        if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+          const lms = results.multiFaceLandmarks[0];
+          currentGaze = extractGaze(lms);
+          lipMoving = lipTracker.update(lms, t);
+          isSpeaking = audioTracker.evaluateSpeech(lipMoving, t);
+        } else {
+          currentGaze.detected = false;
+          lipMoving = false;
+          isSpeaking = audioTracker.evaluateSpeech(false, t);
         }
-      }
-    }, 40);
 
-    // 2. Open WebSocket connection to Python backend
+        // Draw HUD overlay in real time
+        drawProctoringHUD(displayCtx, 640, 480, t, testName);
+
+        // Update HTML bottom metrics
+        el.liveSpeechVal.textContent = isSpeaking ? "Talking" : "Silent";
+        el.liveSpeechVal.style.color = isSpeaking ? "var(--accent-blue)" : "var(--text-muted)";
+        el.liveLipsVal.textContent = lipMoving ? "Active" : "Still";
+        el.liveLinesVal.textContent = nCheat;
+
+        const sec = Math.max(0, t);
+        const mm = String(Math.floor(sec / 60)).padStart(2, "0");
+        const ss = String(Math.floor(sec % 60)).padStart(2, "0");
+        el.timerDisplay.textContent = `${mm}:${ss}`;
+      });
+    }
+
+    // 3. Open WebSocket to Python backend for ReadingPatternEngine
     const protocol = location.protocol === "https:" ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${location.host}/ws/session?test_name=${encodeURIComponent(testName)}`;
     ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
       isRunning = true;
+      sessionStartTime = Date.now();
+
       el.startBtn.style.display = "none";
       el.stopBtn.style.display = "inline-flex";
       el.stopBtn.disabled = false;
@@ -151,86 +477,50 @@ async function startSession() {
       el.systemStatusText.textContent = "Proctoring Armed";
       el.speechStateTag.textContent = "HUD Live";
 
-      // Live timer (ticks smoothly every second)
-      const sessionStart = Date.now();
-      timerInterval = setInterval(() => {
-        if (!isRunning) return;
-        const totalSec = Math.floor((Date.now() - sessionStart) / 1000);
-        const mm = String(Math.floor(totalSec / 60)).padStart(2, "0");
-        const ss = String(totalSec % 60).padStart(2, "0");
-        el.timerDisplay.textContent = `${mm}:${ss}`;
-
-        // If no server frame arrived in last 1.2s, reset stale talking state
-        if (lastServerFrameTime > 0 && Date.now() - lastServerFrameTime > 1200) {
-          el.liveSpeechVal.textContent = "Silent";
-          el.liveSpeechVal.style.color = "var(--text-muted)";
-          el.liveLipsVal.textContent = "Still";
-        }
-      }, 500);
-
-      // 3. Strict Ping-Pong Stream: only send 1 frame at a time, zero backlog
-      frameInterval = setInterval(() => {
+      // 4. Send telemetry stream every 50ms (20 FPS) — only 80 bytes!
+      telemetryInterval = setInterval(() => {
         if (!isRunning || ws.readyState !== WebSocket.OPEN) return;
-        if (el.webcam.videoWidth === 0) return;
+        const t = Math.max(0.001, (Date.now() - sessionStartTime) / 1000);
 
-        // Never send if previous frame is still traveling / being processed
-        // (with a 800ms safety timeout in case of packet loss)
-        if (isFrameInFlight && (Date.now() - lastFrameSentTime < 800)) {
-          return;
+        ws.send(JSON.stringify({
+          action: "telemetry",
+          t: t,
+          gaze_x: currentGaze.x,
+          gaze_y: currentGaze.y,
+          is_speaking: isSpeaking,
+          lip_moving: lipMoving,
+        }));
+      }, 50);
+
+      // 5. Run continuous camera detection loop
+      async function processCamera() {
+        if (!isRunning) return;
+        if (el.webcam.readyState >= 2) {
+          await faceMesh.send({ image: el.webcam });
         }
-
-        // Check socket buffer
-        if (ws.bufferedAmount > 32768) {
-          return;
-        }
-
-        try {
-          // Capture lightweight 480x360 frame for instant low-latency transfer
-          captureCtx.drawImage(el.webcam, 0, 0, 480, 360);
-          const base64Data = el.captureCanvas.toDataURL("image/jpeg", 0.50);
-          const rms = getAudioRMS();
-
-          frameSeq++;
-          isFrameInFlight = true;
-          lastFrameSentTime = Date.now();
-
-          ws.send(JSON.stringify({ frame: base64Data, rms: rms, seq: frameSeq }));
-        } catch (e) {
-          isFrameInFlight = false;
-        }
-      }, 30);
+        requestAnimationFrame(processCamera);
+      }
+      requestAnimationFrame(processCamera);
     };
 
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (data.type === "frame") {
-          isFrameInFlight = false;
-          lastServerFrameTime = Date.now();
+        if (data.type === "telemetry") {
+          currentScore = data.score !== undefined ? data.score : currentScore;
+          currentStatus = data.status || currentStatus;
+          currentLabel = data.label || currentLabel;
+          flowStreak = data.flow_streak !== undefined ? data.flow_streak : flowStreak;
+          driftX = data.drift_x !== undefined ? data.drift_x : driftX;
+          nCheat = data.n_cheat !== undefined ? data.n_cheat : nCheat;
+          nClean = data.n_clean !== undefined ? data.n_clean : nClean;
 
-          const incomingSeq = data.seq || 0;
-          if (incomingSeq > 0 && incomingSeq < highestRenderedSeq) {
-            return; // Drop older frame that arrived out of order
-          }
-
-          if (data.frame) {
-            const currentSeq = incomingSeq;
-            const img = new Image();
-            img.onload = () => {
-              if (currentSeq >= highestRenderedSeq) {
-                highestRenderedSeq = currentSeq;
-                displayCtx.drawImage(img, 0, 0, 640, 480);
-              }
-            };
-            img.src = data.frame;
-          }
-          updateTelemetry(data);
+          highlightSentence(flowStreak);
         } else if (data.type === "report") {
           displayReport(data);
         }
       } catch (e) {
-        isFrameInFlight = false;
-        console.error("Frame parse error:", e);
+        console.error("WS parse error:", e);
       }
     };
 
@@ -239,7 +529,6 @@ async function startSession() {
     };
 
     ws.onclose = () => {
-      console.log("WebSocket connection finalized");
       if (isRunning) {
         el.systemStatusText.textContent = "Connection Closed";
       }
@@ -253,7 +542,7 @@ async function startSession() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Stop Assessment Session (Explicitly on user click)
+// Stop Assessment Session
 // ─────────────────────────────────────────────────────────────────────────────
 function stopSession() {
   if (!isRunning && (!ws || ws.readyState !== WebSocket.OPEN)) return;
@@ -261,18 +550,9 @@ function stopSession() {
   el.stopBtn.disabled = true;
   el.stopBtn.innerHTML = `<span>Finalizing...</span>`;
 
-  // Stop frame capture loops & timer
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
-  if (frameInterval) {
-    clearInterval(frameInterval);
-    frameInterval = null;
-  }
-  if (localRenderInterval) {
-    clearInterval(localRenderInterval);
-    localRenderInterval = null;
+  if (telemetryInterval) {
+    clearInterval(telemetryInterval);
+    telemetryInterval = null;
   }
 
   // Request final report from server
@@ -310,21 +590,8 @@ function stopSession() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Real-time Telemetry Updates
+// Highlight Sentence in Reading Evaluation
 // ─────────────────────────────────────────────────────────────────────────────
-function updateTelemetry(data) {
-  el.timerDisplay.textContent = data.elapsed_formatted || "00:00";
-
-  // Speech & Lips
-  el.liveSpeechVal.textContent = data.is_speaking ? "Talking" : "Silent";
-  el.liveSpeechVal.style.color = data.is_speaking ? "var(--accent-blue)" : "var(--text-muted)";
-  el.liveLipsVal.textContent = data.lip_moving ? "Active" : "Still";
-  el.liveLinesVal.textContent = data.n_cheat || 0;
-
-  // Highlight active reading sentence in teleprompter
-  highlightSentence(data.flow_streak);
-}
-
 function highlightSentence(streak) {
   const lineNum = Math.min(8, Math.max(1, (streak || 0) + 1));
   document.querySelectorAll(".sentence-row").forEach((row) => {
@@ -478,10 +745,10 @@ function init() {
   el.stopBtn.addEventListener("click", stopSession);
 
   const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-  const timeStr = new Date().toTimeString().slice(0, 5).replace(/:/g, "");
-  el.testNameInput.placeholder = `manager_eval_${todayStr}_${timeStr}`;
+  const timePart = new Date().toTimeString().slice(0, 5).replace(/:/g, "");
+  el.testNameInput.value = `manager_eval_${todayStr}_${timePart}`;
 
   loadHistory();
 }
 
-document.addEventListener("DOMContentLoaded", init);
+window.addEventListener("DOMContentLoaded", init);

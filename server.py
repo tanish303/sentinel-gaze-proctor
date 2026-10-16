@@ -159,6 +159,32 @@ async def websocket_session(websocket: WebSocket):
                         })
                         break
 
+                    if action == "telemetry" or "gaze_x" in msg:
+                        t = float(msg.get("t", time.perf_counter() - start_time))
+                        t = max(0.001, t)
+                        gx = float(msg.get("gaze_x", 0.5))
+                        gy = float(msg.get("gaze_y", 0.5))
+                        is_speaking = bool(msg.get("is_speaking", False))
+
+                        n_cheat, score, status, label, tel = engine.update(t, gx, gy, is_speaking)
+                        streak = tel.get("streak", 0)
+                        drift = tel.get("drift_x", 0.0)
+                        if np.isnan(drift): drift = 0.0
+                        n_clean = len(engine.clean_speaking)
+
+                        await websocket.send_json({
+                            "type": "telemetry",
+                            "score": round(score, 4),
+                            "score_pct": f"{score*100:.1f}%",
+                            "status": status,
+                            "label": label,
+                            "flow_streak": streak,
+                            "drift_x": round(drift, 4),
+                            "n_cheat": n_cheat,
+                            "n_clean": n_clean,
+                        })
+                        continue
+
                     if "frame" in msg:
                         seq = int(msg.get("seq", 0))
                         base64_str = msg.get("frame", "")
