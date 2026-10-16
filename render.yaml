@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: sentinel-gaze-proctor
+    env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: Dockerfile
+    healthCheckPath: /api/sessions
+    envVars:
+      - key: PORT
+        value: 8000
