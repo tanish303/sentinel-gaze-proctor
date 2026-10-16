@@ -1,0 +1,53 @@
+{
+  "test_metadata": {
+    "test_name": "cheating",
+    "timestamp": "2026-10-15T11:10:17.177047",
+    "duration_formatted": "00:34.7",
+    "duration_seconds": 34.66,
+    "final_verdict": "CLEAN (Normal Conversational Speech)",
+    "confidence_score": 0.0,
+    "confidence_percentage": "0.0%",
+    "risk_level": "CLEAN",
+    "total_cheating_lines": 0,
+    "total_clean_speak_events": 9
+  },
+  "cheating_reading_lines": [],
+  "clean_speaking_timeline": [
+    {
+      "timestamp_seconds": 2.62,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 4.71,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 6.73,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 8.74,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 11.33,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 18.02,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 20.03,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 23.11,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 29.27,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+=================================================================
+       AUDIT SUMMARY: xxx
+=================================================================
+Timestamp        : 2026-10-16 15:18:45
+Duration         : 00:56.5 (56.5 s)
+Final Verdict    : CHEATING / READING DETECTED (High Confidence)
+Confidence       : 99.0% (CRITICAL)
+
+-----------------------------------------------------------------
+CHEATING / READING LINES DETECTED: 5
+-----------------------------------------------------------------
+  Incident # 1 (Line # 2) @ 00:14.3 (t= 14.3s) | span=0.070  step=+-0.004  read_dur=5.14s  [Aloud]
+  Incident # 2 (Line # 2) @ 00:43.0 (t= 43.0s) | span=0.047  step=+-0.011  read_dur=1.11s  [Aloud]
+  Incident # 3 (Line # 3) @ 00:46.8 (t= 46.8s) | span=0.036  step=+-0.002  read_dur=2.70s  [Aloud]
+  Incident # 4 (Line # 4) @ 00:50.5 (t= 50.5s) | span=0.060  step=+-0.002  read_dur=2.90s  [Aloud]
+  Incident # 5 (Line # 5) @ 00:52.6 (t= 52.6s) | span=0.056  step=+0.008  read_dur=1.33s  [Aloud]
+
+-----------------------------------------------------------------
+CLEAN SPEAKING INTERVALS: 3
+-----------------------------------------------------------------
+  @ 00:04.1 (t=  4.1s): Natural conversational speech to interviewer
+  @ 00:28.3 (t= 28.3s): Natural conversational speech (score cooled to 25.0%)
+  @ 00:33.8 (t= 33.8s): Natural conversational speech (score cooled to 22.8%)
+=================================================================

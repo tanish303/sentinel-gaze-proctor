@@ -1,0 +1,124 @@
+{
+  "test_metadata": {
+    "test_name": "test13",
+    "timestamp": "2026-10-14T14:55:59.210568",
+    "duration_formatted": "01:48.4",
+    "duration_seconds": 108.45,
+    "final_verdict": "LOW RISK (Isolated Pattern)",
+    "confidence_score": 0.0,
+    "confidence_percentage": "0.0%",
+    "risk_level": "LOW",
+    "total_cheating_lines": 2,
+    "total_clean_speak_events": 21
+  },
+  "cheating_reading_lines": [
+    {
+      "incident_number": 1,
+      "line_number": 2,
+      "timestamp_formatted": "00:13.3",
+      "timestamp_seconds": 13.34,
+      "description": "Reading sequence confirmed on Line #2 (step +0.009, span 0.042)",
+      "horizontal_span": 0.0425,
+      "vertical_step": 0.0085,
+      "duration_seconds": 1.52,
+      "candidate_speaking": false
+    },
+    {
+      "incident_number": 2,
+      "line_number": 3,
+      "timestamp_formatted": "00:22.9",
+      "timestamp_seconds": 22.9,
+      "description": "Reading sequence confirmed on Line #3 (step +0.030, span 0.043)",
+      "horizontal_span": 0.0432,
+      "vertical_step": 0.0303,
+      "duration_seconds": 0.87,
+      "candidate_speaking": false
+    }
+  ],
+  "clean_speaking_timeline": [
+    {
+      "timestamp_seconds": 24.41,
+      "description": "Normal conversational speech (score cooled to 20.0%)"
+    },
+    {
+      "timestamp_seconds": 28.43,
+      "description": "Normal conversational speech (score cooled to 19.9%)"
+    },
+    {
+      "timestamp_seconds": 30.46,
+      "description": "Normal conversational speech (score cooled to 18.5%)"
+    },
+    {
+      "timestamp_seconds": 32.48,
+      "description": "Normal conversational speech (score cooled to 16.5%)"
+    },
+    {
+      "timestamp_seconds": 34.48,
+      "description": "Normal conversational speech (score cooled to 15.1%)"
+    },
+    {
+      "timestamp_seconds": 36.5,
+      "description": "Normal conversational speech (score cooled to 14.2%)"
+    },
+    {
+      "timestamp_seconds": 40.85,
+      "description": "Normal conversational speech (score cooled to 12.8%)"
+    },
+    {
+      "timestamp_seconds": 50.4,
+      "description": "Normal conversational speech (score cooled to 12.8%)"
+    },
+    {
+      "timestamp_seconds": 55.65,
+      "description": "Normal conversational speech (score cooled to 10.9%)"
+    },
+    {
+      "timestamp_seconds": 57.65,
+      "description": "Normal conversational speech (score cooled to 9.2%)"
+    },
+    {
+      "timestamp_seconds": 65.22,
+      "description": "Normal conversational speech (score cooled to 8.4%)"
+    },
+    {
+      "timestamp_seconds": 69.57,
+      "description": "Normal conversational speech (score cooled to 7.4%)"
+    },
+    {
+      "timestamp_seconds": 71.64,
+      "description": "Normal conversational speech (score cooled to 5.5%)"
+    },
+    {
+      "timestamp_seconds": 75.34,
+      "description": "Normal conversational speech (score cooled to 4.2%)"
+    },
+    {
+      "timestamp_seconds": 78.54,
+      "description": "Normal conversational speech (score cooled to 3.6%)"
+    },
+    {
+      "timestamp_seconds": 82.63,
+      "description": "Normal conversational speech (score cooled to 2.5%)"
+    },
+    {
+      "timestamp_seconds": 87.94,
+      "description": "Normal conversational speech (score cooled to 2.4%)"
+    },
+    {
+      "timestamp_seconds": 93.04,
+      "description": "Normal conversational speech (score cooled to 1.2%)"
+    },
+    {
+      "timestamp_seconds": 96.45,
+      "description": "Normal conversational speech (score cooled to 0.7%)"
+    },
+    {
+      "timestamp_seconds": 98.46,
+      "description": "Normal conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 100.47,
+      "description": "Normal conversational speech (score cooled to 0.0%)"
+    }
+  ]
+}

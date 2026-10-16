@@ -1,0 +1,77 @@
+{
+  "test_metadata": {
+    "test_name": "test7",
+    "timestamp": "2026-10-14T12:27:52.008608",
+    "duration_seconds": 87.88,
+    "final_verdict": "SUSPICIOUS ACTIVITY",
+    "confidence_score": 0.4084,
+    "confidence_percentage": "40.8%",
+    "risk_level": "HIGH",
+    "total_cheating_lines": 4,
+    "total_clean_speak_events": 6
+  },
+  "cheating_reading_lines": [
+    {
+      "line_number": 2,
+      "timestamp_s": 10.61,
+      "description": "Reading sequence confirmed on Line #2 (step +0.014, span 0.192)",
+      "horizontal_span": 0.1919,
+      "vertical_step": 0.0139,
+      "duration_s": 1.73,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 3,
+      "timestamp_s": 35.26,
+      "description": "Reading sequence confirmed on Line #3 (step +0.018, span 0.062)",
+      "horizontal_span": 0.0621,
+      "vertical_step": 0.0183,
+      "duration_s": 1.92,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 4,
+      "timestamp_s": 68.88,
+      "description": "Reading sequence confirmed on Line #4 (step +0.008, span 0.057)",
+      "horizontal_span": 0.0567,
+      "vertical_step": 0.0079,
+      "duration_s": 0.49,
+      "candidate_speaking": false
+    },
+    {
+      "line_number": 5,
+      "timestamp_s": 83.1,
+      "description": "Reading sequence confirmed on Line #5 (step +0.040, span 0.060)",
+      "horizontal_span": 0.0602,
+      "vertical_step": 0.04,
+      "duration_s": 1.21,
+      "candidate_speaking": true
+    }
+  ],
+  "clean_speaking_timeline": [
+    {
+      "timestamp_seconds": 21.73,
+      "description": "Normal conversational speech (score cooled to 11.9%)"
+    },
+    {
+      "timestamp_seconds": 26.91,
+      "description": "Normal conversational speech (score cooled to 11.8%)"
+    },
+    {
+      "timestamp_seconds": 29.42,
+      "description": "Normal conversational speech (score cooled to 9.5%)"
+    },
+    {
+      "timestamp_seconds": 40.85,
+      "description": "Normal conversational speech (score cooled to 21.0%)"
+    },
+    {
+      "timestamp_seconds": 53.25,
+      "description": "Normal conversational speech (score cooled to 20.9%)"
+    },
+    {
+      "timestamp_seconds": 63.89,
+      "description": "Normal conversational speech (score cooled to 19.0%)"
+    }
+  ]
+}

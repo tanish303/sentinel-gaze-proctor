@@ -1,0 +1,37 @@
+{
+  "test_metadata": {
+    "test_name": "chch",
+    "timestamp": "2026-10-15T13:51:06.653369",
+    "duration_formatted": "00:31.6",
+    "duration_seconds": 31.57,
+    "final_verdict": "CLEAN (Normal Conversational Speech)",
+    "confidence_score": 0.0,
+    "confidence_percentage": "0.0%",
+    "risk_level": "CLEAN",
+    "total_cheating_lines": 0,
+    "total_clean_speak_events": 5
+  },
+  "cheating_reading_lines": [],
+  "clean_speaking_timeline": [
+    {
+      "timestamp_seconds": 2.5,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 4.51,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 6.55,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 8.58,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 10.68,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    }
+  ]
+}

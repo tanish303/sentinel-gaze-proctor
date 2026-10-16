@@ -1,0 +1,55 @@
+{
+  "test_metadata": {
+    "test_name": "test15",
+    "timestamp": "2026-10-14T16:17:10.972351",
+    "duration_formatted": "00:37.3",
+    "duration_seconds": 37.28,
+    "final_verdict": "LOW RISK (Isolated Pattern)",
+    "confidence_score": 0.2951,
+    "confidence_percentage": "29.5%",
+    "risk_level": "LOW",
+    "total_cheating_lines": 3,
+    "total_clean_speak_events": 1
+  },
+  "cheating_reading_lines": [
+    {
+      "incident_number": 1,
+      "line_number": 2,
+      "timestamp_formatted": "00:05.4",
+      "timestamp_seconds": 5.44,
+      "description": "Reading sequence confirmed on Line #2 (step +0.018, span 0.043)",
+      "horizontal_span": 0.0433,
+      "vertical_step": 0.0177,
+      "duration_seconds": 0.93,
+      "candidate_speaking": false
+    },
+    {
+      "incident_number": 2,
+      "line_number": 3,
+      "timestamp_formatted": "00:11.0",
+      "timestamp_seconds": 11.02,
+      "description": "Reading sequence confirmed on Line #3 (step +-0.001, span 0.044)",
+      "horizontal_span": 0.0445,
+      "vertical_step": -0.0005,
+      "duration_seconds": 2.62,
+      "candidate_speaking": false
+    },
+    {
+      "incident_number": 3,
+      "line_number": 4,
+      "timestamp_formatted": "00:12.5",
+      "timestamp_seconds": 12.46,
+      "description": "Reading sequence confirmed on Line #4 (step +0.010, span 0.047)",
+      "horizontal_span": 0.0469,
+      "vertical_step": 0.0103,
+      "duration_seconds": 0.96,
+      "candidate_speaking": false
+    }
+  ],
+  "clean_speaking_timeline": [
+    {
+      "timestamp_seconds": 22.68,
+      "description": "Normal conversational speech (score cooled to 30.0%)"
+    }
+  ]
+}

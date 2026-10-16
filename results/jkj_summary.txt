@@ -1,0 +1,28 @@
+=================================================================
+       AUDIT SUMMARY: jkj
+=================================================================
+Timestamp        : 2026-10-16 15:22:18
+Duration         : 00:49.8 (49.8 s)
+Final Verdict    : CHEATING / READING DETECTED (High Confidence)
+Confidence       : 76.4% (CRITICAL)
+
+-----------------------------------------------------------------
+CHEATING / READING LINES DETECTED: 8
+-----------------------------------------------------------------
+  Incident # 1 (Line # 2) @ 00:16.3 (t= 16.3s) | span=0.040  step=+-0.008  read_dur=0.95s  [Aloud]
+  Incident # 2 (Line # 3) @ 00:17.9 (t= 17.9s) | span=0.042  step=+0.051  read_dur=1.30s  [Aloud]
+  Incident # 3 (Line # 4) @ 00:19.3 (t= 19.3s) | span=0.072  step=+0.009  read_dur=1.13s  [Aloud]
+  Incident # 4 (Line # 5) @ 00:20.9 (t= 20.9s) | span=0.040  step=+-0.013  read_dur=0.91s  [Aloud]
+  Incident # 5 (Line # 6) @ 00:28.4 (t= 28.4s) | span=0.048  step=+-0.008  read_dur=2.06s  [Aloud]
+  Incident # 6 (Line # 7) @ 00:32.2 (t= 32.2s) | span=0.045  step=+0.033  read_dur=1.07s  [Aloud]
+  Incident # 7 (Line # 8) @ 00:34.7 (t= 34.7s) | span=0.050  step=+0.014  read_dur=2.24s  [Aloud]
+  Incident # 8 (Line # 9) @ 00:36.7 (t= 36.7s) | span=0.049  step=+0.005  read_dur=1.33s  [Aloud]
+
+-----------------------------------------------------------------
+CLEAN SPEAKING INTERVALS: 4
+-----------------------------------------------------------------
+  @ 00:04.9 (t=  4.9s): Natural conversational speech to interviewer
+  @ 00:11.2 (t= 11.2s): Natural conversational speech to interviewer
+  @ 00:43.9 (t= 43.9s): Natural conversational speech (score cooled to 80.0%)
+  @ 00:47.4 (t= 47.4s): Natural conversational speech (score cooled to 76.4%)
+=================================================================

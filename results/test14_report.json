@@ -1,0 +1,88 @@
+{
+  "test_metadata": {
+    "test_name": "test14",
+    "timestamp": "2026-10-14T16:16:24.358992",
+    "duration_formatted": "01:13.2",
+    "duration_seconds": 73.16,
+    "final_verdict": "SUSPICIOUS ACTIVITY",
+    "confidence_score": 0.6582,
+    "confidence_percentage": "65.8%",
+    "risk_level": "HIGH",
+    "total_cheating_lines": 6,
+    "total_clean_speak_events": 1
+  },
+  "cheating_reading_lines": [
+    {
+      "incident_number": 1,
+      "line_number": 2,
+      "timestamp_formatted": "00:10.1",
+      "timestamp_seconds": 10.1,
+      "description": "Reading sequence confirmed on Line #2 (step +-0.007, span 0.100)",
+      "horizontal_span": 0.0997,
+      "vertical_step": -0.0074,
+      "duration_seconds": 0.61,
+      "candidate_speaking": false
+    },
+    {
+      "incident_number": 2,
+      "line_number": 3,
+      "timestamp_formatted": "00:12.1",
+      "timestamp_seconds": 12.1,
+      "description": "Reading sequence confirmed on Line #3 (step +0.007, span 0.050)",
+      "horizontal_span": 0.0504,
+      "vertical_step": 0.0073,
+      "duration_seconds": 1.76,
+      "candidate_speaking": false
+    },
+    {
+      "incident_number": 3,
+      "line_number": 4,
+      "timestamp_formatted": "00:17.1",
+      "timestamp_seconds": 17.07,
+      "description": "Reading sequence confirmed on Line #4 (step +0.012, span 0.036)",
+      "horizontal_span": 0.0363,
+      "vertical_step": 0.0116,
+      "duration_seconds": 0.82,
+      "candidate_speaking": false
+    },
+    {
+      "incident_number": 4,
+      "line_number": 5,
+      "timestamp_formatted": "00:30.5",
+      "timestamp_seconds": 30.51,
+      "description": "Reading sequence confirmed on Line #5 (step +-0.003, span 0.124)",
+      "horizontal_span": 0.1236,
+      "vertical_step": -0.0031,
+      "duration_seconds": 0.92,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 5,
+      "line_number": 6,
+      "timestamp_formatted": "00:34.1",
+      "timestamp_seconds": 34.09,
+      "description": "Reading sequence confirmed on Line #6 (step +-0.010, span 0.055)",
+      "horizontal_span": 0.0548,
+      "vertical_step": -0.0101,
+      "duration_seconds": 1.79,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 6,
+      "line_number": 7,
+      "timestamp_formatted": "00:35.8",
+      "timestamp_seconds": 35.75,
+      "description": "Reading sequence confirmed on Line #7 (step +0.000, span 0.045)",
+      "horizontal_span": 0.0445,
+      "vertical_step": 0.0001,
+      "duration_seconds": 1.31,
+      "candidate_speaking": true
+    }
+  ],
+  "clean_speaking_timeline": [
+    {
+      "timestamp_seconds": 67.02,
+      "description": "Normal conversational speech (score cooled to 66.0%)"
+    }
+  ]
+}

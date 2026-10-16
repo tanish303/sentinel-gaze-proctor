@@ -1,0 +1,69 @@
+{
+  "test_metadata": {
+    "test_name": "aa",
+    "timestamp": "2026-10-15T15:54:19.581498",
+    "duration_formatted": "00:47.0",
+    "duration_seconds": 46.96,
+    "final_verdict": "CLEAN (Normal Conversational Speech)",
+    "confidence_score": 0.0,
+    "confidence_percentage": "0.0%",
+    "risk_level": "CLEAN",
+    "total_cheating_lines": 0,
+    "total_clean_speak_events": 13
+  },
+  "cheating_reading_lines": [],
+  "clean_speaking_timeline": [
+    {
+      "timestamp_seconds": 2.51,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 4.53,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 6.55,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 8.58,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 10.58,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 17.19,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 23.53,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 30.79,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 37.47,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 39.64,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 41.65,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 43.76,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 45.77,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    }
+  ]
+}

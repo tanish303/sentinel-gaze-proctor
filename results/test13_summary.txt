@@ -1,0 +1,39 @@
+=================================================================
+       AUDIT SUMMARY: test13
+=================================================================
+Timestamp        : 2026-10-14 14:55:59
+Duration         : 01:48.4 (108.4 s)
+Final Verdict    : LOW RISK (Isolated Pattern)
+Confidence       : 0.0% (LOW)
+
+-----------------------------------------------------------------
+CHEATING / READING LINES DETECTED: 2
+-----------------------------------------------------------------
+  Incident # 1 (Line # 2) @ 00:13.3 (t= 13.3s) | span=0.043  step=+0.009  read_dur=1.52s  [Silent]
+  Incident # 2 (Line # 3) @ 00:22.9 (t= 22.9s) | span=0.043  step=+0.030  read_dur=0.87s  [Silent]
+
+-----------------------------------------------------------------
+CLEAN SPEAKING INTERVALS: 21
+-----------------------------------------------------------------
+  @ 00:24.4 (t= 24.4s): Normal conversational speech (score cooled to 20.0%)
+  @ 00:28.4 (t= 28.4s): Normal conversational speech (score cooled to 19.9%)
+  @ 00:30.5 (t= 30.5s): Normal conversational speech (score cooled to 18.5%)
+  @ 00:32.5 (t= 32.5s): Normal conversational speech (score cooled to 16.5%)
+  @ 00:34.5 (t= 34.5s): Normal conversational speech (score cooled to 15.1%)
+  @ 00:36.5 (t= 36.5s): Normal conversational speech (score cooled to 14.2%)
+  @ 00:40.9 (t= 40.9s): Normal conversational speech (score cooled to 12.8%)
+  @ 00:50.4 (t= 50.4s): Normal conversational speech (score cooled to 12.8%)
+  @ 00:55.6 (t= 55.6s): Normal conversational speech (score cooled to 10.9%)
+  @ 00:57.6 (t= 57.6s): Normal conversational speech (score cooled to 9.2%)
+  @ 01:05.2 (t= 65.2s): Normal conversational speech (score cooled to 8.4%)
+  @ 01:09.6 (t= 69.6s): Normal conversational speech (score cooled to 7.4%)
+  @ 01:11.6 (t= 71.6s): Normal conversational speech (score cooled to 5.5%)
+  @ 01:15.3 (t= 75.3s): Normal conversational speech (score cooled to 4.2%)
+  @ 01:18.5 (t= 78.5s): Normal conversational speech (score cooled to 3.6%)
+  @ 01:22.6 (t= 82.6s): Normal conversational speech (score cooled to 2.5%)
+  @ 01:27.9 (t= 87.9s): Normal conversational speech (score cooled to 2.4%)
+  @ 01:33.0 (t= 93.0s): Normal conversational speech (score cooled to 1.2%)
+  @ 01:36.5 (t= 96.5s): Normal conversational speech (score cooled to 0.7%)
+  @ 01:38.5 (t= 98.5s): Normal conversational speech (score cooled to 0.0%)
+  @ 01:40.5 (t=100.5s): Normal conversational speech (score cooled to 0.0%)
+=================================================================

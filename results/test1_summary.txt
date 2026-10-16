@@ -1,0 +1,28 @@
+=================================================================
+           AUDIT SUMMARY REPORT: test1
+=================================================================
+Timestamp           : 2026-10-13 16:34:40
+Session Duration    : 46.4 seconds
+Final Verdict       : CLEAN (Normal Conversational Speech)
+Confidence Score    : 0.0% (CLEAN)
+Total Reading Lines : 0 lines
+
+-----------------------------------------------------------------
+SPECIFIC LINES WHERE CANDIDATE APPEARED TO CHEAT / READ:
+-----------------------------------------------------------------
+ • None. No multi-line reading patterns detected.
+
+-----------------------------------------------------------------
+NORMAL CONVERSATIONAL SPEAKING INTERVALS:
+-----------------------------------------------------------------
+ • At t=2.51s: Candidate speaking naturally (score decreased)
+ • At t=4.51s: Candidate speaking naturally (score decreased)
+ • At t=6.52s: Candidate speaking naturally (score decreased)
+ • At t=8.52s: Candidate speaking naturally (score decreased)
+ • At t=10.56s: Candidate speaking naturally (score decreased)
+ • At t=12.59s: Candidate speaking naturally (score decreased)
+ • At t=14.6s: Candidate speaking naturally (score decreased)
+ • At t=16.6s: Candidate speaking naturally (score decreased)
+ • At t=18.64s: Candidate speaking naturally (score decreased)
+ • At t=20.64s: Candidate speaking naturally (score decreased)
+=================================================================

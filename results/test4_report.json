@@ -1,0 +1,65 @@
+{
+  "test_metadata": {
+    "test_name": "test4",
+    "timestamp": "2026-10-14T11:46:09.390706",
+    "duration_seconds": 108.68,
+    "final_verdict": "CHEATING / READING DETECTED (High Confidence)",
+    "final_confidence_score": 0.99,
+    "final_confidence_percentage": "99.0%",
+    "risk_level": "CRITICAL",
+    "total_cheating_reading_lines": 5
+  },
+  "lines_where_candidate_cheated": [
+    {
+      "line_number": 2,
+      "timestamp_seconds": 15.49,
+      "details": "Verified reading sequence connected to Line #2 (Step Down: +0.013)",
+      "horizontal_span": 0.0261,
+      "vertical_step_down": 0.0131,
+      "duration_seconds": 0.66,
+      "candidate_speaking": false
+    },
+    {
+      "line_number": 3,
+      "timestamp_seconds": 16.56,
+      "details": "Verified reading sequence connected to Line #3 (Step Down: +0.004)",
+      "horizontal_span": 0.0452,
+      "vertical_step_down": 0.0039,
+      "duration_seconds": 0.85,
+      "candidate_speaking": false
+    },
+    {
+      "line_number": 4,
+      "timestamp_seconds": 43.5,
+      "details": "Verified reading sequence connected to Line #4 (Step Down: +0.027)",
+      "horizontal_span": 0.042,
+      "vertical_step_down": 0.027,
+      "duration_seconds": 0.9,
+      "candidate_speaking": false
+    },
+    {
+      "line_number": 5,
+      "timestamp_seconds": 58.72,
+      "details": "Verified reading sequence connected to Line #5 (Step Down: +0.012)",
+      "horizontal_span": 0.0318,
+      "vertical_step_down": 0.0124,
+      "duration_seconds": 2.83,
+      "candidate_speaking": false
+    },
+    {
+      "line_number": 6,
+      "timestamp_seconds": 107.87,
+      "details": "Verified reading sequence connected to Line #6 (Step Down: +0.009)",
+      "horizontal_span": 0.0365,
+      "vertical_step_down": 0.0094,
+      "duration_seconds": 1.86,
+      "candidate_speaking": false
+    }
+  ],
+  "normal_speaking_timeline": [
+    {
+      "timestamp_seconds": 11.02,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    }
+  ]
+}

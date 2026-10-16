@@ -1,0 +1,23 @@
+=================================================================
+       AUDIT SUMMARY: test14
+=================================================================
+Timestamp        : 2026-10-14 16:16:24
+Duration         : 01:13.2 (73.2 s)
+Final Verdict    : SUSPICIOUS ACTIVITY
+Confidence       : 65.8% (HIGH)
+
+-----------------------------------------------------------------
+CHEATING / READING LINES DETECTED: 6
+-----------------------------------------------------------------
+  Incident # 1 (Line # 2) @ 00:10.1 (t= 10.1s) | span=0.100  step=+-0.007  read_dur=0.61s  [Silent]
+  Incident # 2 (Line # 3) @ 00:12.1 (t= 12.1s) | span=0.050  step=+0.007  read_dur=1.76s  [Silent]
+  Incident # 3 (Line # 4) @ 00:17.1 (t= 17.1s) | span=0.036  step=+0.012  read_dur=0.82s  [Silent]
+  Incident # 4 (Line # 5) @ 00:30.5 (t= 30.5s) | span=0.124  step=+-0.003  read_dur=0.92s  [Aloud]
+  Incident # 5 (Line # 6) @ 00:34.1 (t= 34.1s) | span=0.055  step=+-0.010  read_dur=1.79s  [Aloud]
+  Incident # 6 (Line # 7) @ 00:35.8 (t= 35.8s) | span=0.044  step=+0.000  read_dur=1.31s  [Aloud]
+
+-----------------------------------------------------------------
+CLEAN SPEAKING INTERVALS: 1
+-----------------------------------------------------------------
+  @ 01:07.0 (t= 67.0s): Normal conversational speech (score cooled to 66.0%)
+=================================================================

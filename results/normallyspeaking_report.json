@@ -1,0 +1,107 @@
+{
+  "test_metadata": {
+    "test_name": "normallyspeaking",
+    "timestamp": "2026-10-15T11:07:20.803111",
+    "duration_formatted": "00:53.5",
+    "duration_seconds": 53.47,
+    "final_verdict": "LOW RISK (Isolated Pattern)",
+    "confidence_score": 0.3446,
+    "confidence_percentage": "34.5%",
+    "risk_level": "LOW",
+    "total_cheating_lines": 3,
+    "total_clean_speak_events": 14
+  },
+  "cheating_reading_lines": [
+    {
+      "incident_number": 1,
+      "line_number": 2,
+      "timestamp_formatted": "00:16.6",
+      "timestamp_seconds": 16.56,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step +0.011, span 0.130)",
+      "horizontal_span": 0.1304,
+      "vertical_step": 0.0108,
+      "duration_seconds": 1.39,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 2,
+      "line_number": 3,
+      "timestamp_formatted": "00:34.5",
+      "timestamp_seconds": 34.54,
+      "description": "AI Teleprompter reading confirmed on Line #3 (step +0.005, span 0.164)",
+      "horizontal_span": 0.1643,
+      "vertical_step": 0.0053,
+      "duration_seconds": 1.09,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 3,
+      "line_number": 4,
+      "timestamp_formatted": "00:48.6",
+      "timestamp_seconds": 48.63,
+      "description": "AI Teleprompter reading confirmed on Line #4 (step +0.014, span 0.042)",
+      "horizontal_span": 0.0418,
+      "vertical_step": 0.0143,
+      "duration_seconds": 1.51,
+      "candidate_speaking": true
+    }
+  ],
+  "clean_speaking_timeline": [
+    {
+      "timestamp_seconds": 2.58,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 4.58,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 6.59,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 8.61,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 10.63,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 18.9,
+      "description": "Natural conversational speech (score cooled to 14.0%)"
+    },
+    {
+      "timestamp_seconds": 23.51,
+      "description": "Natural conversational speech (score cooled to 13.9%)"
+    },
+    {
+      "timestamp_seconds": 25.51,
+      "description": "Natural conversational speech (score cooled to 13.3%)"
+    },
+    {
+      "timestamp_seconds": 27.54,
+      "description": "Natural conversational speech (score cooled to 11.7%)"
+    },
+    {
+      "timestamp_seconds": 29.57,
+      "description": "Natural conversational speech (score cooled to 9.6%)"
+    },
+    {
+      "timestamp_seconds": 31.6,
+      "description": "Natural conversational speech (score cooled to 7.6%)"
+    },
+    {
+      "timestamp_seconds": 38.58,
+      "description": "Natural conversational speech (score cooled to 21.5%)"
+    },
+    {
+      "timestamp_seconds": 44.68,
+      "description": "Natural conversational speech (score cooled to 21.5%)"
+    },
+    {
+      "timestamp_seconds": 51.05,
+      "description": "Natural conversational speech (score cooled to 34.5%)"
+    }
+  ]
+}

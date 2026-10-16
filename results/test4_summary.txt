@@ -1,0 +1,23 @@
+=================================================================
+           AUDIT SUMMARY REPORT: test4
+=================================================================
+Timestamp           : 2026-10-14 11:46:09
+Session Duration    : 108.7 seconds
+Final Verdict       : CHEATING / READING DETECTED (High Confidence)
+Confidence Score    : 99.0% (CRITICAL)
+Total Reading Lines : 5 lines
+
+-----------------------------------------------------------------
+SPECIFIC LINES WHERE CANDIDATE APPEARED TO CHEAT / READ:
+-----------------------------------------------------------------
+ • Line #2 at t=15.49s: Read across span 0.026, stepped down +0.013 (Silently, Duration: 0.66s)
+ • Line #3 at t=16.56s: Read across span 0.045, stepped down +0.004 (Silently, Duration: 0.85s)
+ • Line #4 at t=43.5s: Read across span 0.042, stepped down +0.027 (Silently, Duration: 0.9s)
+ • Line #5 at t=58.72s: Read across span 0.032, stepped down +0.012 (Silently, Duration: 2.83s)
+ • Line #6 at t=107.87s: Read across span 0.036, stepped down +0.009 (Silently, Duration: 1.86s)
+
+-----------------------------------------------------------------
+NORMAL CONVERSATIONAL SPEAKING INTERVALS:
+-----------------------------------------------------------------
+ • At t=11.02s: Candidate speaking naturally (score decreased)
+=================================================================

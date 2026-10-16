@@ -1,0 +1,41 @@
+=================================================================
+       AUDIT SUMMARY: 17
+=================================================================
+Timestamp        : 2026-10-14 16:44:02
+Duration         : 01:56.4 (116.4 s)
+Final Verdict    : CHEATING / READING DETECTED (High Confidence)
+Confidence       : 78.0% (CRITICAL)
+
+-----------------------------------------------------------------
+CHEATING / READING LINES DETECTED: 6
+-----------------------------------------------------------------
+  Incident # 1 (Line # 2) @ 00:37.2 (t= 37.2s) | span=0.095  step=+0.039  read_dur=0.72s  [Aloud]
+  Incident # 2 (Line # 3) @ 00:45.0 (t= 45.0s) | span=0.107  step=+0.035  read_dur=0.65s  [Aloud]
+  Incident # 3 (Line # 4) @ 01:05.9 (t= 65.9s) | span=0.038  step=+0.018  read_dur=2.40s  [Aloud]
+  Incident # 4 (Line # 5) @ 01:08.3 (t= 68.3s) | span=0.077  step=+0.015  read_dur=1.84s  [Aloud]
+  Incident # 5 (Line # 6) @ 01:13.9 (t= 73.9s) | span=0.071  step=+0.033  read_dur=1.01s  [Aloud]
+  Incident # 6 (Line # 7) @ 01:47.5 (t=107.5s) | span=0.128  step=+0.032  read_dur=1.60s  [Aloud]
+
+-----------------------------------------------------------------
+CLEAN SPEAKING INTERVALS: 19
+-----------------------------------------------------------------
+  @ 00:05.6 (t=  5.6s): Natural conversational speech (score cooled to 0.0%)
+  @ 00:08.0 (t=  8.0s): Natural conversational speech (score cooled to 0.0%)
+  @ 00:13.5 (t= 13.5s): Natural conversational speech (score cooled to 0.0%)
+  @ 00:17.3 (t= 17.3s): Natural conversational speech (score cooled to 0.0%)
+  @ 00:23.3 (t= 23.3s): Natural conversational speech (score cooled to 0.0%)
+  @ 00:30.1 (t= 30.1s): Natural conversational speech (score cooled to 0.0%)
+  @ 00:32.1 (t= 32.1s): Natural conversational speech (score cooled to 0.0%)
+  @ 00:35.7 (t= 35.7s): Natural conversational speech (score cooled to 0.0%)
+  @ 00:51.8 (t= 51.8s): Natural conversational speech (score cooled to 28.0%)
+  @ 00:54.5 (t= 54.5s): Natural conversational speech (score cooled to 27.9%)
+  @ 01:03.0 (t= 63.0s): Natural conversational speech (score cooled to 27.9%)
+  @ 01:17.0 (t= 77.0s): Natural conversational speech (score cooled to 69.9%)
+  @ 01:26.7 (t= 86.7s): Natural conversational speech (score cooled to 69.8%)
+  @ 01:32.8 (t= 92.8s): Natural conversational speech (score cooled to 69.8%)
+  @ 01:34.8 (t= 94.8s): Natural conversational speech (score cooled to 68.1%)
+  @ 01:38.0 (t= 98.0s): Natural conversational speech (score cooled to 67.2%)
+  @ 01:40.0 (t=100.0s): Natural conversational speech (score cooled to 65.8%)
+  @ 01:45.5 (t=105.5s): Natural conversational speech (score cooled to 64.3%)
+  @ 01:55.4 (t=115.4s): Natural conversational speech (score cooled to 78.3%)
+=================================================================

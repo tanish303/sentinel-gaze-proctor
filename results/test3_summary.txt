@@ -1,0 +1,21 @@
+=================================================================
+           AUDIT SUMMARY REPORT: test3
+=================================================================
+Timestamp           : 2026-10-14 11:43:28
+Session Duration    : 65.2 seconds
+Final Verdict       : SUSPICIOUS ACTIVITY (Reading Patterns Observed)
+Confidence Score    : 68.0% (HIGH)
+Total Reading Lines : 3 lines
+
+-----------------------------------------------------------------
+SPECIFIC LINES WHERE CANDIDATE APPEARED TO CHEAT / READ:
+-----------------------------------------------------------------
+ • Line #2 at t=50.13s: Read across span 0.037, stepped down +0.008 (Silently, Duration: 0.8s)
+ • Line #3 at t=52.47s: Read across span 0.038, stepped down +0.013 (Silently, Duration: 1.79s)
+ • Line #4 at t=54.93s: Read across span 0.061, stepped down +0.014 (Silently, Duration: 0.58s)
+
+-----------------------------------------------------------------
+NORMAL CONVERSATIONAL SPEAKING INTERVALS:
+-----------------------------------------------------------------
+ • At t=2.55s: Candidate speaking naturally (score decreased)
+=================================================================

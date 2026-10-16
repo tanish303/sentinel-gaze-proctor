@@ -1,0 +1,91 @@
+{
+  "test_metadata": {
+    "test_name": "test2",
+    "timestamp": "2026-10-13T16:36:04.316936",
+    "duration_seconds": 41.25,
+    "final_verdict": "CLEAN (Normal Conversational Speech)",
+    "final_confidence_score": 0.0,
+    "final_confidence_percentage": "0.0%",
+    "risk_level": "CLEAN",
+    "total_cheating_reading_lines": 0
+  },
+  "lines_where_candidate_cheated": [],
+  "normal_speaking_timeline": [
+    {
+      "timestamp_seconds": 2.5,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 4.5,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 6.51,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 8.55,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 10.58,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 12.58,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 14.58,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 16.6,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 18.63,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 20.67,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 22.67,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 24.68,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 26.68,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 28.68,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 30.68,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 32.7,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 34.7,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 36.73,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    },
+    {
+      "timestamp_seconds": 38.76,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    }
+  ]
+}

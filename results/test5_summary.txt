@@ -1,0 +1,37 @@
+=================================================================
+           AUDIT SUMMARY REPORT: test5
+=================================================================
+Timestamp           : 2026-10-14 11:55:10
+Session Duration    : 105.0 seconds
+Final Verdict       : LOW RISK (Isolated Line Movement)
+Confidence Score    : 8.1% (LOW)
+Total Reading Lines : 5 lines
+
+-----------------------------------------------------------------
+SPECIFIC LINES WHERE CANDIDATE APPEARED TO CHEAT / READ:
+-----------------------------------------------------------------
+ • Line #2 at t=10.39s: Read across span 0.031, stepped down +0.002 (Aloud, Duration: 0.25s)
+ • Line #3 at t=19.18s: Read across span 0.031, stepped down +0.045 (Aloud, Duration: 0.19s)
+ • Line #4 at t=49.0s: Read across span 0.033, stepped down +0.043 (Aloud, Duration: 0.09s)
+ • Line #5 at t=65.37s: Read across span 0.049, stepped down +0.002 (Silently, Duration: 0.31s)
+ • Line #6 at t=97.37s: Read across span 0.025, stepped down +0.003 (Aloud, Duration: 0.16s)
+
+-----------------------------------------------------------------
+NORMAL CONVERSATIONAL SPEAKING INTERVALS:
+-----------------------------------------------------------------
+ • At t=3.61s: Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)
+ • At t=7.45s: Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)
+ • At t=13.94s: Candidate speaking naturally to camera / interviewer (Score cooled to 24.7%)
+ • At t=16.12s: Candidate speaking naturally to camera / interviewer (Score cooled to 19.5%)
+ • At t=18.33s: Candidate speaking naturally to camera / interviewer (Score cooled to 13.8%)
+ • At t=20.98s: Candidate speaking naturally to camera / interviewer (Score cooled to 38.5%)
+ • At t=23.22s: Candidate speaking naturally to camera / interviewer (Score cooled to 36.2%)
+ • At t=25.32s: Candidate speaking naturally to camera / interviewer (Score cooled to 25.2%)
+ • At t=27.35s: Candidate speaking naturally to camera / interviewer (Score cooled to 14.0%)
+ • At t=30.01s: Candidate speaking naturally to camera / interviewer (Score cooled to 10.4%)
+ • At t=32.01s: Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)
+ • At t=34.02s: Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)
+ • At t=36.07s: Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)
+ • At t=38.12s: Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)
+ • At t=40.12s: Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)
+=================================================================

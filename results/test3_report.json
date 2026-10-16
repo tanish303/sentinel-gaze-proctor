@@ -1,0 +1,47 @@
+{
+  "test_metadata": {
+    "test_name": "test3",
+    "timestamp": "2026-10-14T11:43:28.633548",
+    "duration_seconds": 65.19,
+    "final_verdict": "SUSPICIOUS ACTIVITY (Reading Patterns Observed)",
+    "final_confidence_score": 0.68,
+    "final_confidence_percentage": "68.0%",
+    "risk_level": "HIGH",
+    "total_cheating_reading_lines": 3
+  },
+  "lines_where_candidate_cheated": [
+    {
+      "line_number": 2,
+      "timestamp_seconds": 50.13,
+      "details": "Verified reading sequence connected to Line #2 (Step Down: +0.008)",
+      "horizontal_span": 0.0367,
+      "vertical_step_down": 0.0076,
+      "duration_seconds": 0.8,
+      "candidate_speaking": false
+    },
+    {
+      "line_number": 3,
+      "timestamp_seconds": 52.47,
+      "details": "Verified reading sequence connected to Line #3 (Step Down: +0.013)",
+      "horizontal_span": 0.0378,
+      "vertical_step_down": 0.0134,
+      "duration_seconds": 1.79,
+      "candidate_speaking": false
+    },
+    {
+      "line_number": 4,
+      "timestamp_seconds": 54.93,
+      "details": "Verified reading sequence connected to Line #4 (Step Down: +0.014)",
+      "horizontal_span": 0.0615,
+      "vertical_step_down": 0.0144,
+      "duration_seconds": 0.58,
+      "candidate_speaking": false
+    }
+  ],
+  "normal_speaking_timeline": [
+    {
+      "timestamp_seconds": 2.55,
+      "description": "Candidate speaking naturally to camera / interviewer without reading pattern"
+    }
+  ]
+}

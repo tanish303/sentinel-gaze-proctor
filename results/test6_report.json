@@ -1,0 +1,341 @@
+{
+  "test_metadata": {
+    "test_name": "test6",
+    "timestamp": "2026-10-14T12:12:33.233664",
+    "duration_seconds": 358.89,
+    "final_verdict": "CHEATING / READING DETECTED (High Confidence)",
+    "confidence_score": 0.9831,
+    "confidence_percentage": "98.3%",
+    "risk_level": "CRITICAL",
+    "total_cheating_lines": 20,
+    "total_clean_speak_events": 36
+  },
+  "cheating_reading_lines": [
+    {
+      "line_number": 2,
+      "timestamp_s": 56.27,
+      "description": "Reading sequence confirmed on Line #2 (step +0.008, span 0.053)",
+      "horizontal_span": 0.0528,
+      "vertical_step": 0.0076,
+      "duration_s": 1.03,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 3,
+      "timestamp_s": 74.32,
+      "description": "Reading sequence confirmed on Line #3 (step +0.020, span 0.049)",
+      "horizontal_span": 0.0489,
+      "vertical_step": 0.0197,
+      "duration_s": 0.53,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 4,
+      "timestamp_s": 79.2,
+      "description": "Reading sequence confirmed on Line #4 (step +0.027, span 0.038)",
+      "horizontal_span": 0.0378,
+      "vertical_step": 0.0266,
+      "duration_s": 1.09,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 5,
+      "timestamp_s": 88.21,
+      "description": "Reading sequence confirmed on Line #5 (step +0.016, span 0.027)",
+      "horizontal_span": 0.0271,
+      "vertical_step": 0.0163,
+      "duration_s": 2.24,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 6,
+      "timestamp_s": 89.95,
+      "description": "Reading sequence confirmed on Line #6 (step +0.007, span 0.046)",
+      "horizontal_span": 0.0462,
+      "vertical_step": 0.0075,
+      "duration_s": 1.02,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 7,
+      "timestamp_s": 102.96,
+      "description": "Reading sequence confirmed on Line #7 (step +0.016, span 0.055)",
+      "horizontal_span": 0.0554,
+      "vertical_step": 0.0156,
+      "duration_s": 1.73,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 8,
+      "timestamp_s": 130.56,
+      "description": "Reading sequence confirmed on Line #8 (step +0.011, span 0.044)",
+      "horizontal_span": 0.0442,
+      "vertical_step": 0.0111,
+      "duration_s": 0.64,
+      "candidate_speaking": false
+    },
+    {
+      "line_number": 9,
+      "timestamp_s": 239.15,
+      "description": "Reading sequence confirmed on Line #9 (step +0.032, span 0.062)",
+      "horizontal_span": 0.0618,
+      "vertical_step": 0.0322,
+      "duration_s": 2.1,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 10,
+      "timestamp_s": 244.37,
+      "description": "Reading sequence confirmed on Line #10 (step +0.005, span 0.073)",
+      "horizontal_span": 0.0735,
+      "vertical_step": 0.0051,
+      "duration_s": 1.74,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 11,
+      "timestamp_s": 246.11,
+      "description": "Reading sequence confirmed on Line #11 (step +0.011, span 0.054)",
+      "horizontal_span": 0.0537,
+      "vertical_step": 0.0107,
+      "duration_s": 0.53,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 12,
+      "timestamp_s": 257.2,
+      "description": "Reading sequence confirmed on Line #12 (step +0.042, span 0.052)",
+      "horizontal_span": 0.0518,
+      "vertical_step": 0.0417,
+      "duration_s": 0.8,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 13,
+      "timestamp_s": 259.34,
+      "description": "Reading sequence confirmed on Line #13 (step +0.014, span 0.040)",
+      "horizontal_span": 0.0398,
+      "vertical_step": 0.0142,
+      "duration_s": 0.68,
+      "candidate_speaking": false
+    },
+    {
+      "line_number": 14,
+      "timestamp_s": 274.08,
+      "description": "Reading sequence confirmed on Line #14 (step +0.012, span 0.150)",
+      "horizontal_span": 0.1498,
+      "vertical_step": 0.0116,
+      "duration_s": 0.78,
+      "candidate_speaking": false
+    },
+    {
+      "line_number": 15,
+      "timestamp_s": 284.0,
+      "description": "Reading sequence confirmed on Line #15 (step +0.043, span 0.108)",
+      "horizontal_span": 0.1077,
+      "vertical_step": 0.0432,
+      "duration_s": 1.12,
+      "candidate_speaking": false
+    },
+    {
+      "line_number": 16,
+      "timestamp_s": 287.15,
+      "description": "Reading sequence confirmed on Line #16 (step +0.006, span 0.089)",
+      "horizontal_span": 0.0891,
+      "vertical_step": 0.0061,
+      "duration_s": 0.66,
+      "candidate_speaking": false
+    },
+    {
+      "line_number": 17,
+      "timestamp_s": 292.63,
+      "description": "Reading sequence confirmed on Line #17 (step +0.032, span 0.080)",
+      "horizontal_span": 0.0804,
+      "vertical_step": 0.0318,
+      "duration_s": 0.61,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 18,
+      "timestamp_s": 334.11,
+      "description": "Reading sequence confirmed on Line #18 (step +0.019, span 0.039)",
+      "horizontal_span": 0.0393,
+      "vertical_step": 0.0194,
+      "duration_s": 0.77,
+      "candidate_speaking": false
+    },
+    {
+      "line_number": 19,
+      "timestamp_s": 343.07,
+      "description": "Reading sequence confirmed on Line #19 (step +0.005, span 0.045)",
+      "horizontal_span": 0.0448,
+      "vertical_step": 0.0054,
+      "duration_s": 0.48,
+      "candidate_speaking": false
+    },
+    {
+      "line_number": 20,
+      "timestamp_s": 345.85,
+      "description": "Reading sequence confirmed on Line #20 (step +0.005, span 0.034)",
+      "horizontal_span": 0.0336,
+      "vertical_step": 0.005,
+      "duration_s": 0.72,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 21,
+      "timestamp_s": 356.48,
+      "description": "Reading sequence confirmed on Line #21 (step +0.036, span 0.070)",
+      "horizontal_span": 0.0696,
+      "vertical_step": 0.0358,
+      "duration_s": 0.72,
+      "candidate_speaking": true
+    }
+  ],
+  "clean_speaking_timeline": [
+    {
+      "timestamp_seconds": 3.04,
+      "description": "Normal conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 6.22,
+      "description": "Normal conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 8.75,
+      "description": "Normal conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 14.64,
+      "description": "Normal conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 22.88,
+      "description": "Normal conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 27.22,
+      "description": "Normal conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 35.23,
+      "description": "Normal conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 45.74,
+      "description": "Normal conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 48.32,
+      "description": "Normal conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 50.85,
+      "description": "Normal conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 53.38,
+      "description": "Normal conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 59.81,
+      "description": "Normal conversational speech (score cooled to 11.5%)"
+    },
+    {
+      "timestamp_seconds": 62.33,
+      "description": "Normal conversational speech (score cooled to 8.7%)"
+    },
+    {
+      "timestamp_seconds": 82.74,
+      "description": "Normal conversational speech (score cooled to 30.8%)"
+    },
+    {
+      "timestamp_seconds": 95.79,
+      "description": "Normal conversational speech (score cooled to 51.8%)"
+    },
+    {
+      "timestamp_seconds": 116.72,
+      "description": "Normal conversational speech (score cooled to 58.4%)"
+    },
+    {
+      "timestamp_seconds": 119.42,
+      "description": "Normal conversational speech (score cooled to 56.5%)"
+    },
+    {
+      "timestamp_seconds": 121.94,
+      "description": "Normal conversational speech (score cooled to 55.3%)"
+    },
+    {
+      "timestamp_seconds": 134.69,
+      "description": "Normal conversational speech (score cooled to 62.3%)"
+    },
+    {
+      "timestamp_seconds": 139.02,
+      "description": "Normal conversational speech (score cooled to 60.3%)"
+    },
+    {
+      "timestamp_seconds": 145.52,
+      "description": "Normal conversational speech (score cooled to 55.5%)"
+    },
+    {
+      "timestamp_seconds": 148.05,
+      "description": "Normal conversational speech (score cooled to 52.7%)"
+    },
+    {
+      "timestamp_seconds": 173.23,
+      "description": "Normal conversational speech (score cooled to 42.9%)"
+    },
+    {
+      "timestamp_seconds": 190.11,
+      "description": "Normal conversational speech (score cooled to 33.4%)"
+    },
+    {
+      "timestamp_seconds": 222.22,
+      "description": "Normal conversational speech (score cooled to 21.4%)"
+    },
+    {
+      "timestamp_seconds": 235.52,
+      "description": "Normal conversational speech (score cooled to 14.6%)"
+    },
+    {
+      "timestamp_seconds": 264.66,
+      "description": "Normal conversational speech (score cooled to 60.9%)"
+    },
+    {
+      "timestamp_seconds": 270.29,
+      "description": "Normal conversational speech (score cooled to 58.0%)"
+    },
+    {
+      "timestamp_seconds": 278.42,
+      "description": "Normal conversational speech (score cooled to 66.6%)"
+    },
+    {
+      "timestamp_seconds": 296.14,
+      "description": "Normal conversational speech (score cooled to 93.3%)"
+    },
+    {
+      "timestamp_seconds": 302.05,
+      "description": "Normal conversational speech (score cooled to 89.4%)"
+    },
+    {
+      "timestamp_seconds": 304.58,
+      "description": "Normal conversational speech (score cooled to 87.1%)"
+    },
+    {
+      "timestamp_seconds": 313.23,
+      "description": "Normal conversational speech (score cooled to 81.7%)"
+    },
+    {
+      "timestamp_seconds": 315.76,
+      "description": "Normal conversational speech (score cooled to 79.3%)"
+    },
+    {
+      "timestamp_seconds": 318.29,
+      "description": "Normal conversational speech (score cooled to 76.6%)"
+    },
+    {
+      "timestamp_seconds": 321.06,
+      "description": "Normal conversational speech (score cooled to 73.7%)"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+=================================================================
+       AUDIT SUMMARY: normallyspeaking
+=================================================================
+Timestamp        : 2026-10-15 11:07:20
+Duration         : 00:53.5 (53.5 s)
+Final Verdict    : LOW RISK (Isolated Pattern)
+Confidence       : 34.5% (LOW)
+
+-----------------------------------------------------------------
+CHEATING / READING LINES DETECTED: 3
+-----------------------------------------------------------------
+  Incident # 1 (Line # 2) @ 00:16.6 (t= 16.6s) | span=0.130  step=+0.011  read_dur=1.39s  [Aloud]
+  Incident # 2 (Line # 3) @ 00:34.5 (t= 34.5s) | span=0.164  step=+0.005  read_dur=1.09s  [Aloud]
+  Incident # 3 (Line # 4) @ 00:48.6 (t= 48.6s) | span=0.042  step=+0.014  read_dur=1.51s  [Aloud]
+
+-----------------------------------------------------------------
+CLEAN SPEAKING INTERVALS: 14
+-----------------------------------------------------------------
+  @ 00:02.6 (t=  2.6s): Natural conversational speech (score cooled to 0.0%)
+  @ 00:04.6 (t=  4.6s): Natural conversational speech (score cooled to 0.0%)
+  @ 00:06.6 (t=  6.6s): Natural conversational speech (score cooled to 0.0%)
+  @ 00:08.6 (t=  8.6s): Natural conversational speech (score cooled to 0.0%)
+  @ 00:10.6 (t= 10.6s): Natural conversational speech (score cooled to 0.0%)
+  @ 00:18.9 (t= 18.9s): Natural conversational speech (score cooled to 14.0%)
+  @ 00:23.5 (t= 23.5s): Natural conversational speech (score cooled to 13.9%)
+  @ 00:25.5 (t= 25.5s): Natural conversational speech (score cooled to 13.3%)
+  @ 00:27.5 (t= 27.5s): Natural conversational speech (score cooled to 11.7%)
+  @ 00:29.6 (t= 29.6s): Natural conversational speech (score cooled to 9.6%)
+  @ 00:31.6 (t= 31.6s): Natural conversational speech (score cooled to 7.6%)
+  @ 00:38.6 (t= 38.6s): Natural conversational speech (score cooled to 21.5%)
+  @ 00:44.7 (t= 44.7s): Natural conversational speech (score cooled to 21.5%)
+  @ 00:51.0 (t= 51.0s): Natural conversational speech (score cooled to 34.5%)
+=================================================================

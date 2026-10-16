@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sentinel Gaze Proctor</title>
+  <meta name="description" content="Minimalist AI Teleprompter & Gaze Proctoring System" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <!-- Off-screen canvas for frame capture -->
+  <canvas id="captureCanvas" width="640" height="480" style="display:none;"></canvas>
+
+  <div class="app-container">
+    
+    <!-- Clean Minimalist Header -->
+    <header class="header">
+      <div class="header-brand">
+        <span class="brand-name">Sentinel Gaze</span>
+        <span class="brand-subtitle">Proctoring &amp; Reading Audit</span>
+      </div>
+      <div class="header-right">
+        <span class="status-badge" id="systemStatusBadge">
+          <span class="dot"></span>
+          <span id="systemStatusText">Ready</span>
+        </span>
+        <a href="#history-section" class="nav-link">Past Tests (<span id="vaultCount">0</span>)</a>
+      </div>
+    </header>
+
+    <!-- Simple Assessment Action Bar -->
+    <section class="action-card">
+      <div class="input-group">
+        <label for="testNameInput">Test Name</label>
+        <input type="text" id="testNameInput" placeholder="e.g. candidate_john_demo" />
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-start" id="startBtn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span>Start Assessment</span>
+        </button>
+
+        <button class="btn btn-stop" id="stopBtn" style="display: none;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <rect x="6" y="6" width="12" height="12" rx="2"></rect>
+          </svg>
+          <span>Stop Assessment</span>
+        </button>
+      </div>
+
+      <div class="timer-box">
+        <span class="timer-label">Time</span>
+        <span class="timer-val" id="timerDisplay">00:00</span>
+      </div>
+    </section>
+
+    <!-- Side-by-Side Assessment Workspace -->
+    <section class="workspace-grid">
+      
+      <!-- Left: Camera Box -->
+      <div class="card camera-card">
+        <div class="card-header">
+          <span class="card-title">Candidate Camera</span>
+          <span class="indicator-tag" id="speechStateTag">Camera Idle</span>
+        </div>
+
+        <div class="video-wrapper">
+          <video id="webcam" autoplay playsinline muted></video>
+          <div class="video-placeholder" id="videoPlaceholder">
+            <p>Click <strong>Start Assessment</strong> to activate camera</p>
+          </div>
+
+          <!-- Thin top confidence bar -->
+          <div class="confidence-bar-track">
+            <div class="confidence-bar-fill" id="confidenceBar"></div>
+          </div>
+          <div class="confidence-pill" id="confidencePill">Score: 0%</div>
+        </div>
+
+        <div class="camera-footer">
+          <div class="metric-item">
+            <span class="m-label">Speech:</span>
+            <span class="m-val" id="liveSpeechVal">Silent</span>
+          </div>
+          <div class="metric-item">
+            <span class="m-label">Lips:</span>
+            <span class="m-val" id="liveLipsVal">Still</span>
+          </div>
+          <div class="metric-item">
+            <span class="m-label">Reading Lines:</span>
+            <span class="m-val" id="liveLinesVal">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Reading Window -->
+      <div class="card prompter-card">
+        <div class="card-header">
+          <span class="card-title">Reading Evaluation (Lines 1 – 8)</span>
+          <span class="guide-note">Read sentences aloud left-to-right</span>
+        </div>
+
+        <div class="sentences-box" id="sentencesBox">
+          <div class="sentence-row" data-line="1">
+            <span class="num">1</span>
+            <p>When candidates take online technical assessments or live proctored interviews, eye gaze patterns reflect cognitive focus and visual attention across the screen.</p>
+          </div>
+          <div class="sentence-row" data-line="2">
+            <span class="num">2</span>
+            <p>As your eyes read continuously across each written sentence from left to right, the ocular muscles maintain a steady horizontal sweep speed across the full window.</p>
+          </div>
+          <div class="sentence-row" data-line="3">
+            <span class="num">3</span>
+            <p>Upon reaching the end of the line on the right side of the screen, the visual cortex initiates a rapid ballistic return saccade back to the beginning of the next sentence.</p>
+          </div>
+          <div class="sentence-row" data-line="4">
+            <span class="num">4</span>
+            <p>This rapid return jump is accompanied by a coordinated downward vertical step of several pixels to precisely align your focus with the start of the next line.</p>
+          </div>
+          <div class="sentence-row" data-line="5">
+            <span class="num">5</span>
+            <p>In contrast to natural conversational speaking where people look directly at the webcam, reading off an external script creates repeated consecutive staircase steps.</p>
+          </div>
+          <div class="sentence-row" data-line="6">
+            <span class="num">6</span>
+            <p>When you pause or remain completely silent between thoughts, the anti-cheat confidence score is strictly frozen in place without any premature decrease.</p>
+          </div>
+          <div class="sentence-row" data-line="7">
+            <span class="num">7</span>
+            <p>However, when you speak naturally and maintain direct conversational eye contact with the interviewer, the confidence score cools down safely over time.</p>
+          </div>
+          <div class="sentence-row" data-line="8">
+            <span class="num">8</span>
+            <p>Once you complete your reading evaluation or interview session, press Stop Assessment to immediately finalize the detailed audit report and forensic graphs.</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Assessment Results Section (Shown on Stop) -->
+    <section class="card results-card" id="resultsSection" style="display: none;">
+      <div class="card-header">
+        <span class="card-title">Assessment Results</span>
+        <span class="verdict-tag" id="resultVerdictTag">VERDICT</span>
+      </div>
+
+      <div class="results-grid">
+        <div class="kpi-box">
+          <span class="kpi-label">Final Verdict</span>
+          <h3 class="kpi-title" id="resultVerdictTitle">Clean Candidate</h3>
+          <p class="kpi-desc" id="resultVerdictDesc">No cheating patterns detected.</p>
+        </div>
+
+        <div class="kpi-box">
+          <span class="kpi-label">Confidence Score</span>
+          <h2 class="kpi-number" id="resultScore">0.0%</h2>
+        </div>
+
+        <div class="kpi-box">
+          <span class="kpi-label">Cheating Lines</span>
+          <h2 class="kpi-number" id="resultLines">0</h2>
+        </div>
+
+        <div class="kpi-box">
+          <span class="kpi-label">Duration</span>
+          <h2 class="kpi-number" id="resultDuration">00:00</h2>
+        </div>
+      </div>
+
+      <!-- Forensic Graph Image Preview -->
+      <div class="graph-box">
+        <div class="graph-header">
+          <span>Forensic Gaze &amp; Speech Trajectory Chart</span>
+          <a class="btn-download" id="graphDownloadBtn" href="#" target="_blank" download>Download Chart (PNG)</a>
+        </div>
+        <img id="resultGraphImg" src="" alt="Forensic Trajectory Chart" />
+      </div>
+
+      <!-- Detected Incidents Table -->
+      <div class="table-container">
+        <table class="simple-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Line #</th>
+              <th>Timestamp</th>
+              <th>Duration</th>
+              <th>Horizontal Span</th>
+              <th>Vertical Step</th>
+              <th>Mode</th>
+            </tr>
+          </thead>
+          <tbody id="incidentsTableBody">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="results-actions">
+        <a class="btn-secondary" id="jsonDownloadBtn" href="#" target="_blank" download>Download JSON Report</a>
+        <a class="btn-secondary" id="txtDownloadBtn" href="#" target="_blank" download>Download Summary TXT</a>
+      </div>
+    </section>
+
+    <!-- Persistent Past Tests History Section -->
+    <section class="card history-card" id="history-section">
+      <div class="card-header">
+        <span class="card-title">Saved Assessment Vault (Persistent)</span>
+        <span class="vault-caption">All past sessions stored in results/</span>
+      </div>
+
+      <div class="table-container">
+        <table class="simple-table history-table">
+          <thead>
+            <tr>
+              <th>Test Session Name</th>
+              <th>Date</th>
+              <th>Duration</th>
+              <th>Verdict</th>
+              <th>Score</th>
+              <th>Lines</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <tr>
+              <td colspan="7" style="text-align:center; padding: 20px;">Loading saved tests...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

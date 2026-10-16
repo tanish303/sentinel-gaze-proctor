@@ -1,0 +1,217 @@
+{
+  "test_metadata": {
+    "test_name": "test5",
+    "timestamp": "2026-10-14T11:55:10.019732",
+    "duration_seconds": 104.97,
+    "final_verdict": "LOW RISK (Isolated Line Movement)",
+    "final_confidence_score": 0.0814,
+    "final_confidence_percentage": "8.1%",
+    "risk_level": "LOW",
+    "total_cheating_reading_lines": 5
+  },
+  "lines_where_candidate_cheated": [
+    {
+      "line_number": 2,
+      "timestamp_seconds": 10.39,
+      "details": "Verified reading sequence connected to Line #2 (Step Down: +0.002)",
+      "horizontal_span": 0.031,
+      "vertical_step_down": 0.0016,
+      "duration_seconds": 0.25,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 3,
+      "timestamp_seconds": 19.18,
+      "details": "Verified reading sequence connected to Line #3 (Step Down: +0.045)",
+      "horizontal_span": 0.0306,
+      "vertical_step_down": 0.0451,
+      "duration_seconds": 0.19,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 4,
+      "timestamp_seconds": 49.0,
+      "details": "Verified reading sequence connected to Line #4 (Step Down: +0.043)",
+      "horizontal_span": 0.033,
+      "vertical_step_down": 0.0429,
+      "duration_seconds": 0.09,
+      "candidate_speaking": true
+    },
+    {
+      "line_number": 5,
+      "timestamp_seconds": 65.37,
+      "details": "Verified reading sequence connected to Line #5 (Step Down: +0.002)",
+      "horizontal_span": 0.0486,
+      "vertical_step_down": 0.0023,
+      "duration_seconds": 0.31,
+      "candidate_speaking": false
+    },
+    {
+      "line_number": 6,
+      "timestamp_seconds": 97.37,
+      "details": "Verified reading sequence connected to Line #6 (Step Down: +0.003)",
+      "horizontal_span": 0.0252,
+      "vertical_step_down": 0.0033,
+      "duration_seconds": 0.16,
+      "candidate_speaking": true
+    }
+  ],
+  "normal_speaking_timeline": [
+    {
+      "timestamp_seconds": 3.61,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 7.45,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 13.94,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 24.7%)"
+    },
+    {
+      "timestamp_seconds": 16.12,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 19.5%)"
+    },
+    {
+      "timestamp_seconds": 18.33,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 13.8%)"
+    },
+    {
+      "timestamp_seconds": 20.98,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 38.5%)"
+    },
+    {
+      "timestamp_seconds": 23.22,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 36.2%)"
+    },
+    {
+      "timestamp_seconds": 25.32,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 25.2%)"
+    },
+    {
+      "timestamp_seconds": 27.35,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 14.0%)"
+    },
+    {
+      "timestamp_seconds": 30.01,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 10.4%)"
+    },
+    {
+      "timestamp_seconds": 32.01,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 34.02,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 36.07,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 38.12,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 40.12,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 42.15,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 44.2,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 46.2,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 50.81,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 17.7%)"
+    },
+    {
+      "timestamp_seconds": 52.81,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 6.7%)"
+    },
+    {
+      "timestamp_seconds": 54.84,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 56.95,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 58.95,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 63.45,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 67.18,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 17.7%)"
+    },
+    {
+      "timestamp_seconds": 69.21,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 6.6%)"
+    },
+    {
+      "timestamp_seconds": 71.21,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 73.21,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 75.22,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 77.27,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 79.32,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 81.37,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 83.37,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 85.75,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 87.75,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 91.83,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 95.09,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 99.22,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 17.8%)"
+    },
+    {
+      "timestamp_seconds": 104.19,
+      "description": "Candidate speaking naturally to camera / interviewer (Score cooled to 9.7%)"
+    }
+  ]
+}

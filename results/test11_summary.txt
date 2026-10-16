@@ -1,0 +1,33 @@
+=================================================================
+       AUDIT SUMMARY: test11
+=================================================================
+Timestamp        : 2026-10-14 14:07:09
+Duration         : 01:06.3 (66.3 s)
+Final Verdict    : LOW RISK (Isolated Pattern)
+Confidence       : 22.2% (LOW)
+
+-----------------------------------------------------------------
+CHEATING / READING LINES DETECTED: 3
+-----------------------------------------------------------------
+  Incident # 1 (Line # 2) @ 00:17.9 (t= 17.9s) | span=0.077  step=+0.050  read_dur=0.72s  [Aloud]
+  Incident # 2 (Line # 3) @ 00:21.4 (t= 21.4s) | span=0.038  step=+0.012  read_dur=1.57s  [Aloud]
+  Incident # 3 (Line # 4) @ 00:25.5 (t= 25.5s) | span=0.055  step=+0.015  read_dur=0.97s  [Aloud]
+
+-----------------------------------------------------------------
+CLEAN SPEAKING INTERVALS: 14
+-----------------------------------------------------------------
+  @ 00:02.5 (t=  2.5s): Normal conversational speech (score cooled to 0.0%)
+  @ 00:05.0 (t=  5.0s): Normal conversational speech (score cooled to 0.0%)
+  @ 00:13.5 (t= 13.5s): Normal conversational speech (score cooled to 0.0%)
+  @ 00:29.0 (t= 29.0s): Normal conversational speech (score cooled to 36.0%)
+  @ 00:31.5 (t= 31.5s): Normal conversational speech (score cooled to 33.5%)
+  @ 00:34.0 (t= 34.0s): Normal conversational speech (score cooled to 31.0%)
+  @ 00:36.6 (t= 36.6s): Normal conversational speech (score cooled to 28.5%)
+  @ 00:39.1 (t= 39.1s): Normal conversational speech (score cooled to 26.7%)
+  @ 00:41.6 (t= 41.6s): Normal conversational speech (score cooled to 26.2%)
+  @ 00:44.4 (t= 44.4s): Normal conversational speech (score cooled to 26.1%)
+  @ 00:46.9 (t= 46.9s): Normal conversational speech (score cooled to 25.7%)
+  @ 00:51.3 (t= 51.3s): Normal conversational speech (score cooled to 25.0%)
+  @ 00:55.8 (t= 55.8s): Normal conversational speech (score cooled to 24.1%)
+  @ 01:04.0 (t= 64.0s): Normal conversational speech (score cooled to 23.1%)
+=================================================================

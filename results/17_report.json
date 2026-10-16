@@ -1,0 +1,160 @@
+{
+  "test_metadata": {
+    "test_name": "17",
+    "timestamp": "2026-10-14T16:44:02.864250",
+    "duration_formatted": "01:56.4",
+    "duration_seconds": 116.45,
+    "final_verdict": "CHEATING / READING DETECTED (High Confidence)",
+    "confidence_score": 0.7805,
+    "confidence_percentage": "78.0%",
+    "risk_level": "CRITICAL",
+    "total_cheating_lines": 6,
+    "total_clean_speak_events": 19
+  },
+  "cheating_reading_lines": [
+    {
+      "incident_number": 1,
+      "line_number": 2,
+      "timestamp_formatted": "00:37.2",
+      "timestamp_seconds": 37.16,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step +0.039, span 0.095)",
+      "horizontal_span": 0.0946,
+      "vertical_step": 0.0392,
+      "duration_seconds": 0.72,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 2,
+      "line_number": 3,
+      "timestamp_formatted": "00:45.0",
+      "timestamp_seconds": 45.04,
+      "description": "AI Teleprompter reading confirmed on Line #3 (step +0.035, span 0.107)",
+      "horizontal_span": 0.1074,
+      "vertical_step": 0.0349,
+      "duration_seconds": 0.65,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 3,
+      "line_number": 4,
+      "timestamp_formatted": "01:05.9",
+      "timestamp_seconds": 65.94,
+      "description": "AI Teleprompter reading confirmed on Line #4 (step +0.018, span 0.038)",
+      "horizontal_span": 0.038,
+      "vertical_step": 0.0184,
+      "duration_seconds": 2.4,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 4,
+      "line_number": 5,
+      "timestamp_formatted": "01:08.3",
+      "timestamp_seconds": 68.28,
+      "description": "AI Teleprompter reading confirmed on Line #5 (step +0.015, span 0.077)",
+      "horizontal_span": 0.0767,
+      "vertical_step": 0.0155,
+      "duration_seconds": 1.84,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 5,
+      "line_number": 6,
+      "timestamp_formatted": "01:13.9",
+      "timestamp_seconds": 73.92,
+      "description": "AI Teleprompter reading confirmed on Line #6 (step +0.033, span 0.071)",
+      "horizontal_span": 0.0711,
+      "vertical_step": 0.0328,
+      "duration_seconds": 1.01,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 6,
+      "line_number": 7,
+      "timestamp_formatted": "01:47.5",
+      "timestamp_seconds": 107.45,
+      "description": "AI Teleprompter reading confirmed on Line #7 (step +0.032, span 0.128)",
+      "horizontal_span": 0.1281,
+      "vertical_step": 0.0318,
+      "duration_seconds": 1.6,
+      "candidate_speaking": true
+    }
+  ],
+  "clean_speaking_timeline": [
+    {
+      "timestamp_seconds": 5.59,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 7.99,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 13.46,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 17.28,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 23.29,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 30.09,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 32.1,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 35.74,
+      "description": "Natural conversational speech (score cooled to 0.0%)"
+    },
+    {
+      "timestamp_seconds": 51.81,
+      "description": "Natural conversational speech (score cooled to 28.0%)"
+    },
+    {
+      "timestamp_seconds": 54.5,
+      "description": "Natural conversational speech (score cooled to 27.9%)"
+    },
+    {
+      "timestamp_seconds": 63.05,
+      "description": "Natural conversational speech (score cooled to 27.9%)"
+    },
+    {
+      "timestamp_seconds": 76.96,
+      "description": "Natural conversational speech (score cooled to 69.9%)"
+    },
+    {
+      "timestamp_seconds": 86.73,
+      "description": "Natural conversational speech (score cooled to 69.8%)"
+    },
+    {
+      "timestamp_seconds": 92.75,
+      "description": "Natural conversational speech (score cooled to 69.8%)"
+    },
+    {
+      "timestamp_seconds": 94.77,
+      "description": "Natural conversational speech (score cooled to 68.1%)"
+    },
+    {
+      "timestamp_seconds": 97.95,
+      "description": "Natural conversational speech (score cooled to 67.2%)"
+    },
+    {
+      "timestamp_seconds": 99.96,
+      "description": "Natural conversational speech (score cooled to 65.8%)"
+    },
+    {
+      "timestamp_seconds": 105.48,
+      "description": "Natural conversational speech (score cooled to 64.3%)"
+    },
+    {
+      "timestamp_seconds": 115.38,
+      "description": "Natural conversational speech (score cooled to 78.3%)"
+    }
+  ]
+}

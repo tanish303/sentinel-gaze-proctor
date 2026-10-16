@@ -1,0 +1,20 @@
+{
+  "test_metadata": {
+    "test_name": "test8",
+    "timestamp": "2026-10-14T12:31:09.571792",
+    "duration_seconds": 37.39,
+    "final_verdict": "CLEAN (Normal Conversational Speech)",
+    "confidence_score": 0.0,
+    "confidence_percentage": "0.0%",
+    "risk_level": "CLEAN",
+    "total_cheating_lines": 0,
+    "total_clean_speak_events": 1
+  },
+  "cheating_reading_lines": [],
+  "clean_speaking_timeline": [
+    {
+      "timestamp_seconds": 28.01,
+      "description": "Normal conversational speech (score cooled to 0.0%)"
+    }
+  ]
+}
