@@ -11,8 +11,8 @@
   <link rel="stylesheet" href="/static/style.css?v=3" />
 </head>
 <body>
-  <!-- Off-screen canvas for frame capture -->
-  <canvas id="captureCanvas" width="640" height="480" style="display:none;"></canvas>
+  <!-- Off-screen canvas for frame capture (optimized for low-latency transmission) -->
+  <canvas id="captureCanvas" width="480" height="360" style="display:none;"></canvas>
 
   <div class="app-container">
     
@@ -235,6 +235,6 @@
 
   </div>
 
-  <script src="/static/app.js?v=4"></script>
+  <script src="/static/app.js?v=5"></script>
 </body>
 </html>

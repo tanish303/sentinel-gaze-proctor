@@ -121,11 +121,10 @@ async function startSession() {
     let isFrameInFlight = false;
     let lastFrameSentTime = 0;
 
-    // Local mirroring fallback: ONLY runs before the very first server frame arrives,
-    // or if the server completely stalls for > 1200ms. Eliminates HUD/webcam flickering!
+    // Local initial mirror: ONLY runs before the very first server frame arrives
     localRenderInterval = setInterval(() => {
       if (!isRunning) return;
-      if (lastServerFrameTime === 0 || Date.now() - lastServerFrameTime > 1200) {
+      if (lastServerFrameTime === 0) {
         if (el.webcam.videoWidth > 0) {
           displayCtx.save();
           displayCtx.translate(640, 0);
@@ -134,7 +133,7 @@ async function startSession() {
           displayCtx.restore();
         }
       }
-    }, 50);
+    }, 40);
 
     // 2. Open WebSocket connection to Python backend
     const protocol = location.protocol === "https:" ? "wss:" : "ws:";
@@ -160,26 +159,35 @@ async function startSession() {
         const mm = String(Math.floor(totalSec / 60)).padStart(2, "0");
         const ss = String(totalSec % 60).padStart(2, "0");
         el.timerDisplay.textContent = `${mm}:${ss}`;
+
+        // If no server frame arrived in last 1.2s, reset stale talking state
+        if (lastServerFrameTime > 0 && Date.now() - lastServerFrameTime > 1200) {
+          el.liveSpeechVal.textContent = "Silent";
+          el.liveSpeechVal.style.color = "var(--text-muted)";
+          el.liveLipsVal.textContent = "Still";
+        }
       }, 500);
 
-      // 3. Adaptive Stream Loop: Only send when ready (zero queue backlog, locked 18-20 FPS)
+      // 3. Strict Ping-Pong Stream: only send 1 frame at a time, zero backlog
       frameInterval = setInterval(() => {
         if (!isRunning || ws.readyState !== WebSocket.OPEN) return;
         if (el.webcam.videoWidth === 0) return;
 
-        // Flow control: don't pile up frames if previous frame is still processing (with 140ms timeout)
-        if (isFrameInFlight && (Date.now() - lastFrameSentTime < 140)) {
+        // Never send if previous frame is still traveling / being processed
+        // (with a 800ms safety timeout in case of packet loss)
+        if (isFrameInFlight && (Date.now() - lastFrameSentTime < 800)) {
           return;
         }
 
-        // Don't send if network socket buffer is already filled
-        if (ws.bufferedAmount > 65536) {
+        // Check socket buffer
+        if (ws.bufferedAmount > 32768) {
           return;
         }
 
         try {
-          captureCtx.drawImage(el.webcam, 0, 0, 640, 480);
-          const base64Data = el.captureCanvas.toDataURL("image/jpeg", 0.52);
+          // Capture lightweight 480x360 frame for instant low-latency transfer
+          captureCtx.drawImage(el.webcam, 0, 0, 480, 360);
+          const base64Data = el.captureCanvas.toDataURL("image/jpeg", 0.50);
           const rms = getAudioRMS();
 
           frameSeq++;
@@ -190,7 +198,7 @@ async function startSession() {
         } catch (e) {
           isFrameInFlight = false;
         }
-      }, 45);
+      }, 30);
     };
 
     ws.onmessage = (event) => {
@@ -200,21 +208,17 @@ async function startSession() {
           isFrameInFlight = false;
           lastServerFrameTime = Date.now();
 
-          // Monotonic sequence guarantee: drop stale frames so video never replays old
           const incomingSeq = data.seq || 0;
           if (incomingSeq > 0 && incomingSeq < highestRenderedSeq) {
-            return;
-          }
-          if (incomingSeq > 0) {
-            highestRenderedSeq = incomingSeq;
+            return; // Drop older frame that arrived out of order
           }
 
           if (data.frame) {
             const currentSeq = incomingSeq;
             const img = new Image();
             img.onload = () => {
-              // Only draw if this image is still the newest frame decoded
               if (currentSeq >= highestRenderedSeq) {
+                highestRenderedSeq = currentSeq;
                 displayCtx.drawImage(img, 0, 0, 640, 480);
               }
             };
@@ -225,6 +229,7 @@ async function startSession() {
           displayReport(data);
         }
       } catch (e) {
+        isFrameInFlight = false;
         console.error("Frame parse error:", e);
       }
     };
