@@ -47,6 +47,7 @@ const el = {
   liveSpeechVal: document.getElementById("liveSpeechVal"),
   liveLipsVal: document.getElementById("liveLipsVal"),
   liveLinesVal: document.getElementById("liveLinesVal"),
+  liveRiskVal: document.getElementById("liveRiskVal"),
 
   resultsSection: document.getElementById("resultsSection"),
   resultVerdictTag: document.getElementById("resultVerdictTag"),
@@ -559,6 +560,22 @@ async function startSession() {
           nCheat = data.n_cheat !== undefined ? data.n_cheat : nCheat;
           nClean = data.n_clean !== undefined ? data.n_clean : nClean;
 
+          if (el.liveRiskVal) {
+            if (currentScore >= 0.70) {
+              el.liveRiskVal.textContent = "High";
+              el.liveRiskVal.style.color = "var(--accent-red)";
+            } else if (currentScore >= 0.40) {
+              el.liveRiskVal.textContent = "Medium";
+              el.liveRiskVal.style.color = "var(--accent-yellow)";
+            } else if (nCheat >= 1) {
+              el.liveRiskVal.textContent = "Review";
+              el.liveRiskVal.style.color = "var(--accent-yellow)";
+            } else {
+              el.liveRiskVal.textContent = "Clean";
+              el.liveRiskVal.style.color = "var(--accent-green)";
+            }
+          }
+
           highlightSentence(flowStreak);
         } else if (data.type === "report") {
           displayReport(data);
@@ -631,6 +648,10 @@ function stopSession() {
 
   el.systemStatusText.textContent = "Completed";
   el.speechStateTag.textContent = "Camera Idle";
+  if (el.liveRiskVal) {
+    el.liveRiskVal.textContent = "Clean";
+    el.liveRiskVal.style.color = "";
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
