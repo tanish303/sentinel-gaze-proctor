@@ -95,6 +95,10 @@
             <span class="m-val" id="liveLinesVal">0</span>
           </div>
           <div class="metric-item">
+            <span class="m-label">Speech Pace:</span>
+            <span class="m-val" id="liveWpmVal">0 WPM</span>
+          </div>
+          <div class="metric-item">
             <span class="m-label">Live Risk:</span>
             <span class="m-val" id="liveRiskVal">Clean</span>
           </div>
@@ -176,6 +180,48 @@
         </div>
       </div>
 
+      <!-- 5-Pillar Scorecard Breakdown -->
+      <div class="pillars-section">
+        <div class="section-title-sm">Multi-Modal Proctoring Pillars (5 Check Analysis)</div>
+        <div class="pillars-grid">
+          <div class="pillar-card" id="pillarGazeCard">
+            <div class="pillar-top">
+              <span class="pillar-name">1. Ocular Saccades</span>
+              <span class="pillar-badge" id="pillarGazeBadge">0%</span>
+            </div>
+            <p class="pillar-sub" id="pillarGazeSub">Teleprompter L→R sweep cadence (Weight: 35%)</p>
+          </div>
+          <div class="pillar-card" id="pillarWpmCard">
+            <div class="pillar-top">
+              <span class="pillar-name">2. Speech Pace</span>
+              <span class="pillar-badge" id="pillarWpmBadge">0%</span>
+            </div>
+            <p class="pillar-sub" id="pillarWpmSub">Rapid reading burst rate (>165 WPM, Weight: 20%)</p>
+          </div>
+          <div class="pillar-card" id="pillarLlmCard">
+            <div class="pillar-top">
+              <span class="pillar-name">3. LLM Stylometry</span>
+              <span class="pillar-badge" id="pillarLlmBadge">0%</span>
+            </div>
+            <p class="pillar-sub" id="pillarLlmSub">Canonical AI phrasing &amp; lists (Weight: 20%)</p>
+          </div>
+          <div class="pillar-card" id="pillarEchoCard">
+            <div class="pillar-top">
+              <span class="pillar-name">4. Question Echo</span>
+              <span class="pillar-badge" id="pillarEchoBadge">0%</span>
+            </div>
+            <p class="pillar-sub" id="pillarEchoSub">Stall tactics &amp; keyword repeats (Weight: 15%)</p>
+          </div>
+          <div class="pillar-card" id="pillarCadenceCard">
+            <div class="pillar-top">
+              <span class="pillar-name">5. Cadence</span>
+              <span class="pillar-badge" id="pillarCadenceBadge">0%</span>
+            </div>
+            <p class="pillar-sub" id="pillarCadenceSub">Metronomic reading rhythm (Weight: 10%)</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Forensic Graph Image Preview -->
       <div class="graph-box">
         <div class="graph-header">
@@ -191,12 +237,11 @@
           <thead>
             <tr>
               <th>#</th>
-              <th>Line #</th>
+              <th>Pillar</th>
+              <th>Evidence / Description</th>
               <th>Timestamp</th>
-              <th>Duration</th>
-              <th>Horizontal Span</th>
-              <th>Vertical Step</th>
-              <th>Mode</th>
+              <th>Metric / Value</th>
+              <th>Severity</th>
             </tr>
           </thead>
           <tbody id="incidentsTableBody">
@@ -242,6 +287,6 @@
 
   </div>
 
-  <script src="/static/app.js?v=8"></script>
+  <script src="/static/app.js?v=9"></script>
 </body>
 </html>

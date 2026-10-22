@@ -47,7 +47,20 @@ const el = {
   liveSpeechVal: document.getElementById("liveSpeechVal"),
   liveLipsVal: document.getElementById("liveLipsVal"),
   liveLinesVal: document.getElementById("liveLinesVal"),
+  liveWpmVal: document.getElementById("liveWpmVal"),
   liveRiskVal: document.getElementById("liveRiskVal"),
+
+  pillarGazeBadge: document.getElementById("pillarGazeBadge"),
+  pillarWpmBadge: document.getElementById("pillarWpmBadge"),
+  pillarLlmBadge: document.getElementById("pillarLlmBadge"),
+  pillarEchoBadge: document.getElementById("pillarEchoBadge"),
+  pillarCadenceBadge: document.getElementById("pillarCadenceBadge"),
+
+  pillarGazeCard: document.getElementById("pillarGazeCard"),
+  pillarWpmCard: document.getElementById("pillarWpmCard"),
+  pillarLlmCard: document.getElementById("pillarLlmCard"),
+  pillarEchoCard: document.getElementById("pillarEchoCard"),
+  pillarCadenceCard: document.getElementById("pillarCadenceCard"),
 
   resultsSection: document.getElementById("resultsSection"),
   resultVerdictTag: document.getElementById("resultVerdictTag"),
@@ -189,6 +202,92 @@ class BrowserAudioTracker {
 
 const lipTracker = new BrowserLipTracker();
 const audioTracker = new BrowserAudioTracker();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// In-Browser Speech Intelligence (WPM Burst & Live Transcription via Web Speech API)
+// ─────────────────────────────────────────────────────────────────────────────
+class BrowserSpeechIntel {
+  constructor() {
+    this.recognition = null;
+    this.supported = false;
+    this.currentTranscript = "";
+    this.wordHistory = [];
+    this.currentWpm = 0;
+    this.activePrompt = "";
+    this.init();
+  }
+
+  init() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+    try {
+      this.recognition = new SpeechRecognition();
+      this.recognition.continuous = true;
+      this.recognition.interimResults = true;
+      this.recognition.lang = "en-US";
+
+      this.recognition.onresult = (event) => {
+        let interim = "";
+        let finalized = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const trans = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalized += trans + " ";
+          } else {
+            interim += trans;
+          }
+        }
+        const text = (finalized || interim).trim();
+        if (text) {
+          this.currentTranscript = text;
+          this.computeWpm(text);
+        }
+      };
+
+      this.recognition.onerror = () => {};
+      this.recognition.onend = () => {
+        if (isRunning && this.recognition) {
+          try { this.recognition.start(); } catch (e) {}
+        }
+      };
+      this.supported = true;
+    } catch (e) {
+      this.supported = false;
+    }
+  }
+
+  start() {
+    this.currentTranscript = "";
+    this.wordHistory = [];
+    this.currentWpm = 0;
+    if (this.recognition && this.supported) {
+      try { this.recognition.start(); } catch (e) {}
+    }
+  }
+
+  stop() {
+    if (this.recognition && this.supported) {
+      try { this.recognition.stop(); } catch (e) {}
+    }
+  }
+
+  computeWpm(text) {
+    const words = text.split(/\s+/).filter((w) => w.length > 0);
+    const now = Date.now();
+    this.wordHistory.push({ count: words.length, time: now });
+    // Sliding 5s window
+    this.wordHistory = this.wordHistory.filter((entry) => now - entry.time <= 5000);
+    if (this.wordHistory.length >= 2) {
+      const dt = (now - this.wordHistory[0].time) / 1000;
+      const dw = Math.max(0, words.length - (this.wordHistory[0].count - 1));
+      if (dt > 1.2) {
+        this.currentWpm = Math.min(260, Math.round((dw / dt) * 60));
+      }
+    }
+  }
+}
+
+const speechIntel = new BrowserSpeechIntel();
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Eye Gaze Extraction (Exact Replica of OpenCV Local Detector with Blink Guard)
@@ -515,12 +614,16 @@ async function startSession() {
       el.systemStatusText.textContent = "Proctoring Armed";
       el.speechStateTag.textContent = "HUD Live";
 
+      // Start speech recognition
+      speechIntel.start();
+
       // 4. Send telemetry stream every 40ms (25 FPS) — only 80 bytes!
       telemetryInterval = setInterval(() => {
         if (!isRunning || ws.readyState !== WebSocket.OPEN) return;
         if (!currentGaze.detected) return; // Suppress during blinks!
 
         const t = Math.max(0.001, (Date.now() - sessionStartTime) / 1000);
+        const rms = getAudioRMS();
 
         ws.send(JSON.stringify({
           action: "telemetry",
@@ -534,6 +637,10 @@ async function startSession() {
           is_speaking: isSpeaking,
           lip_moving: lipMoving,
           detected: true,
+          transcript: speechIntel.currentTranscript,
+          wpm: speechIntel.currentWpm,
+          active_prompt: speechIntel.activePrompt,
+          rms: rms,
         }));
       }, 40);
 
@@ -559,6 +666,10 @@ async function startSession() {
           driftX = data.drift_x !== undefined ? data.drift_x : driftX;
           nCheat = data.n_cheat !== undefined ? data.n_cheat : nCheat;
           nClean = data.n_clean !== undefined ? data.n_clean : nClean;
+
+          if (el.liveWpmVal) {
+            el.liveWpmVal.textContent = `${speechIntel.currentWpm} WPM`;
+          }
 
           if (el.liveRiskVal) {
             if (currentScore >= 0.70) {
@@ -621,6 +732,8 @@ function stopSession() {
     ws.send(JSON.stringify({ action: "stop" }));
   }
 
+  speechIntel.stop();
+
   // Stop hardware media tracks
   if (mediaStream) {
     mediaStream.getTracks().forEach((track) => track.stop());
@@ -652,6 +765,9 @@ function stopSession() {
     el.liveRiskVal.textContent = "Clean";
     el.liveRiskVal.style.color = "";
   }
+  if (el.liveWpmVal) {
+    el.liveWpmVal.textContent = "0 WPM";
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -659,10 +775,17 @@ function stopSession() {
 // ─────────────────────────────────────────────────────────────────────────────
 function highlightSentence(streak) {
   const lineNum = Math.min(8, Math.max(1, (streak || 0) + 1));
+  let activeText = "";
   document.querySelectorAll(".sentence-row").forEach((row) => {
     const rowNum = parseInt(row.dataset.line, 10);
-    row.classList.toggle("active", rowNum === lineNum && isRunning);
+    const isActive = rowNum === lineNum && isRunning;
+    row.classList.toggle("active", isActive);
+    if (isActive) {
+      const p = row.querySelector("p");
+      if (p) activeText = p.textContent;
+    }
   });
+  speechIntel.activePrompt = activeText;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -702,28 +825,49 @@ function displayReport(data) {
   el.jsonDownloadBtn.href = data.report_url || `/results/${meta.test_name}_report.json`;
   el.txtDownloadBtn.href = data.summary_url || `/results/${meta.test_name}_summary.txt`;
 
-  // Incidents Table
-  const lines = (data.report && data.report.cheating_reading_lines) || [];
+  // Render 5-Pillar Scorecard
+  const scorecard = data.pillar_scorecard || (data.report && data.report.pillar_scorecard) || {};
+
+  function updatePillarUI(card, badge, key) {
+    if (!badge) return;
+    const pData = scorecard[key] || {};
+    const pct = pData.sub_score_percentage || "0.0%";
+    const status = (pData.status || "NORMAL").toUpperCase();
+    badge.textContent = pct;
+    badge.className = "pillar-badge" + (status === "ALERT" ? " alert" : (status === "WARNING" ? " warning" : ""));
+    if (card) {
+      card.className = "pillar-card" + (status === "ALERT" ? " alert" : (status === "WARNING" ? " warning" : ""));
+    }
+  }
+
+  updatePillarUI(el.pillarGazeCard, el.pillarGazeBadge, "ocular_gaze_mechanics");
+  updatePillarUI(el.pillarWpmCard, el.pillarWpmBadge, "speech_wpm_reading_burst");
+  updatePillarUI(el.pillarLlmCard, el.pillarLlmBadge, "spoken_llm_stylometry");
+  updatePillarUI(el.pillarEchoCard, el.pillarEchoBadge, "question_echoing_delay");
+  updatePillarUI(el.pillarCadenceCard, el.pillarCadenceBadge, "cadence_prosody_uniformity");
+
+  // Multi-Pillar Incidents Table
+  const items = data.all_incidents || (data.report && data.report.all_incidents) || [];
   el.incidentsTableBody.innerHTML = "";
 
-  if (lines.length === 0) {
+  if (items.length === 0) {
     el.incidentsTableBody.innerHTML = `
       <tr>
-        <td colspan="7" style="text-align:center; padding: 18px; color: var(--text-dim);">
-          No cheating reading incidents recorded. Normal conversational behavior verified.
+        <td colspan="6" style="text-align:center; padding: 18px; color: var(--text-dim);">
+          No anomalous incidents detected across any of the 5 checks. Clean conversational candidate verified.
         </td>
       </tr>`;
   } else {
-    lines.forEach((inc) => {
+    items.forEach((inc, idx) => {
+      const badgeClass = (inc.badge || "GAZE").toLowerCase();
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td style="font-weight:600; color: #ffffff;">#${inc.incident_number}</td>
-        <td>Line ${inc.line_number}</td>
-        <td>${inc.timestamp_formatted}</td>
-        <td>${inc.duration_seconds.toFixed(2)}s</td>
-        <td>${inc.horizontal_span.toFixed(3)}</td>
-        <td>${inc.vertical_step > 0 ? "+" : ""}${inc.vertical_step.toFixed(3)}</td>
-        <td>${inc.candidate_speaking ? "Aloud" : "Silent"}</td>
+        <td style="font-weight:600; color: #ffffff;">#${idx + 1}</td>
+        <td><span class="pillar-pill ${badgeClass}">${inc.badge}</span></td>
+        <td style="color:#e2e8f0;">${inc.description}</td>
+        <td style="font-family:var(--font-mono);">${inc.timestamp_formatted}</td>
+        <td style="font-family:var(--font-mono); color:#93c5fd;">${inc.metric}</td>
+        <td><span style="font-weight:600; color:${inc.severity === 'CRITICAL' ? 'var(--accent-red)' : 'var(--accent-yellow)'}">${inc.severity}</span></td>
       `;
       el.incidentsTableBody.appendChild(tr);
     });

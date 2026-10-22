@@ -37,6 +37,7 @@ from anti_cheat_detector import (
     MODEL_PATH,
     RESULTS_DIR,
 )
+from multi_pillar_engine import MultiPillarProctorEngine, save_multi_pillar_deliverables
 import mediapipe as mp
 from mediapipe.tasks import python as mp_python
 from mediapipe.tasks.python import vision
@@ -127,6 +128,7 @@ async def websocket_session(websocket: WebSocket):
     )
 
     engine = ReadingPatternEngine(warmup=2.5)
+    multi_engine = MultiPillarProctorEngine(engine)
     lip_tracker = LipMotionTracker()
     audio_tracker = RemoteAudioTracker()
 
@@ -143,17 +145,21 @@ async def websocket_session(websocket: WebSocket):
 
                     if action == "stop":
                         duration = time.perf_counter() - start_time
-                        rpt, json_path, txt_path, graph_path, verdict, risk = save_session_deliverables(
-                            clean_name, duration, engine
+                        rpt, json_path, txt_path, graph_path, verdict, risk = save_multi_pillar_deliverables(
+                            clean_name, duration, multi_engine, RESULTS_DIR
                         )
+                        score = rpt["test_metadata"]["composite_confidence_score"]
+                        score_pct = rpt["test_metadata"]["composite_confidence_percentage"]
                         await websocket.send_json({
                             "type": "report",
                             "test_name": clean_name,
                             "report": rpt,
                             "verdict": verdict,
                             "risk": risk,
-                            "score": round(engine.score, 4),
-                            "score_pct": f"{engine.score*100:.1f}%",
+                            "score": round(score, 4),
+                            "score_pct": score_pct,
+                            "pillar_scorecard": rpt.get("pillar_scorecard", {}),
+                            "all_incidents": rpt.get("all_incidents", []),
                             "graph_url": f"/results/{clean_name}_graph.png?t={int(time.time())}",
                             "summary_url": f"/results/{clean_name}_summary.txt",
                             "report_url": f"/results/{clean_name}_report.json",
@@ -172,6 +178,10 @@ async def websocket_session(websocket: WebSocket):
                         pitch = float(msg.get("pitch", 0.0))
                         yaw = float(msg.get("yaw", 0.0))
                         is_speaking = bool(msg.get("is_speaking", False))
+                        transcript = str(msg.get("transcript", ""))
+                        wpm = int(msg.get("wpm", 0))
+                        active_prompt = str(msg.get("active_prompt", ""))
+                        rms = float(msg.get("rms", 0.0))
 
                         if t < engine.warmup:
                             engine.record_warmup_pose(pitch, yaw)
@@ -190,22 +200,23 @@ async def websocket_session(websocket: WebSocket):
                         screen_x = float(np.clip(1.0 - corr_x, 0.0, 1.0))
                         screen_y = float(np.clip(corr_y, 0.0, 1.0))
 
-                        n_cheat, score, status, label, tel = engine.update(t, screen_x, screen_y, is_speaking)
-                        streak = tel.get("streak", 0)
-                        drift = tel.get("drift_x", 0.0)
-                        if np.isnan(drift): drift = 0.0
-                        n_clean = len(engine.clean_speaking)
+                        tel_res = multi_engine.update(
+                            t, screen_x, screen_y, is_speaking,
+                            transcript=transcript, wpm=wpm, active_prompt=active_prompt, rms=rms
+                        )
 
                         await websocket.send_json({
                             "type": "telemetry",
-                            "score": round(score, 4),
-                            "score_pct": f"{score*100:.1f}%",
-                            "status": status,
-                            "label": label,
-                            "flow_streak": streak,
-                            "drift_x": round(drift, 4),
-                            "n_cheat": n_cheat,
-                            "n_clean": n_clean,
+                            "score": tel_res["composite_score"],
+                            "score_pct": tel_res["composite_score_pct"],
+                            "status": tel_res["status"],
+                            "label": tel_res["label"],
+                            "flow_streak": tel_res["flow_streak"],
+                            "drift_x": tel_res["drift_x"],
+                            "n_cheat": tel_res["n_cheat"],
+                            "n_clean": tel_res["n_clean"],
+                            "pillar_scores": tel_res["pillar_scores"],
+                            "pillar_hits": tel_res["pillar_hits"],
                         })
                         continue
 
