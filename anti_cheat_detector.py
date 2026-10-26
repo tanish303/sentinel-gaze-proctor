@@ -21,11 +21,12 @@ import sys
 import time
 import urllib.request
 from collections import deque
-from datetime import datetime
 from pathlib import Path
 
 import cv2
 import numpy as np
+
+from multi_pillar_engine import MultiPillarProctorEngine, save_multi_pillar_deliverables
 
 import matplotlib
 matplotlib.use("Agg")
@@ -903,6 +904,7 @@ def main():
     mic         = LiveMicrophoneTracker()
     lip_tracker = LipMotionTracker()
     engine      = ReadingPatternEngine(warmup=2.5)
+    multi_engine = MultiPillarProctorEngine(engine)
     start       = None
     last_ts     = -1
 
@@ -971,6 +973,7 @@ def main():
                 lip_moving = False
                 lip_mar    = 0.0
 
+                gx, gy = 0.5, 0.5
                 if result.face_landmarks:
                     lms = result.face_landmarks[0]
                     lip_moving, lip_mar = lip_tracker.update(lms, t)
@@ -981,66 +984,120 @@ def main():
                         engine.record_warmup_pose(pitch, yaw)
                     if gaze is not None:
                         gx, gy = gaze
-                        n_cheat, score, status, label, tel = engine.update(t, gx, gy, is_speaking)
                 else:
                     is_speaking = mic.evaluate_speech(False, t)
 
-                # ── Status colour ─────────────────────────────────────────────
-                if score >= 0.70:
-                    scol = (0, 0, 255)
-                elif score >= 0.40:
-                    scol = (0, 215, 255)
-                elif tel["pending"] or n_cheat >= 1:
-                    scol = (0, 255, 255)
-                else:
-                    scol = (0, 220, 0)
+                # Active prompt line from test text
+                cur_cheat_lines = len(engine.cheating_lines)
+                active_line_idx = min(len(LINES) - 1, max(0, cur_cheat_lines))
+                active_prompt_text = LINES[active_line_idx]
 
-                # ── HUD ───────────────────────────────────────────────────────
-                cv2.rectangle(disp, (0, 0), (w, 115), (16, 16, 16), -1)
-                cv2.line(disp, (0, 115), (w, 115), (55, 55, 55), 1)
+                # Update 5-Pillar Engine
+                tel_res = multi_engine.update(
+                    t, gx, gy, is_speaking,
+                    transcript="", wpm=0, active_prompt=active_prompt_text, rms=mic.current_rms
+                )
 
-                # Row 1: test name and live clock [MM:SS]
-                cv2.putText(disp, f"TEST: {test_name}  [{fmt_time(t)}]", (16, 24),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.55, (170, 170, 170), 1)
+                comp_score = tel_res["composite_score"]
+                comp_pct = tel_res["composite_score_pct"]
+                label = tel_res["label"]
+                status = tel_res["status"]
+                n_cheat = tel_res["n_cheat"]
+                n_clean = tel_res["n_clean"]
+                pillar_details = tel_res.get("pillar_details", {})
 
-                # Row 2: Status
-                cv2.putText(disp, f"STATUS: {status}", (16, 52),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.52, scol, 2)
+                # ── Multi-Pillar HUD (Top Composite + 5 Separate Horizontal Cards) ──
+                hud_h = 135
+                cv2.rectangle(disp, (0, 0), (w, hud_h), (14, 17, 23), -1)
+                cv2.line(disp, (0, hud_h), (w, hud_h), (45, 52, 64), 1)
 
-                # Row 3: line counts + telemetry
-                streak = tel.get("streak", 0)
-                row3 = (f"Cheat-lines: {n_cheat}  |  Clean-speak: {n_clean}  |  "
-                        f"Flow: {streak}L  |  Drift: +{tel['drift_x']:.3f}  |  {label}")
-                cv2.putText(disp, row3, (16, 78),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.38, (200, 200, 200), 1)
+                # 1. Top Row: Final Composite Score (Mixed Score)
+                cv2.putText(disp, f"TEST: {test_name}  [{fmt_time(t)}]", (12, 19),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.44, (180, 180, 180), 1, cv2.LINE_AA)
 
-                # Row 4: Speech & Lip VAD status (bottom row)
+                comp_col = (0, 220, 0)
+                comp_tag = "CLEAN"
+                if comp_score >= 0.70:
+                    comp_col = (0, 0, 240)
+                    comp_tag = "CRITICAL"
+                elif comp_score >= 0.40:
+                    comp_col = (0, 215, 255)
+                    comp_tag = "REVIEW"
+                elif comp_score >= 0.20:
+                    comp_col = (0, 240, 255)
+                    comp_tag = "MONITOR"
+
+                cv2.putText(disp, f"FINAL COMPOSITE RISK: {comp_pct} [{comp_tag}]", (165, 19),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.46, comp_col, 2, cv2.LINE_AA)
+
+                # Top-Right Meter Bar
+                mb_x, mb_y, mb_w, mb_h = w - 150, 8, 138, 12
+                cv2.rectangle(disp, (mb_x, mb_y), (mb_x + mb_w, mb_y + mb_h), (35, 38, 45), -1)
+                fill_w = int(mb_w * float(np.clip(comp_score, 0.0, 1.0)))
+                cv2.rectangle(disp, (mb_x, mb_y), (mb_x + fill_w, mb_y + mb_h), comp_col, -1)
+
+                # 2. Horizontal 5-Parameter Grid Row (y: 28 to 98)
+                cw = (w - 18) // 5
+                p_keys = [("gaze", "1. GAZE"), ("wpm", "2. WPM"), ("llm", "3. LLM"), ("echo", "4. ECHO"), ("cadence", "5. CADENCE")]
+
+                for idx, (pkey, title) in enumerate(p_keys):
+                    bx = 8 + idx * (cw + 2)
+                    by = 28
+                    bw = cw
+                    bh = 70
+                    pdata = pillar_details.get(pkey, {})
+                    psc = pdata.get("score", 0.0)
+                    psev = pdata.get("severity", "CLEAN")
+                    pstat = pdata.get("status", "Normal")[:13]
+                    pmetric = pdata.get("metric", "")[:14]
+
+                    bcol = (50, 60, 75)
+                    txtcol = (0, 220, 0)
+                    if psev == "CRITICAL":
+                        bcol = (0, 0, 230)
+                        txtcol = (0, 0, 255)
+                    elif psev == "WARN":
+                        bcol = (0, 180, 240)
+                        txtcol = (0, 215, 255)
+                    elif psev == "MONITOR":
+                        bcol = (200, 160, 60)
+                        txtcol = (230, 180, 80)
+
+                    cv2.rectangle(disp, (bx, by), (bx + bw, by + bh), (22, 26, 34), -1)
+                    cv2.rectangle(disp, (bx, by), (bx + bw, by + bh), bcol, 1)
+
+                    cv2.putText(disp, title, (bx + 5, by + 16),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (220, 220, 220), 1, cv2.LINE_AA)
+                    cv2.putText(disp, f"{psc*100:.0f}%", (bx + bw - 32, by + 16),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.38, txtcol, 1, cv2.LINE_AA)
+
+                    mbar_y = by + 22
+                    mbar_w = bw - 10
+                    cv2.rectangle(disp, (bx + 5, mbar_y), (bx + 5 + mbar_w, mbar_y + 4), (35, 40, 50), -1)
+                    mbar_fill = int(mbar_w * float(np.clip(psc, 0.0, 1.0)))
+                    if mbar_fill > 0:
+                        cv2.rectangle(disp, (bx + 5, mbar_y), (bx + 5 + mbar_fill, mbar_y + 4), txtcol, -1)
+
+                    cv2.putText(disp, pstat, (bx + 5, by + 44),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.31, (180, 180, 180), 1, cv2.LINE_AA)
+                    cv2.putText(disp, pmetric, (bx + 5, by + 60),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.28, (130, 140, 155), 1, cv2.LINE_AA)
+
+                # 3. Row 3: Speech, Lips, Mic VU meter (y: 104 to 132)
                 vad_col = (0, 240, 255) if mic.is_speaking else (160, 160, 160)
                 vad_str = "TALKING" if mic.is_speaking else "SILENT"
                 lip_str = "ACTIVE" if lip_moving else "STILL"
                 cv2.putText(disp, f"SPEECH: {vad_str} [LIPS: {lip_str} | MIC: {mic.current_rms:.3f}/{mic.sensitive_threshold:.3f}]",
-                            (16, 102), cv2.FONT_HERSHEY_SIMPLEX, 0.38, vad_col, 1)
+                            (12, 122), cv2.FONT_HERSHEY_SIMPLEX, 0.36, vad_col, 1, cv2.LINE_AA)
 
-                bx, by, bw, bh = 300, 93, 105, 10
-                cv2.rectangle(disp, (bx, by), (bx+bw, by+bh), (40, 40, 40), -1)
+                bx, by, bw, bh = 320, 112, 110, 10
+                cv2.rectangle(disp, (bx, by), (bx + bw, by + bh), (35, 40, 48), -1)
                 fr = int(bw * float(np.clip(mic.current_rms / 0.050, 0, 1)))
-                cv2.rectangle(disp, (bx, by), (bx+fr, by+bh), vad_col, -1)
+                cv2.rectangle(disp, (bx, by), (bx + fr, by + bh), vad_col, -1)
                 tx = int(bx + bw * float(np.clip(mic.sensitive_threshold / 0.050, 0, 1)))
-                cv2.line(disp, (tx, by-2), (tx, by+bh+2), (0, 0, 255), 2)
-                cv2.putText(disp, "[-/+] Sens", (bx+bw+6, 102),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.33, (120, 120, 120), 1)
-
-                # Confidence bar (top-right)
-                cbw = 175; cbx = w-cbw-20; cby = 16
-                cv2.rectangle(disp, (cbx, cby), (cbx+cbw, cby+16), (40,40,40), -1)
-                fc = int(cbw * float(np.clip(score, 0, 1)))
-                mc = (0,0,255) if score>=0.70 else ((0,215,255) if score>=0.40 else (0,220,0))
-                cv2.rectangle(disp, (cbx, cby), (cbx+fc, cby+16), mc, -1)
-                
-                state_tag = "FROZEN" if not is_speaking else ("ALERT" if "READING_CONFIRMED" in label else ("COOLING" if "SPEAKING_NATURAL" in label else ""))
-                tag_str = f" [{state_tag}]" if state_tag else ""
-                cv2.putText(disp, f"Confidence: {score*100:.0f}%{tag_str}", (cbx, cby+33),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.42, (210,210,210), 1)
+                cv2.line(disp, (tx, by - 2), (tx, by + bh + 2), (0, 0, 255), 2)
+                cv2.putText(disp, "[-/+] Sens", (bx + bw + 8, 121),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.31, (130, 130, 130), 1, cv2.LINE_AA)
 
                 cv2.imshow("Anti-Cheat Proctoring", disp)
                 cv2.imshow("Test Text", canvas)
@@ -1060,19 +1117,19 @@ def main():
         cap.release()
         cv2.destroyAllWindows()
         duration = (time.time() - start) if start else 0.0
-        rpt, json_path, txt_path, graph_path, verdict, risk = save_session_deliverables(test_name, duration, engine)
+        rpt, json_path, txt_path, graph_path, verdict, risk = save_multi_pillar_deliverables(test_name, duration, multi_engine, RESULTS_DIR)
 
         # Terminal scorecard
         print("\n" + "="*65)
-        print(f"          FINAL SCORECARD — {test_name}")
+        print(f"          FINAL 5-PILLAR SCORECARD — {test_name}")
         print("="*65)
         print(f"  Duration          : {fmt_time(duration)} ({duration:.1f} s)")
-        print(f"  Cheating lines    : {len(engine.cheating_lines)}")
-        if engine.cheating_lines:
-            print(f"  Line numbers      : {[r['line_number'] for r in engine.cheating_lines]}")
-        print(f"  Clean speak events: {len(engine.clean_speaking)}")
         print(f"  Final Verdict     : {verdict}")
-        print(f"  Confidence Score  : {engine.score*100:.1f}% ({risk})")
+        print(f"  Composite Score   : {multi_engine.composite_score*100:.1f}% ({risk})")
+        print("  " + "-"*50)
+        print("  Pillar Sub-Scores :")
+        for k, v in rpt["pillar_scorecard"].items():
+            print(f"    - {k:28}: {v['sub_score_percentage']} [{v['status']}]")
         print("-"*65)
         print(f"  [1] JSON Report   : {json_path}")
         print(f"  [2] Text Summary  : {txt_path}")
