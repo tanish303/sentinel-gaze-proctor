@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/style.css?v=6" />
+  <link rel="stylesheet" href="/static/style.css?v=10" />
   <!-- In-Browser MediaPipe FaceMesh for 60 FPS zero-latency vision -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
@@ -60,6 +60,188 @@
       <div class="timer-box">
         <span class="timer-label">Time</span>
         <span class="timer-val" id="timerDisplay">00:00</span>
+      </div>
+    </section>
+
+    <!-- Top Final Composite Score Banner (Distinct Final Mixed Score at Top) -->
+    <section class="composite-top-banner" id="compositeTopBanner">
+      <div class="composite-left">
+        <div class="composite-meta-tag">
+          <span class="pulse-indicator"></span>
+          <span>FINAL COMPOSITE CHEATING RISK (5-CHECK MULTI-MODAL FUSION)</span>
+        </div>
+        <div class="composite-score-row">
+          <h2 class="composite-number" id="topCompositeScore">0.0%</h2>
+          <span class="composite-risk-badge badge-clean" id="topCompositeRisk">CLEAN</span>
+          <div class="composite-desc-box">
+            <span class="composite-verdict" id="topCompositeVerdict">Clean Candidate — Normal Conversational Flow</span>
+            <span class="composite-formula">Formula: 75% Primary Signal + 25% Corroboration (+20% Synergy Bonus if ≥2 Pillars Trigger)</span>
+          </div>
+        </div>
+      </div>
+      <div class="composite-right">
+        <div class="meter-label-row">
+          <span class="meter-lbl">Fused Risk Probability:</span>
+          <span class="meter-val" id="topCompositeScoreText">0.0% Risk</span>
+        </div>
+        <div class="composite-meter-track">
+          <div class="composite-meter-fill fill-clean" id="topCompositeMeterFill" style="width: 0%"></div>
+        </div>
+        <div class="meter-ticks">
+          <span>0% Clean</span>
+          <span>40% Review</span>
+          <span>70% Critical</span>
+          <span>100%</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Horizontal 5-Parameter Detection Grid (5 Separate Independent Tests Live) -->
+    <section class="live-pillars-section" id="livePillarsSection">
+      <div class="live-pillars-header">
+        <div class="header-left-group">
+          <span class="live-pulse-dot"></span>
+          <span class="section-title-sm">LIVE PARAMETER SURVEILLANCE — 5 SEPARATE INDEPENDENT CHECKS</span>
+        </div>
+        <span class="live-tag">REAL-TIME TELEMETRY</span>
+      </div>
+      <div class="live-pillars-grid">
+        
+        <!-- Parameter 1: Gaze -->
+        <div class="live-pillar-card" id="liveCardGaze">
+          <div class="pillar-card-header">
+            <div class="pillar-title-group">
+              <span class="pillar-num">1</span>
+              <div class="pillar-name-box">
+                <span class="pillar-title">Ocular Saccades</span>
+                <span class="pillar-wt">Weight: 35%</span>
+              </div>
+            </div>
+            <span class="pill pill-clean" id="livePillGaze">CLEAN</span>
+          </div>
+          <div class="pillar-body">
+            <div class="pillar-score-row">
+              <span class="pillar-score-val" id="liveScoreGaze">0%</span>
+              <span class="pillar-status-text" id="liveStatusGaze">Direct Eye Contact</span>
+            </div>
+            <div class="pillar-meter">
+              <div class="pillar-meter-fill fill-clean" id="liveFillGaze" style="width: 0%"></div>
+            </div>
+            <div class="pillar-footer-stat">
+              <span class="stat-lbl">Evidence:</span>
+              <span class="stat-val" id="liveMetricGaze">0 Saccade Lines</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parameter 2: Speech Pace -->
+        <div class="live-pillar-card" id="liveCardWpm">
+          <div class="pillar-card-header">
+            <div class="pillar-title-group">
+              <span class="pillar-num">2</span>
+              <div class="pillar-name-box">
+                <span class="pillar-title">Speech Pace</span>
+                <span class="pillar-wt">Weight: 20%</span>
+              </div>
+            </div>
+            <span class="pill pill-clean" id="livePillWpm">CLEAN</span>
+          </div>
+          <div class="pillar-body">
+            <div class="pillar-score-row">
+              <span class="pillar-score-val" id="liveScoreWpm">0%</span>
+              <span class="pillar-status-text" id="liveStatusWpm">Conversational Flow</span>
+            </div>
+            <div class="pillar-meter">
+              <div class="pillar-meter-fill fill-clean" id="liveFillWpm" style="width: 0%"></div>
+            </div>
+            <div class="pillar-footer-stat">
+              <span class="stat-lbl">Reading Rate:</span>
+              <span class="stat-val" id="liveMetricWpm">0 WPM (0 Bursts)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parameter 3: LLM Stylometry -->
+        <div class="live-pillar-card" id="liveCardLlm">
+          <div class="pillar-card-header">
+            <div class="pillar-title-group">
+              <span class="pillar-num">3</span>
+              <div class="pillar-name-box">
+                <span class="pillar-title">AI Stylometry</span>
+                <span class="pillar-wt">Weight: 20%</span>
+              </div>
+            </div>
+            <span class="pill pill-clean" id="livePillLlm">CLEAN</span>
+          </div>
+          <div class="pillar-body">
+            <div class="pillar-score-row">
+              <span class="pillar-score-val" id="liveScoreLlm">0%</span>
+              <span class="pillar-status-text" id="liveStatusLlm">Natural Human Speech</span>
+            </div>
+            <div class="pillar-meter">
+              <div class="pillar-meter-fill fill-clean" id="liveFillLlm" style="width: 0%"></div>
+            </div>
+            <div class="pillar-footer-stat">
+              <span class="stat-lbl">AI Artifacts:</span>
+              <span class="stat-val" id="liveMetricLlm">0 Markers</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parameter 4: Question Echo -->
+        <div class="live-pillar-card" id="liveCardEcho">
+          <div class="pillar-card-header">
+            <div class="pillar-title-group">
+              <span class="pillar-num">4</span>
+              <div class="pillar-name-box">
+                <span class="pillar-title">Question Echo</span>
+                <span class="pillar-wt">Weight: 15%</span>
+              </div>
+            </div>
+            <span class="pill pill-clean" id="livePillEcho">CLEAN</span>
+          </div>
+          <div class="pillar-body">
+            <div class="pillar-score-row">
+              <span class="pillar-score-val" id="liveScoreEcho">0%</span>
+              <span class="pillar-status-text" id="liveStatusEcho">Direct Response</span>
+            </div>
+            <div class="pillar-meter">
+              <div class="pillar-meter-fill fill-clean" id="liveFillEcho" style="width: 0%"></div>
+            </div>
+            <div class="pillar-footer-stat">
+              <span class="stat-lbl">Delay Tactics:</span>
+              <span class="stat-val" id="liveMetricEcho">0 Stalling Events</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parameter 5: Voice Cadence -->
+        <div class="live-pillar-card" id="liveCardCadence">
+          <div class="pillar-card-header">
+            <div class="pillar-title-group">
+              <span class="pillar-num">5</span>
+              <div class="pillar-name-box">
+                <span class="pillar-title">Voice Cadence</span>
+                <span class="pillar-wt">Weight: 10%</span>
+              </div>
+            </div>
+            <span class="pill pill-clean" id="livePillCadence">CLEAN</span>
+          </div>
+          <div class="pillar-body">
+            <div class="pillar-score-row">
+              <span class="pillar-score-val" id="liveScoreCadence">0%</span>
+              <span class="pillar-status-text" id="liveStatusCadence">Natural Prosody</span>
+            </div>
+            <div class="pillar-meter">
+              <div class="pillar-meter-fill fill-clean" id="liveFillCadence" style="width: 0%"></div>
+            </div>
+            <div class="pillar-footer-stat">
+              <span class="stat-lbl">Drone Rhythm:</span>
+              <span class="stat-val" id="liveMetricCadence">Natural Pitch Variance</span>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -287,6 +469,6 @@
 
   </div>
 
-  <script src="/static/app.js?v=9"></script>
+  <script src="/static/app.js?v=10"></script>
 </body>
 </html>

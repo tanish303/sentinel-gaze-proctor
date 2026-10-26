@@ -393,6 +393,141 @@ class MultiPillarProctorEngine:
         elif active_pillars >= 2:
             display_label = "MULTI_PILLAR_FLOW"
 
+        # Individual Pillar Statuses & Severities for Live Display
+        # 1. Gaze Status
+        if s_gaze >= 0.70:
+            gaze_status = "Sustained Reading"
+            gaze_sev = "CRITICAL"
+        elif s_gaze >= 0.35:
+            gaze_status = "Saccade Pattern"
+            gaze_sev = "WARN"
+        elif tel.get("streak", 0) >= 2:
+            gaze_status = f"Tracking ({tel.get('streak', 0)}L)"
+            gaze_sev = "MONITOR"
+        else:
+            gaze_status = "Direct Contact"
+            gaze_sev = "CLEAN"
+
+        # 2. WPM Status
+        if s_wpm >= 0.60:
+            wpm_status = f"Teleprompter Burst ({wpm} WPM)"
+            wpm_sev = "CRITICAL"
+        elif s_wpm >= 0.25:
+            wpm_status = f"Reading Rate ({wpm} WPM)"
+            wpm_sev = "WARN"
+        elif self.wpm.burst_count == 1:
+            wpm_status = f"Rapid Burst ({wpm} WPM)"
+            wpm_sev = "MONITOR"
+        elif wpm >= 165:
+            wpm_status = f"High Speed ({wpm} WPM)"
+            wpm_sev = "MONITOR"
+        elif wpm > 0:
+            wpm_status = f"Conversational ({wpm} WPM)"
+            wpm_sev = "CLEAN"
+        else:
+            wpm_status = "Silent / Paused"
+            wpm_sev = "CLEAN"
+
+        # 3. LLM Stylometry Status
+        if s_llm >= 0.60:
+            llm_status = "Sustained AI Phrasing"
+            llm_sev = "CRITICAL"
+        elif s_llm >= 0.35:
+            llm_status = "Confirmed AI Markers"
+            llm_sev = "WARN"
+        elif self.llm.hit_count == 1:
+            llm_status = "1 AI Marker (Grace 0%)"
+            llm_sev = "MONITOR"
+        else:
+            llm_status = "Natural Candidate Speech"
+            llm_sev = "CLEAN"
+
+        # 4. Question Echo Status
+        if s_echo >= 0.60:
+            echo_status = "Sustained Stalling"
+            echo_sev = "CRITICAL"
+        elif s_echo >= 0.35:
+            echo_status = "Question Echo Confirmed"
+            echo_sev = "WARN"
+        elif self.echo.echo_count == 1:
+            echo_status = "1 Echo (Benign 0%)"
+            echo_sev = "MONITOR"
+        else:
+            echo_status = "Direct Response"
+            echo_sev = "CLEAN"
+
+        # 5. Cadence Status
+        if s_cadence >= 0.55:
+            cadence_status = "Metronomic Recitation"
+            cadence_sev = "CRITICAL"
+        elif s_cadence >= 0.30:
+            cadence_status = "Robotic Drone Confirmed"
+            cadence_sev = "WARN"
+        elif self.cadence.hit_count == 1:
+            cadence_status = "Uniform Rhythm (Grace 0%)"
+            cadence_sev = "MONITOR"
+        else:
+            cadence_status = "Natural Conversational Pitch"
+            cadence_sev = "CLEAN"
+
+        pillar_details = {
+            "gaze": {
+                "name": "1. Ocular Saccades",
+                "short_name": "Gaze Saccades",
+                "weight": "35%",
+                "score": round(s_gaze, 3),
+                "score_pct": f"{s_gaze * 100:.0f}%",
+                "status": gaze_status,
+                "metric": f"{n_cheat} Saccade Lines",
+                "severity": gaze_sev,
+                "hits": n_cheat,
+            },
+            "wpm": {
+                "name": "2. Speech Pace",
+                "short_name": "Speech Pace (WPM)",
+                "weight": "20%",
+                "score": round(s_wpm, 3),
+                "score_pct": f"{s_wpm * 100:.0f}%",
+                "status": wpm_status,
+                "metric": f"{wpm} WPM ({len(self.wpm.incidents)} Bursts)",
+                "severity": wpm_sev,
+                "hits": len(self.wpm.incidents),
+            },
+            "llm": {
+                "name": "3. AI Stylometry",
+                "short_name": "LLM Stylometry",
+                "weight": "20%",
+                "score": round(s_llm, 3),
+                "score_pct": f"{s_llm * 100:.0f}%",
+                "status": llm_status,
+                "metric": f"{len(self.llm.incidents)} AI Markers" if self.llm.incidents else "0 AI Markers",
+                "severity": llm_sev,
+                "hits": len(self.llm.incidents),
+            },
+            "echo": {
+                "name": "4. Question Echo",
+                "short_name": "Echo Stalling",
+                "weight": "15%",
+                "score": round(s_echo, 3),
+                "score_pct": f"{s_echo * 100:.0f}%",
+                "status": echo_status,
+                "metric": f"{len(self.echo.incidents)} Echo Delays",
+                "severity": echo_sev,
+                "hits": len(self.echo.incidents),
+            },
+            "cadence": {
+                "name": "5. Voice Cadence",
+                "short_name": "Prosody Uniformity",
+                "weight": "10%",
+                "score": round(s_cadence, 3),
+                "score_pct": f"{s_cadence * 100:.0f}%",
+                "status": cadence_status,
+                "metric": f"{len(self.cadence.incidents)} Drone Intervals" if self.cadence.incidents else "Natural Rhythm",
+                "severity": cadence_sev,
+                "hits": len(self.cadence.incidents),
+            },
+        }
+
         return {
             "composite_score": round(self.composite_score, 4),
             "composite_score_pct": f"{self.composite_score * 100:.1f}%",
@@ -415,7 +550,8 @@ class MultiPillarProctorEngine:
                 "llm_markers": len(self.llm.incidents),
                 "echo_events": len(self.echo.incidents),
                 "cadence_intervals": len(self.cadence.incidents),
-            }
+            },
+            "pillar_details": pillar_details,
         }
 
     def get_full_deliverables(self, test_name: str, duration: float) -> Dict[str, Any]:

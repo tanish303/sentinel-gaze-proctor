@@ -217,6 +217,7 @@ async def websocket_session(websocket: WebSocket):
                             "n_clean": tel_res["n_clean"],
                             "pillar_scores": tel_res["pillar_scores"],
                             "pillar_hits": tel_res["pillar_hits"],
+                            "pillar_details": tel_res.get("pillar_details", {}),
                         })
                         continue
 

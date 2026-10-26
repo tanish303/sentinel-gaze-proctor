@@ -62,6 +62,58 @@ const el = {
   pillarEchoCard: document.getElementById("pillarEchoCard"),
   pillarCadenceCard: document.getElementById("pillarCadenceCard"),
 
+  // Top Final Composite Score Banner (Distinct Mixed Score at Top)
+  compositeTopBanner: document.getElementById("compositeTopBanner"),
+  topCompositeScore: document.getElementById("topCompositeScore"),
+  topCompositeRisk: document.getElementById("topCompositeRisk"),
+  topCompositeVerdict: document.getElementById("topCompositeVerdict"),
+  topCompositeScoreText: document.getElementById("topCompositeScoreText"),
+  topCompositeMeterFill: document.getElementById("topCompositeMeterFill"),
+
+  // Live 5-Parameter Detection Grid Elements
+  livePillars: {
+    gaze: {
+      card: document.getElementById("liveCardGaze"),
+      pill: document.getElementById("livePillGaze"),
+      score: document.getElementById("liveScoreGaze"),
+      status: document.getElementById("liveStatusGaze"),
+      fill: document.getElementById("liveFillGaze"),
+      metric: document.getElementById("liveMetricGaze"),
+    },
+    wpm: {
+      card: document.getElementById("liveCardWpm"),
+      pill: document.getElementById("livePillWpm"),
+      score: document.getElementById("liveScoreWpm"),
+      status: document.getElementById("liveStatusWpm"),
+      fill: document.getElementById("liveFillWpm"),
+      metric: document.getElementById("liveMetricWpm"),
+    },
+    llm: {
+      card: document.getElementById("liveCardLlm"),
+      pill: document.getElementById("livePillLlm"),
+      score: document.getElementById("liveScoreLlm"),
+      status: document.getElementById("liveStatusLlm"),
+      fill: document.getElementById("liveFillLlm"),
+      metric: document.getElementById("liveMetricLlm"),
+    },
+    echo: {
+      card: document.getElementById("liveCardEcho"),
+      pill: document.getElementById("livePillEcho"),
+      score: document.getElementById("liveScoreEcho"),
+      status: document.getElementById("liveStatusEcho"),
+      fill: document.getElementById("liveFillEcho"),
+      metric: document.getElementById("liveMetricEcho"),
+    },
+    cadence: {
+      card: document.getElementById("liveCardCadence"),
+      pill: document.getElementById("livePillCadence"),
+      score: document.getElementById("liveScoreCadence"),
+      status: document.getElementById("liveStatusCadence"),
+      fill: document.getElementById("liveFillCadence"),
+      metric: document.getElementById("liveMetricCadence"),
+    },
+  },
+
   resultsSection: document.getElementById("resultsSection"),
   resultVerdictTag: document.getElementById("resultVerdictTag"),
   resultVerdictTitle: document.getElementById("resultVerdictTitle"),
@@ -489,8 +541,8 @@ function drawProctoringHUD(ctx, width, height, t, testName) {
   ctx.lineTo(bx + tx, by + bh + 2);
   ctx.stroke();
 
-  // Confidence Bar (top-right)
-  const cbw = 175;
+  // Composite Confidence Bar (top-right of camera)
+  const cbw = 185;
   const cbx = width - cbw - 20;
   const cby = 16;
 
@@ -506,9 +558,13 @@ function drawProctoringHUD(ctx, width, height, t, testName) {
   ctx.fillRect(cbx, cby, fc, 16);
 
   ctx.fillStyle = "#dcdcdc";
-  ctx.font = "12px 'Inter', sans-serif";
+  ctx.font = "11px 'JetBrains Mono', monospace";
   const stateTag = !isSpeaking ? " [FROZEN]" : (currentLabel.includes("READING") ? " [ALERT]" : "");
-  ctx.fillText(`Confidence: ${(currentScore * 100).toFixed(0)}%${stateTag}`, cbx, cby + 33);
+  ctx.fillText(`OVERALL COMPOSITE: ${(currentScore * 100).toFixed(0)}%${stateTag}`, cbx, cby + 33);
+
+  ctx.fillStyle = "#888888";
+  ctx.font = "10px 'Inter', sans-serif";
+  ctx.fillText("5 Live Parameters Active Above", cbx, cby + 47);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -518,6 +574,9 @@ async function startSession() {
   const defaultName = `eval_${new Date().toISOString().slice(0, 10).replace(/-/g, "")}_${new Date().toTimeString().slice(0, 5).replace(/:/g, "")}`;
   const testName = el.testNameInput.value.trim() || defaultName;
   el.testNameInput.value = testName;
+
+  // Reset live 5-parameter grid and top composite score banner to clean state
+  resetLiveDashboard();
 
   try {
     el.startBtn.disabled = true;
@@ -667,6 +726,9 @@ async function startSession() {
           nCheat = data.n_cheat !== undefined ? data.n_cheat : nCheat;
           nClean = data.n_clean !== undefined ? data.n_clean : nClean;
 
+          // Update Live Top Banner & 5 Separate Horizontal Parameter Cards
+          updateLiveDashboard(data);
+
           if (el.liveWpmVal) {
             el.liveWpmVal.textContent = `${speechIntel.currentWpm} WPM`;
           }
@@ -771,6 +833,153 @@ function stopSession() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Live Dashboard State Controller (Top Final Mixed Score + 5 Separate Tests)
+// ─────────────────────────────────────────────────────────────────────────────
+function resetLiveDashboard() {
+  if (el.topCompositeScore) el.topCompositeScore.textContent = "0.0%";
+  if (el.topCompositeScoreText) el.topCompositeScoreText.textContent = "0.0% Risk";
+  if (el.topCompositeRisk) {
+    el.topCompositeRisk.textContent = "CLEAN";
+    el.topCompositeRisk.className = "composite-risk-badge badge-clean";
+  }
+  if (el.topCompositeVerdict) {
+    el.topCompositeVerdict.textContent = "Clean Candidate — Normal Conversational Flow";
+  }
+  if (el.topCompositeMeterFill) {
+    el.topCompositeMeterFill.style.width = "0%";
+    el.topCompositeMeterFill.className = "composite-meter-fill fill-clean";
+  }
+  if (el.compositeTopBanner) {
+    el.compositeTopBanner.className = "composite-top-banner";
+  }
+
+  const defaults = {
+    gaze: { status: "Direct Eye Contact", metric: "0 Saccade Lines" },
+    wpm: { status: "Conversational Flow", metric: "0 WPM (0 Bursts)" },
+    llm: { status: "Natural Phrasing", metric: "0 AI Markers" },
+    echo: { status: "Direct Response", metric: "0 Stalling Events" },
+    cadence: { status: "Natural Prosody", metric: "Natural Pitch Variance" },
+  };
+
+  ["gaze", "wpm", "llm", "echo", "cadence"].forEach((key) => {
+    const pDom = el.livePillars && el.livePillars[key];
+    if (!pDom) return;
+    if (pDom.score) pDom.score.textContent = "0%";
+    if (pDom.status) pDom.status.textContent = defaults[key].status;
+    if (pDom.metric) pDom.metric.textContent = defaults[key].metric;
+    if (pDom.pill) {
+      pDom.pill.textContent = "CLEAN";
+      pDom.pill.className = "pill pill-clean";
+    }
+    if (pDom.fill) {
+      pDom.fill.style.width = "0%";
+      pDom.fill.className = "pillar-meter-fill fill-clean";
+      pDom.fill.style.background = "";
+    }
+    if (pDom.card) {
+      pDom.card.className = "live-pillar-card";
+    }
+  });
+}
+
+function updateLiveDashboard(data) {
+  const score = data.score !== undefined ? data.score : 0.0;
+  const pctStr = `${(score * 100).toFixed(1)}%`;
+
+  // 1. Update Top Final Composite Score Banner (Distinct Mixed Score at Top)
+  if (el.topCompositeScore) {
+    el.topCompositeScore.textContent = pctStr;
+  }
+  if (el.topCompositeScoreText) {
+    el.topCompositeScoreText.textContent = `${pctStr} Risk`;
+  }
+  if (el.topCompositeMeterFill) {
+    el.topCompositeMeterFill.style.width = `${Math.min(100, Math.max(0, score * 100))}%`;
+    if (score >= 0.70) {
+      el.topCompositeMeterFill.className = "composite-meter-fill fill-critical";
+    } else if (score >= 0.40) {
+      el.topCompositeMeterFill.className = "composite-meter-fill fill-review";
+    } else {
+      el.topCompositeMeterFill.className = "composite-meter-fill fill-clean";
+    }
+  }
+
+  if (el.topCompositeRisk) {
+    if (score >= 0.70) {
+      el.topCompositeRisk.textContent = "CRITICAL RISK";
+      el.topCompositeRisk.className = "composite-risk-badge badge-critical";
+      if (el.compositeTopBanner) el.compositeTopBanner.className = "composite-top-banner banner-critical";
+      if (el.topCompositeVerdict) el.topCompositeVerdict.textContent = "Multi-Modal Cheating Confirmed — Sustained Teleprompter Recitation";
+    } else if (score >= 0.40) {
+      el.topCompositeRisk.textContent = "HIGH REVIEW";
+      el.topCompositeRisk.className = "composite-risk-badge badge-review";
+      if (el.compositeTopBanner) el.compositeTopBanner.className = "composite-top-banner banner-warn";
+      if (el.topCompositeVerdict) el.topCompositeVerdict.textContent = "Suspicious Behavior Detected Across Multiple Pillars";
+    } else if (score >= 0.20) {
+      el.topCompositeRisk.textContent = "MONITORING";
+      el.topCompositeRisk.className = "composite-risk-badge badge-review";
+      if (el.compositeTopBanner) el.compositeTopBanner.className = "composite-top-banner";
+      if (el.topCompositeVerdict) el.topCompositeVerdict.textContent = "Mild Anomaly Detected — Verifying Repetition Before Penalty";
+    } else {
+      el.topCompositeRisk.textContent = "CLEAN";
+      el.topCompositeRisk.className = "composite-risk-badge badge-clean";
+      if (el.compositeTopBanner) el.compositeTopBanner.className = "composite-top-banner";
+      if (el.topCompositeVerdict) el.topCompositeVerdict.textContent = "Clean Candidate — Normal Conversational Flow";
+    }
+  }
+
+  // 2. Update Live Horizontal 5-Parameter Detection Grid (All 5 Separate Parameters Live)
+  const details = data.pillar_details || {};
+  const pKeys = ["gaze", "wpm", "llm", "echo", "cadence"];
+
+  pKeys.forEach((key) => {
+    const pDom = el.livePillars && el.livePillars[key];
+    const pData = details[key];
+    if (!pDom || !pData) return;
+
+    if (pDom.score) pDom.score.textContent = pData.score_pct || "0%";
+    if (pDom.status) pDom.status.textContent = pData.status || "Normal";
+    if (pDom.metric) pDom.metric.textContent = pData.metric || "";
+
+    const sev = (pData.severity || "CLEAN").toUpperCase();
+    const sc = pData.score || 0.0;
+
+    if (pDom.fill) {
+      pDom.fill.style.width = `${Math.min(100, Math.max(0, sc * 100))}%`;
+      if (sev === "CRITICAL") {
+        pDom.fill.className = "pillar-meter-fill fill-critical";
+        pDom.fill.style.background = "";
+      } else if (sev === "WARN") {
+        pDom.fill.className = "pillar-meter-fill fill-review";
+        pDom.fill.style.background = "";
+      } else if (sev === "MONITOR") {
+        pDom.fill.className = "pillar-meter-fill";
+        pDom.fill.style.background = "#60a5fa";
+      } else {
+        pDom.fill.className = "pillar-meter-fill fill-clean";
+        pDom.fill.style.background = "";
+      }
+    }
+
+    if (pDom.pill) {
+      pDom.pill.textContent = sev;
+      if (sev === "CRITICAL") pDom.pill.className = "pill pill-critical";
+      else if (sev === "WARN") pDom.pill.className = "pill pill-warn";
+      else if (sev === "MONITOR") pDom.pill.className = "pill pill-monitor";
+      else pDom.pill.className = "pill pill-clean";
+    }
+
+    if (pDom.card) {
+      pDom.card.className = "live-pillar-card" + (
+        sev === "CRITICAL" ? " card-sev-critical" :
+        (sev === "WARN" ? " card-sev-warn" :
+        (sev === "MONITOR" ? " card-sev-monitor" : ""))
+      );
+    }
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Highlight Sentence in Reading Evaluation
 // ─────────────────────────────────────────────────────────────────────────────
 function highlightSentence(streak) {
@@ -815,6 +1024,25 @@ function displayReport(data) {
   el.resultScore.textContent = meta.confidence_percentage || `${(score * 100).toFixed(1)}%`;
   el.resultLines.textContent = meta.total_cheating_lines || 0;
   el.resultDuration.textContent = meta.duration_formatted || `${meta.duration_seconds || 0}s`;
+
+  // Sync Top Final Composite Banner with finalized report
+  if (el.topCompositeScore) el.topCompositeScore.textContent = meta.confidence_percentage || `${(score * 100).toFixed(1)}%`;
+  if (el.topCompositeScoreText) el.topCompositeScoreText.textContent = `${meta.confidence_percentage || (score * 100).toFixed(1) + '%'} Final Risk`;
+  if (el.topCompositeRisk) {
+    el.topCompositeRisk.textContent = risk;
+    el.topCompositeRisk.className = "composite-risk-badge " + (
+      risk === "CRITICAL" ? "badge-critical" :
+      (risk === "HIGH" || risk === "REVIEW" ? "badge-review" : "badge-clean")
+    );
+  }
+  if (el.topCompositeVerdict) el.topCompositeVerdict.textContent = verdict;
+  if (el.topCompositeMeterFill) {
+    el.topCompositeMeterFill.style.width = `${Math.min(100, Math.max(0, score * 100))}%`;
+    el.topCompositeMeterFill.className = "composite-meter-fill " + (
+      risk === "CRITICAL" ? "fill-critical" :
+      (risk === "HIGH" || risk === "REVIEW" ? "fill-review" : "fill-clean")
+    );
+  }
 
   // Forensic Chart
   const chartUrl = data.graph_url || `/results/${meta.test_name}_graph.png?t=${Date.now()}`;
