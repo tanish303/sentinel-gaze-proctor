@@ -222,7 +222,7 @@ class LiveMicrophoneTracker:
 
         if self.is_speaking:
             self.audio_speech_buf.append(indata.copy())
-            if len(self.audio_speech_buf) >= 40:  # ~4 seconds buffer limit
+            if len(self.audio_speech_buf) >= 30:  # ~3 seconds max per phrase
                 self._dispatch_transcription()
 
         # Calibrate for initial 1.5s: 20th percentile captures true quiet floor
@@ -250,15 +250,21 @@ class LiveMicrophoneTracker:
             self._is_transcribing = True
             try:
                 audio_np = np.concatenate(chunks, axis=0).flatten()
+                # Normalize microphone audio gain so quiet speech is boosted to clear recognition levels!
+                max_val = float(np.max(np.abs(audio_np)))
+                if max_val > 0.002:
+                    audio_np = (audio_np / max_val) * 0.75
                 audio_int16 = (np.clip(audio_np, -1.0, 1.0) * 32767).astype(np.int16)
                 audio_bytes = audio_int16.tobytes()
                 audio_data = sr.AudioData(audio_bytes, 16000, 2)
                 text = self.recognizer.recognize_google(audio_data, language="en-US")
                 if text:
                     self.latest_transcript = text
-                    print(f"\n[MIC TRANSCRIPT] Recognized: '{text}'\n")
-            except Exception:
+                    print(f"\n[MIC TRANSCRIPT] Recognized: \"{text}\"\n")
+            except sr.UnknownValueError:
                 pass
+            except Exception as e:
+                print(f"[MIC STT WARNING] {e}")
             finally:
                 self._is_transcribing = False
 
@@ -299,7 +305,7 @@ class LiveMicrophoneTracker:
                 self.is_speaking = (t < self.hangover_until)
 
         # Speech pause detected: trigger background transcription of finished phrase
-        if prev_speaking and not self.is_speaking and len(self.audio_speech_buf) >= 8:
+        if prev_speaking and not self.is_speaking and len(self.audio_speech_buf) >= 6:
             self._dispatch_transcription()
 
         return self.is_speaking
@@ -1092,10 +1098,8 @@ def main():
                 else:
                     is_speaking = mic.evaluate_speech(False, t)
 
-                # Active prompt line from test text
-                cur_cheat_lines = len(engine.cheating_lines)
-                active_line_idx = min(len(LINES) - 1, max(0, cur_cheat_lines))
-                active_prompt_text = LINES[active_line_idx]
+                # Active interview prompt for question echoing detection (distinct from Test 1 reading text)
+                active_prompt_text = "What are candidate eye gaze patterns during online technical interviews?"
 
                 # Update 4-Pillar Engine with live transcript & prompt
                 active_transcript = mic.get_transcript()

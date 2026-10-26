@@ -71,8 +71,8 @@ const workflowSpec = {
     { "id": "n_t3_gate", "lane": "l_06", "col": 3, "type": "security", "label": "Stalling Echo?", "sublabel": ">60% overlap in 12s", "tag": "Weight 15%", "width": 140 },
 
     // 07 / Test 4: Robotic Voice
-    { "id": "n_t4_rms", "lane": "l_07", "col": 1, "type": "backend", "label": "30-Frame RMS", "sublabel": "voiced energy buffer", "width": 140 },
-    { "id": "n_t4_gate", "lane": "l_07", "col": 2, "type": "security", "label": "Monotone Drone?", "sublabel": "CV = σ/μ <= 0.22", "tag": "Weight 15%", "width": 140 },
+    { "id": "n_t4_rms", "lane": "l_07", "col": 1, "type": "backend", "label": "16-Frame RMS", "sublabel": "voiced energy buffer", "width": 140 },
+    { "id": "n_t4_gate", "lane": "l_07", "col": 2, "type": "security", "label": "Monotone Drone?", "sublabel": "CV = σ/μ <= 0.34", "tag": "Weight 15%", "width": 140 },
 
     // 08 / Cooldown & Policy
     { "id": "n_silent", "lane": "l_08", "col": 1, "type": "security", "label": "Silence Guard", "sublabel": "freeze score when quiet", "width": 140 },
@@ -131,9 +131,9 @@ const workflowSpec = {
 
     // All Tests feed to Fusion
     { "id": "e_t1_fus", "from": "n_t1_gate", "to": "n_fusion", "label": "line (+10%)", "variant": "emphasis" },
-    { "id": "e_t2_fus", "from": "n_t2_gate", "to": "n_fusion", "label": "AI marker (+40%)", "variant": "emphasis" },
-    { "id": "e_t3_fus", "from": "n_t3_gate", "to": "n_fusion", "label": "echo hit (+40%)", "variant": "emphasis" },
-    { "id": "e_t4_fus", "from": "n_t4_gate", "to": "n_fusion", "label": "drone hit (+12%)", "variant": "emphasis" },
+    { "id": "e_t2_fus", "from": "n_t2_gate", "to": "n_fusion", "label": "AI marker (+35%)", "variant": "emphasis" },
+    { "id": "e_t3_fus", "from": "n_t3_gate", "to": "n_fusion", "label": "echo hit (+25%)", "variant": "emphasis" },
+    { "id": "e_t4_fus", "from": "n_t4_gate", "to": "n_fusion", "label": "drone hit (+20%)", "variant": "emphasis" },
     { "id": "e_cool_fus", "from": "n_cooldown", "to": "n_fusion", "label": "cooldown", "variant": "dashed" },
 
     // Fusion to Severity

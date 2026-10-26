@@ -88,24 +88,26 @@ class WpmBurstEvaluator:
 # ─────────────────────────────────────────────────────────────────────────────
 # Pillar 3: Spoken LLM Stylometry & Artifact Evaluator
 # ─────────────────────────────────────────────────────────────────────────────
+# Pillar 2: Spoken LLM Stylometry & Artifact Evaluator
+# ─────────────────────────────────────────────────────────────────────────────
 class LlmStylometryEvaluator:
     """
     Scans candidate's spoken speech for canonical ChatGPT / Claude verbal structures.
     Cooldown: Clean conversational speaking gradually cools down the stylometry score.
     """
     CANONICAL_PATTERNS = [
-        # Conversational AI Openers
-        (r"\b(certainly[,]? here (is|are)|sure[,]? here (is|are))\b", "AI Assistant Opener"),
-        (r"\b(let['’]?s break this down|to break this down step[- ]by[- ]step)\b", "AI Explanation Framing"),
-        (r"\b(here (is|are) (a|the) (step[- ]by[- ]step|quick overview|key points))\b", "AI Structural Header"),
-        # Structural Enumeration
-        (r"\b(firstly|first and foremost)\b", "List Enumeration [Firstly]"),
-        (r"\b(secondly|in addition|furthermore|moreover)\b", "List Enumeration [Connective]"),
-        (r"\b(thirdly|fourthly|lastly)\b", "List Enumeration [Ordinal]"),
-        (r"\b(in conclusion|to summarize|in summary|to sum up)\b", "List Enumeration [Conclusion]"),
-        # Formal AI Hedging
-        (r"\b(it is (important|crucial|essential) to (note|understand|remember) that)\b", "Formal AI Hedging"),
-        (r"\b(a key (takeaway|consideration|aspect) (is|here is))\b", "AI Summary Framing"),
+        # AI Connectives & Structural Enumeration
+        (r"\b(furthermore|further more|moreover|in addition|first and foremost|firstly|secondly|thirdly)\b", "AI Connective"),
+        # Formal AI Hedging & Analytical Framing
+        (r"\b(it is (important|crucial|essential) to (note|understand|remember)( that)?|worth noting|bear in mind)\b", "Formal AI Hedging"),
+        # AI Conclusion & Summarization
+        (r"\b(in conclusion|to conclude|to summarize|in summary|to sum up|in essence)\b", "AI Conclusion"),
+        # Signature LLM Vocabulary
+        (r"\b(delv(e|ing)( deeper)?( into)?)\b", "LLM Delve Vocabulary"),
+        (r"\b((core )?nuance[s]?|multifaceted|tapestry|holistic)\b", "LLM Nuance Vocabulary"),
+        (r"\b(significant aspect[s]?|key takeaway[s]?|key consideration[s]?|pivotal role)\b", "AI Analytical Framing"),
+        # Conversational AI Openers & Structure
+        (r"\b(certainly[,]? here (is|are)|sure[,]? here (is|are)|let['’]?s break this down|step[- ]by[- ]step|quick overview)\b", "AI Assistant Framing"),
         # AI Self Reference
         (r"\b(as an ai|as a language model|my knowledge cutoff|based on my training)\b", "Direct AI Artifact"),
     ]
@@ -113,60 +115,58 @@ class LlmStylometryEvaluator:
     def __init__(self):
         self.incidents: List[Dict[str, Any]] = []
         self.score: float = 0.0
-        self.matched_categories: set = set()
         self.hit_count: int = 0
-        self.seen_phrases: set = set()
         self.last_hit_t: float = -999.0
+        self.last_evaluated_transcript: str = ""
 
     def update(self, t: float, dt: float, transcript: str, is_speaking: bool) -> Tuple[float, Optional[str]]:
         # Active Cooldown: When not triggering new AI markers, decay score smoothly
-        if (t - self.last_hit_t) > 2.5 and self.score > 0.0:
+        if (t - self.last_hit_t) > 2.0 and self.score > 0.0:
             self.score = max(0.0, self.score - 0.025 * dt)
 
         if not transcript:
             return self.score, None
 
-        lower_text = transcript.lower()
+        # Only evaluate when a NEW or updated transcript snippet arrives
+        clean_text = transcript.strip().lower()
+        if clean_text == self.last_evaluated_transcript:
+            return self.score, None
+        self.last_evaluated_transcript = clean_text
+
         alert_msg = None
+        new_matches = []
 
         for pattern, category in self.CANONICAL_PATTERNS:
-            match = re.search(pattern, lower_text)
+            match = re.search(pattern, clean_text)
             if match:
                 phrase = match.group(0)
-                key = f"{category}_{phrase}"
-                if key in self.seen_phrases:
-                    continue
+                new_matches.append((category, phrase))
 
-                self.seen_phrases.add(key)
-                self.hit_count += 1
-                self.last_hit_t = t
-                self.matched_categories.add(category)
+        if new_matches:
+            self.hit_count += 1
+            self.last_hit_t = t
+            # Multiple markers in the same sentence indicate dense ChatGPT generation (+35%), single (+20%)
+            inc = 0.35 if len(new_matches) >= 2 else 0.20
+            self.score = min(1.0, self.score + inc)
+            primary_cat, primary_phrase = new_matches[0]
+            alert_msg = f"LLM marker detected: '{primary_phrase}' ({len(new_matches)} markers)"
 
-                rec = {
-                    "incident_number": self.hit_count,
-                    "timestamp_seconds": round(t, 2),
-                    "matched_phrase": phrase,
-                    "category": category,
-                    "context": transcript[-120:],
-                    "status": "CONFIRMED"
-                }
-                self.incidents.append(rec)
-
-                if self.hit_count == 1:
-                    self.score = min(1.0, self.score + 0.40)
-                    alert_msg = f"LLM marker detected ('{phrase}')"
-                elif self.hit_count == 2:
-                    self.score = min(1.0, self.score + 0.35)
-                    alert_msg = f"Multiple LLM markers detected ('{phrase}')"
-                else:
-                    self.score = min(1.0, self.score + 0.25)
-                    alert_msg = f"Continued LLM stylometry ('{phrase}')"
+            rec = {
+                "incident_number": self.hit_count,
+                "timestamp_seconds": round(t, 2),
+                "matched_phrase": primary_phrase,
+                "category": primary_cat,
+                "all_matches": [m[1] for m in new_matches],
+                "context": transcript[-120:],
+                "status": "CONFIRMED"
+            }
+            self.incidents.append(rec)
 
         return self.score, alert_msg
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Pillar 4: Question Echoing Delay Tactic Evaluator
+# Pillar 3: Question Echoing Delay Tactic Evaluator
 # ─────────────────────────────────────────────────────────────────────────────
 class QuestionEchoEvaluator:
     """
@@ -181,7 +181,7 @@ class QuestionEchoEvaluator:
     }
 
     DELAY_PATTERNS = [
-        r"\b(let me repeat|to repeat the question|repeating the question|so the question asks|the question is asking|to rephrase the question|so you are asking|let me think about that|give me a second|let me read the question|let me understand the question|good question let me think)\b"
+        r"\b(let me repeat|to repeat the question|repeat the question|repeating the question|so the question asks|the question is asking|to rephrase the question|so you are asking|let me think about that|give me a second|give me a moment|let me read the question|let me understand the question|good question let me think)\b"
     ]
 
     def __init__(self):
@@ -189,47 +189,53 @@ class QuestionEchoEvaluator:
         self.score: float = 0.0
         self.echo_count: int = 0
         self.last_echo_t: float = -999.0
+        self.last_evaluated_text: str = ""
 
     def update(self, t: float, dt: float, spoken_text: str, active_prompt: str, is_speaking: bool) -> Tuple[float, Optional[str]]:
         # Active Cooldown: When not echoing prompt, decay score smoothly
-        if (t - self.last_echo_t) > 2.5 and self.score > 0.0:
+        if (t - self.last_echo_t) > 2.0 and self.score > 0.0:
             self.score = max(0.0, self.score - 0.025 * dt)
 
         if not spoken_text:
             return self.score, None
 
-        lower_spoken = spoken_text.lower()
+        # CRITICAL FIX: Only evaluate when a NEW transcript arrives!
+        # Prevents re-triggering every 3 seconds on stale transcript
+        clean_spoken = spoken_text.strip().lower()
+        if clean_spoken == self.last_evaluated_text:
+            return self.score, None
+        self.last_evaluated_text = clean_spoken
+
         alert_msg = None
 
-        # Check verbal delay stall pattern
+        # 1. Check verbal delay stall pattern
         matched_phrase = None
         for pat in self.DELAY_PATTERNS:
-            m = re.search(pat, lower_spoken)
+            m = re.search(pat, clean_spoken)
             if m:
                 matched_phrase = m.group(0)
                 break
 
-        # Check keyword echo against active prompt
+        # 2. Check keyword echo against active prompt (ONLY if active_prompt is an actual question)
         is_keyword_echo = False
         overlap_keywords = []
         ratio = 0.0
 
-        if active_prompt and len(active_prompt) >= 12:
+        if active_prompt and ("?" in active_prompt or "question" in active_prompt.lower()) and len(active_prompt) >= 15:
             prompt_words = [
                 w for w in re.findall(r"[a-z]{4,}", active_prompt.lower())
                 if w not in self.STOPWORDS
             ]
-            if len(prompt_words) >= 2:
-                # Check recent spoken window (last ~40 words)
-                spoken_words = set(re.findall(r"[a-z]{4,}", lower_spoken[-250:]))
+            if len(prompt_words) >= 3:
+                spoken_words = set(re.findall(r"[a-z]{4,}", clean_spoken[-250:]))
                 overlap_keywords = [w for w in prompt_words if w in spoken_words]
                 ratio = len(overlap_keywords) / float(len(prompt_words))
-                if len(overlap_keywords) >= 2 and ratio >= 0.25:
+                if len(overlap_keywords) >= 3 and ratio >= 0.45:
                     is_keyword_echo = True
 
         triggered = (matched_phrase is not None) or is_keyword_echo
 
-        if triggered and (t - self.last_echo_t) > 3.0:
+        if triggered:
             self.echo_count += 1
             self.last_echo_t = t
 
@@ -246,28 +252,27 @@ class QuestionEchoEvaluator:
             self.incidents.append(rec)
 
             if self.echo_count == 1:
-                self.score = min(1.0, self.score + 0.40)
+                self.score = min(1.0, self.score + 0.25)
                 alert_msg = f"Question echo delay tactic detected"
             elif self.echo_count == 2:
-                self.score = min(1.0, self.score + 0.35)
-                alert_msg = f"Repeated question echoing delay tactic (#{self.echo_count})"
-            else:
                 self.score = min(1.0, self.score + 0.25)
+                alert_msg = f"Repeated question echo delay tactic (#{self.echo_count})"
+            else:
+                self.score = min(1.0, self.score + 0.20)
                 alert_msg = f"Sustained delay tactic (#{self.echo_count})"
 
         return self.score, alert_msg
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# ─────────────────────────────────────────────────────────────────────────────
 # Pillar 4: Speech Cadence & Robotic Voice Evaluator
 # ─────────────────────────────────────────────────────────────────────────────
 class CadenceProsodyEvaluator:
     """
     Measures cadence and vocal energy variance during active speech.
-    Spontaneous cognitive speech has natural pause variability & pitch inflection (CV >= 0.32).
-    AI Script teleprompter reading has an unnaturally flat, metronomic volume envelope (CV <= 0.22).
-    Cooldown: Enabled actively whenever candidate speaks normally or pauses/silent (smooth 3.0%/sec decay).
+    Spontaneous cognitive speech has natural pause variability & pitch inflection (CV >= 0.40).
+    AI Script teleprompter reading has an unnaturally flat, metronomic volume envelope (CV <= 0.34).
+    Cooldown: Enabled actively whenever candidate speaks normally or pauses/silent (smooth 2.5%/sec decay).
     """
     def __init__(self):
         self.incidents: List[Dict[str, Any]] = []
@@ -277,40 +282,30 @@ class CadenceProsodyEvaluator:
         self.last_eval_t: float = -999.0
         self.last_incident_t: float = -999.0
         self.silence_frames: int = 0
-        self.speech_frames: int = 0
 
     def update(self, t: float, dt: float, is_speaking: bool, rms: float) -> Tuple[float, Optional[str]]:
         # Active Cooldown: When not actively in a monotone incident, decay score smoothly
-        if (t - self.last_incident_t) > 2.5 and self.score > 0.0:
-            self.score = max(0.0, self.score - 0.030 * dt)
+        if (t - self.last_incident_t) > 2.0 and self.score > 0.0:
+            self.score = max(0.0, self.score - 0.025 * dt)
 
-        # STRICT Human Speech detection:
-        # Candidate MUST be actively speaking (VAD detected), and RMS must be real voice amplitude (rms >= 0.006)
-        # Background fan noise or room hum will NOT be treated as voiced frames.
-        if is_speaking and rms >= 0.006:
-            # If transitioning from silence into speech, start fresh window for this utterance
-            if self.silence_frames > 2:
-                self.rms_window.clear()
-                self.speech_frames = 0
+        # STRICT Human Speech Gate:
+        # Candidate MUST be actively speaking (multimodal VAD), and RMS must be above quiet ambient
+        if is_speaking and rms >= 0.0025:
             self.silence_frames = 0
-            self.speech_frames += 1
             self.rms_window.append(rms)
-            if len(self.rms_window) > 60:
+            if len(self.rms_window) > 40:
                 self.rms_window.pop(0)
 
-            # Requires at least 28 frames (~0.95s) of sustained voiced speech to evaluate prosody/cadence
-            if len(self.rms_window) >= 28 and self.speech_frames >= 28:
+            # Evaluates over 16 frames (~0.5s) of speech
+            if len(self.rms_window) >= 16:
                 arr = np.array(self.rms_window)
                 mean = float(np.mean(arr))
                 std = float(np.std(arr))
                 cv = (std / mean) if mean > 1e-4 else 1.0
 
-                # Flat teleprompter / robotic drone delivery:
-                # Normal human speech has natural inflection (CV > 0.30)
-                # Pure monotone / robotic cadence has CV <= 0.22
-                if cv <= 0.22 and mean >= 0.008:
-                    # Rate limit to at least 4.5s between incident evaluations to prevent rapid score spiking
-                    if (t - self.last_eval_t) > 4.5:
+                # Flat monotone delivery: CV <= 0.34 (Expressive human speech is CV >= 0.42)
+                if cv <= 0.34 and mean >= 0.003:
+                    if (t - self.last_eval_t) > 2.5:
                         self.hit_count += 1
                         self.last_eval_t = t
                         self.last_incident_t = t
@@ -323,24 +318,26 @@ class CadenceProsodyEvaluator:
                         }
                         self.incidents.append(rec)
 
-                        # Progressive, well-calibrated score increments (+12% -> +12% -> +10%)
+                        # Progressive score increments (+20% -> +20% -> +15%)
                         if self.hit_count == 1:
-                            self.score = min(1.0, self.score + 0.12)
+                            self.score = min(1.0, self.score + 0.20)
                             return self.score, f"Robotic monotone cadence detected (CV={cv:.2f})"
                         elif self.hit_count == 2:
-                            self.score = min(1.0, self.score + 0.12)
+                            self.score = min(1.0, self.score + 0.20)
                             return self.score, f"Sustained robotic teleprompter delivery (CV={cv:.2f})"
                         else:
-                            self.score = min(1.0, self.score + 0.10)
+                            self.score = min(1.0, self.score + 0.15)
                             return self.score, f"Continued monotone cadence (CV={cv:.2f})"
-                elif cv >= 0.28:
-                    # Natural vocal modulation detected: actively cool down robotic score
+                elif cv >= 0.40:
+                    # Natural pitch inflection detected: cool down robotic score actively
                     if self.score > 0.0:
-                        self.score = max(0.0, self.score - 0.035 * dt)
+                        self.score = max(0.0, self.score - 0.030 * dt)
         else:
-            self.speech_frames = 0
             self.silence_frames += 1
-            if len(self.rms_window) > 0:
+            # Pop frames during natural speech pauses
+            if self.silence_frames > 8 and len(self.rms_window) > 0:
+                self.rms_window.pop(0)
+            if self.silence_frames > 35:
                 self.rms_window.clear()
 
         return self.score, None
@@ -466,10 +463,10 @@ class MultiPillarProctorEngine:
             echo_sev = "CLEAN"
 
         # 4. Cadence Status
-        if s_cadence >= 0.28:
+        if s_cadence >= 0.35:
             cadence_status = "Robotic Drone Confirmed"
             cadence_sev = "CRITICAL"
-        elif s_cadence >= 0.10:
+        elif s_cadence >= 0.18:
             cadence_status = "Monotone Detected"
             cadence_sev = "WARN"
         else:

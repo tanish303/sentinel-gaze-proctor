@@ -245,7 +245,7 @@
       "lane": "l_07",
       "col": 1,
       "type": "backend",
-      "label": "30-Frame RMS",
+      "label": "16-Frame RMS",
       "sublabel": "voiced energy buffer",
       "width": 140
     },
@@ -255,7 +255,7 @@
       "col": 2,
       "type": "security",
       "label": "Monotone Drone?",
-      "sublabel": "CV = σ/μ <= 0.22",
+      "sublabel": "CV = σ/μ <= 0.34",
       "tag": "Weight 15%",
       "width": 140
     },
@@ -472,21 +472,21 @@
       "id": "e_t2_fus",
       "from": "n_t2_gate",
       "to": "n_fusion",
-      "label": "AI marker (+40%)",
+      "label": "AI marker (+35%)",
       "variant": "emphasis"
     },
     {
       "id": "e_t3_fus",
       "from": "n_t3_gate",
       "to": "n_fusion",
-      "label": "echo hit (+40%)",
+      "label": "echo hit (+25%)",
       "variant": "emphasis"
     },
     {
       "id": "e_t4_fus",
       "from": "n_t4_gate",
       "to": "n_fusion",
-      "label": "drone hit (+12%)",
+      "label": "drone hit (+20%)",
       "variant": "emphasis"
     },
     {
