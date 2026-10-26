@@ -483,6 +483,12 @@ def read_root():
     return FileResponse(STATIC_DIR / "index.html")
 
 
+@app.get("/diagram")
+def read_diagram():
+    return FileResponse(RESULTS_DIR / "sentinel_gaze_archify.html")
+
+
+
 if __name__ == "__main__":
     import uvicorn
     print("\n" + "="*70)
