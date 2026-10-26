@@ -933,6 +933,7 @@ def main():
 
     default = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     raw     = input(f"Enter Test Name (Enter='{default}'): ").strip()
+    test_name = (raw.replace(" ", "_") if raw else default)
     print(f"\n[CONFIG] Test: '{test_name}'  ->  Results: {RESULTS_DIR.resolve()}\n")
     print("[HOTKEYS]")
     print("  • Press '2': Trigger LLM Stylometry test phrase")
