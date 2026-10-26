@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentinel-Gaze Proctoring System — Master Architecture Diagram</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #0f172a;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #1e293b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    .top-toolbar {
+      width: 100%;
+      max-width: 1320px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .toolbar-title {
+      color: #f8fafc;
+      font-size: 14px;
+      font-family: 'Fira Code', monospace;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .toolbar-title .badge {
+      background: rgba(14, 165, 233, 0.2);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+    }
+    .btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f1f5f9;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn:hover {
+      background: #334155;
+      border-color: #475569;
+    }
+    .btn-primary {
+      background: #2563eb;
+      border-color: #3b82f6;
+    }
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    /* Diagram Canvas Container (resembling Eraser.io canvas) */
+    .canvas-container {
+      width: 100%;
+      max-width: 1320px;
+      background-color: #ffffff;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 20px 40px -15px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+      padding: 36px 44px 44px 44px;
+    }
+
+    /* Dot grid background pattern */
+    .canvas-container::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+      opacity: 0.65;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .diagram-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header in diagram */
+    .diagram-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #edf2f7;
+      padding-bottom: 16px;
+    }
+    .diagram-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: -0.02em;
+    }
+    .diagram-title .bullet {
+      width: 10px;
+      height: 10px;
+      background: #0284c7;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .diagram-subtitle-track {
+      font-family: 'Fira Code', monospace;
+      font-size: 12px;
+      color: #64748b;
+      margin-left: auto;
+      display: flex;
+      gap: 20px;
+    }
+    .diagram-subtitle-track span {
+      background: #f1f5f9;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Section / Swimlane container */
+    .swimlane {
+      border: 1px solid #e2e8f0;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(4px);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .swimlane-label {
+      font-family: 'Fira Code', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .swimlane-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #edf2f7;
+    }
+
+    /* Grid Layouts */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    /* Cards */
+    .card {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    /* Color styles for cards */
+    .card-input {
+      border: 1px solid #94a3b8;
+    }
+    .card-process {
+      border: 1px solid #10b981;
+      background: #f0fdf4;
+    }
+    .card-pillar-1 {
+      border: 1.5px solid #0284c7;
+      background: #f0f9ff;
+    }
+    .card-pillar-2 {
+      border: 1.5px solid #8b5cf6;
+      background: #f5f3ff;
+    }
+    .card-pillar-3 {
+      border: 1.5px solid #f59e0b;
+      background: #fffbeb;
+    }
+    .card-pillar-4 {
+      border: 1.5px solid #ef4444;
+      background: #fef2f2;
+    }
+    .card-gate {
+      border: 1.5px dashed #f43f5e;
+      background: #fff1f2;
+      border-radius: 20px;
+      text-align: center;
+    }
+    .card-fusion {
+      border: 2px solid #0f172a;
+      background: #f8fafc;
+    }
+    .card-output {
+      border: 1px solid #475569;
+      background: #f8fafc;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .card-tag {
+      font-family: 'Fira Code', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .tag-blue { background: #e0f2fe; color: #0284c7; }
+    .tag-purple { background: #ede9fe; color: #7c3aed; }
+    .tag-amber { background: #fef3c7; color: #d97706; }
+    .tag-red { background: #fee2e2; color: #dc2626; }
+    .tag-green { background: #dcfce7; color: #16a34a; }
+    .tag-gray { background: #f1f5f9; color: #475569; }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+      font-family: 'Fira Code', monospace;
+    }
+    .card-body {
+      font-size: 11.5px;
+      color: #475569;
+      line-height: 1.45;
+    }
+    .card-meta {
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px dashed rgba(0,0,0,0.08);
+      font-family: 'Fira Code', monospace;
+      font-size: 10px;
+      color: #64748b;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Connectors & routing indicators */
+    .connector-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: -10px 0 14px 0;
+      gap: 8px;
+      color: #94a3b8;
+      font-family: 'Fira Code', monospace;
+      font-size: 11px;
+    }
+    .arrow-down {
+      width: 2px;
+      height: 18px;
+      background: #cbd5e1;
+      position: relative;
+    }
+    .arrow-down::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: -3px;
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 6px solid #cbd5e1;
+    }
+
+    /* Decision gate badges */
+    .gate-badge {
+      display: inline-block;
+      font-family: 'Fira Code', monospace;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin: 4px 2px;
+    }
+    .gate-yes {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #86efac;
+    }
+    .gate-no {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+    }
+
+    /* Legend */
+    .legend-bar {
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'Fira Code', monospace;
+      font-size: 11px;
+      color: #64748b;
+    }
+    .legend-items {
+      display: flex;
+      gap: 20px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Toolbar -->
+  <div class="top-toolbar">
+    <div class="toolbar-title">
+      <span class="badge">SYSTEM ARCHITECTURE</span>
+      <span>Sentinel-Gaze Proctoring Engine v3.1</span>
+    </div>
+    <div class="btn-group">
+      <button class="btn" onclick="window.print()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print / Save PDF
+      </button>
+      <button class="btn btn-primary" onclick="copyMermaidCode()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Copy Mermaid Code
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Canvas Diagram Container -->
+  <div class="canvas-container" id="diagram-canvas">
+    <div class="diagram-content">
+      
+      <!-- Header -->
+      <div class="diagram-header">
+        <h1 class="diagram-title">
+          <span class="bullet"></span>
+          Sentinel-Gaze Anti-Cheat Architecture
+        </h1>
+        <div class="diagram-subtitle-track">
+          <span>01 / Sensor Capture</span>
+          <span>02 / 4 Threat Pillars</span>
+          <span>03 / Pure Weighted Average</span>
+          <span>04 / Audit Vault</span>
+        </div>
+      </div>
+
+      <!-- 01 / Sensor Ingestion & Raw Capture -->
+      <div class="swimlane">
+        <div class="swimlane-label">01 / Sensor Ingestion & Signal Capture</div>
+        <div class="grid-4">
+          
+          <div class="card card-input">
+            <div class="card-header">
+              <span class="card-tag tag-blue">VIDEO STREAM</span>
+              <span style="font-size:12px;">📷</span>
+            </div>
+            <div class="card-title">Webcam Video Stream</div>
+            <div class="card-body">30 FPS RGB video capture (720p/1080p). Auto-exposure & white-balance lock.</div>
+            <div class="card-meta">
+              <span>OpenCV VideoCapture</span>
+              <span>30 Hz</span>
+            </div>
+          </div>
+
+          <div class="card card-input">
+            <div class="card-header">
+              <span class="card-tag tag-blue">AUDIO STREAM</span>
+              <span style="font-size:12px;">🎙️</span>
+            </div>
+            <div class="card-title">Microphone Audio Stream</div>
+            <div class="card-body">16,000 Hz 16-bit PCM mono audio callback. Real-time RMS buffer & background noise floor.</div>
+            <div class="card-meta">
+              <span>SoundDevice RingBuffer</span>
+              <span>100ms blocks</span>
+            </div>
+          </div>
+
+          <div class="card card-input">
+            <div class="card-header">
+              <span class="card-tag tag-blue">EXAM CONTEXT</span>
+              <span style="font-size:12px;">📝</span>
+            </div>
+            <div class="card-title">Question Anchor Stream</div>
+            <div class="card-body">Active interviewer question prompt text anchor. Basis for question echo delay detection.</div>
+            <div class="card-meta">
+              <span>Prompt Buffer</span>
+              <span>Text Anchor</span>
+            </div>
+          </div>
+
+          <div class="card card-input">
+            <div class="card-header">
+              <span class="card-tag tag-blue">CALIBRATION</span>
+              <span style="font-size:12px;">📐</span>
+            </div>
+            <div class="card-title">Screen Canvas Bounds</div>
+            <div class="card-body">Candidate display screen coordinate bounds & ready-to-read evaluation test statements.</div>
+            <div class="card-meta">
+              <span>Canvas 1380x720</span>
+              <span>4 Statements</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="connector-row"><div class="arrow-down"></div></div>
+
+      <!-- 02 / Signal Processing & Multimodal Fusion -->
+      <div class="swimlane">
+        <div class="swimlane-label">02 / Feature Extraction & Multimodal Gating</div>
+        <div class="grid-3">
+          
+          <div class="card card-process">
+            <div class="card-header">
+              <span class="card-tag tag-green">FACE MESH</span>
+              <span style="font-size:12px;">👁️</span>
+            </div>
+            <div class="card-title">MediaPipe Landmarker</div>
+            <div class="card-body">478 3D facial landmarks. Dual-eye coherent iris centers (468, 473) normalized relative to socket bounds.</div>
+            <div class="card-meta">
+              <span>Sub-pixel Precision</span>
+              <span>Dual Iris Track</span>
+            </div>
+          </div>
+
+          <div class="card card-process">
+            <div class="card-header">
+              <span class="card-tag tag-green">HEAD POSE</span>
+              <span style="font-size:12px;">🧭</span>
+            </div>
+            <div class="card-title">solvePnP Pose Estimator</div>
+            <div class="card-body">6 stable 3D skull points. Computes yaw, pitch, and roll relative to neutral baseline seated posture.</div>
+            <div class="card-meta">
+              <span>Degrees (Pitch/Yaw)</span>
+              <span>Drift Guard</span>
+            </div>
+          </div>
+
+          <div class="card card-process">
+            <div class="card-header">
+              <span class="card-tag tag-green">AUDIO-VISUAL VAD</span>
+              <span style="font-size:12px;">👄</span>
+            </div>
+            <div class="card-title">Multimodal Speech Fusion</div>
+            <div class="card-body">Lip motion ratio (MAR) + audio RMS fusion. Blocks 100% of typing/fan noise; triggers STT on speech pauses.</div>
+            <div class="card-meta">
+              <span>Google STT Thread</span>
+              <span>400ms Hangover</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="connector-row"><div class="arrow-down"></div></div>
+
+      <!-- 03 / Four Independent Threat Pillars -->
+      <div class="swimlane" style="border-width: 2px;">
+        <div class="swimlane-label" style="color: #0f172a; font-weight: 700;">03 / Four Independent Threat Pillars (Real-Time Evaluation)</div>
+        <div class="grid-4">
+          
+          <!-- Pillar 1 -->
+          <div class="card card-pillar-1">
+            <div class="card-header">
+              <span class="card-tag tag-blue">WEIGHT: 45%</span>
+              <span style="font-size:11px; font-weight: 700; color:#0284c7;">TEST 1</span>
+            </div>
+            <div class="card-title">1. Eye Reading</div>
+            <div class="card-body">
+              <strong>Screen Teleprompter Detection</strong><br>
+              • Horizontal gaze sweep (0.35–4.5s)<br>
+              • Velocity saccade (v &lt; -0.18 units/s)<br>
+              • Downward staircase step (0.004–0.055)
+            </div>
+            <div class="card-meta">
+              <span>+10%/line (aloud)</span>
+              <span>+12%/line (silent)</span>
+            </div>
+          </div>
+
+          <!-- Pillar 2 -->
+          <div class="card card-pillar-2">
+            <div class="card-header">
+              <span class="card-tag tag-purple">WEIGHT: 25%</span>
+              <span style="font-size:11px; font-weight: 700; color:#7c3aed;">TEST 2</span>
+            </div>
+            <div class="card-title">2. AI Phrases</div>
+            <div class="card-body">
+              <strong>ChatGPT / LLM Words</strong><br>
+              • STT N-gram phrase scanner<br>
+              • Academic transition vocabulary<br>
+              • ("furthermore", "in conclusion", "delve deeper", "nuances")
+            </div>
+            <div class="card-meta">
+              <span>Hit 1: +40%</span>
+              <span>Hit 2: +35%</span>
+            </div>
+          </div>
+
+          <!-- Pillar 3 -->
+          <div class="card card-pillar-3">
+            <div class="card-header">
+              <span class="card-tag tag-amber">WEIGHT: 15%</span>
+              <span style="font-size:11px; font-weight: 700; color:#d97706;">TEST 3</span>
+            </div>
+            <div class="card-title">3. Question Echo</div>
+            <div class="card-body">
+              <strong>Stalling Delay Tactic</strong><br>
+              • Token Jaccard overlap matrix<br>
+              • Levenshtein keyword similarity<br>
+              • Repeating &gt;60% question prompt in first 12s of answer
+            </div>
+            <div class="card-meta">
+              <span>Confirmed: +40%</span>
+              <span>12s Delay Window</span>
+            </div>
+          </div>
+
+          <!-- Pillar 4 -->
+          <div class="card card-pillar-4">
+            <div class="card-header">
+              <span class="card-tag tag-red">WEIGHT: 15%</span>
+              <span style="font-size:11px; font-weight: 700; color:#dc2626;">TEST 4</span>
+            </div>
+            <div class="card-title">4. Robotic Voice</div>
+            <div class="card-body">
+              <strong>Monotone Teleprompter Cadence</strong><br>
+              • 14-frame sliding RMS energy window<br>
+              • Vocal envelope variance: CV = &sigma; / &mu;<br>
+              • Flat metronomic recitation (CV &le; 0.38)
+            </div>
+            <div class="card-meta">
+              <span>Hit 1: +40%</span>
+              <span>Hit 2: +35%</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="connector-row"><div class="arrow-down"></div></div>
+
+      <!-- 04 / Cooldown & Validation Policy Gates -->
+      <div class="swimlane">
+        <div class="swimlane-label">04 / Cooldown & Validation Policy Gates</div>
+        <div class="grid-3">
+          
+          <div class="card card-gate">
+            <div class="card-title" style="color: #b91c1c;">Silence Freeze Guard?</div>
+            <div class="card-body">When candidate is silent, all scores are <strong>100% frozen</strong>. Zero decay and zero false alarms during pauses.</div>
+            <div style="margin-top:8px;">
+              <span class="gate-badge gate-yes">[Silent = Freeze Score]</span>
+            </div>
+          </div>
+
+          <div class="card card-gate">
+            <div class="card-title" style="color: #b91c1c;">Natural Speech Active?</div>
+            <div class="card-body">When candidate looks straight at webcam & speaks naturally with vocal inflection, all 4 scores <strong>cool down smoothly</strong>.</div>
+            <div style="margin-top:8px;">
+              <span class="gate-badge gate-yes">[Clean = -2.5%/sec Decay]</span>
+            </div>
+          </div>
+
+          <div class="card card-gate">
+            <div class="card-title" style="color: #b91c1c;">Manual Hotkey Override?</div>
+            <div class="card-body">Immediate manual controls for live classroom demonstration: <strong>[2]</strong> AI Words | <strong>[3]</strong> Echo | <strong>[4]</strong> Robot | <strong>[C]</strong> Cooldown.</div>
+            <div style="margin-top:8px;">
+              <span class="gate-badge gate-yes">[C = -25% Instant Cooldown]</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="connector-row"><div class="arrow-down"></div></div>
+
+      <!-- 05 / Pure Weighted Average Aggregator -->
+      <div class="swimlane">
+        <div class="swimlane-label">05 / Pure Weighted Average Fusion Engine</div>
+        <div class="card card-fusion">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+            <div class="card-title" style="font-size: 15px;">Final Composite Risk Score = 0.45·T1 + 0.25·T2 + 0.15·T3 + 0.15·T4</div>
+            <span class="card-tag tag-blue">WEIGHTS SUM = 1.00</span>
+          </div>
+          <div class="grid-4" style="text-align: center; margin-top: 10px;">
+            <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:6px; padding:10px;">
+              <strong style="color:#15803d; font-size:13px; font-family:'Fira Code',monospace;">&lt; 20%</strong><br>
+              <span style="font-size:11px; color:#166534; font-weight:600;">CLEAN</span>
+            </div>
+            <div style="background:#eff6ff; border:1px solid #93c5fd; border-radius:6px; padding:10px;">
+              <strong style="color:#1d4ed8; font-size:13px; font-family:'Fira Code',monospace;">20% – 39%</strong><br>
+              <span style="font-size:11px; color:#1e40af; font-weight:600;">MONITOR</span>
+            </div>
+            <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:10px;">
+              <strong style="color:#b45309; font-size:13px; font-family:'Fira Code',monospace;">40% – 69%</strong><br>
+              <span style="font-size:11px; color:#92400e; font-weight:600;">REVIEW / SUSPICIOUS</span>
+            </div>
+            <div style="background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; padding:10px;">
+              <strong style="color:#b91c1c; font-size:13px; font-family:'Fira Code',monospace;">&ge; 70%</strong><br>
+              <span style="font-size:11px; color:#991b1b; font-weight:600;">CRITICAL CHEATING</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="connector-row"><div class="arrow-down"></div></div>
+
+      <!-- 06 / Real-time Dispatch & Forensic Vault -->
+      <div class="swimlane" style="margin-bottom: 0;">
+        <div class="swimlane-label">06 / Output Dispatch & Forensic Vault</div>
+        <div class="grid-4">
+          
+          <div class="card card-output">
+            <div class="card-header">
+              <span class="card-tag tag-gray">HEADS-UP DISPLAY</span>
+              <span style="font-size:12px;">🖥️</span>
+            </div>
+            <div class="card-title">OpenCV Camera HUD</div>
+            <div class="card-body">Live top risk composite bar + 4 horizontal test cards with real-time percentages, status, & VU meter.</div>
+            <div class="card-meta">
+              <span>OpenCV window</span>
+              <span>30 FPS</span>
+            </div>
+          </div>
+
+          <div class="card card-output">
+            <div class="card-header">
+              <span class="card-tag tag-gray">INSTRUCTOR BOARD</span>
+              <span style="font-size:12px;">📜</span>
+            </div>
+            <div class="card-title">Test Text Canvas</div>
+            <div class="card-body">1380x720 window with statements for all 4 tests, spoken test phrases, and instructor guidelines.</div>
+            <div class="card-meta">
+              <span>"Test Text" Window</span>
+              <span>5 Sections</span>
+            </div>
+          </div>
+
+          <div class="card card-output">
+            <div class="card-header">
+              <span class="card-tag tag-gray">STREAMING API</span>
+              <span style="font-size:12px;">⚡</span>
+            </div>
+            <div class="card-title">WebSocket Telemetry</div>
+            <div class="card-body">FastAPI broadcast to web dashboard (`:8000`) with per-pillar metrics and candidate video frames.</div>
+            <div class="card-meta">
+              <span>ws://localhost:8000</span>
+              <span>JSON Stream</span>
+            </div>
+          </div>
+
+          <div class="card card-output">
+            <div class="card-header">
+              <span class="card-tag tag-gray">EVIDENCE VAULT</span>
+              <span style="font-size:12px;">📁</span>
+            </div>
+            <div class="card-title">Forensic Audit Reports</div>
+            <div class="card-body">Saved to `results/`: Session JSON incident report + formatted TXT summary + PNG 3-panel chart.</div>
+            <div class="card-meta">
+              <span>JSON + TXT + PNG</span>
+              <span>Key [Q] to Save</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend-bar">
+        <div style="font-weight: 700; color: #0f172a;">Architecture Legend:</div>
+        <div class="legend-items">
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #94a3b8;"></div>
+            <span>01 / Sensor Inputs</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #10b981;"></div>
+            <span>02 / Feature Extraction</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #0284c7;"></div>
+            <span>03 / 4 Threat Pillars</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #f43f5e;"></div>
+            <span>04 / Cooldown Policy Gates</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #0f172a;"></div>
+            <span>05 / Weighted Average & Vault</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function copyMermaidCode() {
+      const code = `flowchart TD
+    subgraph S1 ["01 / Sensor Ingestion & Signal Capture"]
+        Cam["Webcam Video Stream<br/>(30 FPS RGB 720p/1080p)"]
+        Mic["Microphone Audio Stream<br/>(16kHz 16-bit Mono PCM)"]
+        Prompt["Question Anchor Stream<br/>(Interviewer Text Prompt)"]
+        Canvas["Screen Canvas Bounds<br/>(Test Statements & Rules)"]
+    end
+
+    subgraph S2 ["02 / Feature Extraction & Multimodal Gating"]
+        MP["MediaPipe Face Landmarker<br/>(478 3D Points & Dual Iris 468/473)"]
+        PnP["solvePnP Pose Estimator<br/>(Neutral Baseline Yaw & Pitch)"]
+        VAD["Multimodal Audio-Visual VAD<br/>(Lip Motion MAR + Audio RMS Fusion)"]
+    end
+
+    subgraph S3 ["03 / Four Independent Threat Pillars"]
+        P1["TEST 1: EYE READING (45%)<br/>(Sweep + Saccade v<-0.18 + Staircase)"]
+        P2["TEST 2: AI PHRASES (25%)<br/>(Google STT + LLM N-gram Lexicon)"]
+        P3["TEST 3: QUESTION ECHO (15%)<br/>(Jaccard/Levenshtein Overlap > 60%)"]
+        P4["TEST 4: ROBOTIC VOICE (15%)<br/>(14-frame Sliding RMS CV <= 0.38)"]
+    end
+
+    subgraph S4 ["04 / Cooldown & Validation Policy Gates"]
+        G1{"Silence Lock?<br/>(Zero decay when silent)"}
+        G2{"Natural Speaking?<br/>(-2.5%/sec smooth decay)"}
+        G3{"Manual Hotkey Override?<br/>([2], [3], [4], [C])"}
+    end
+
+    subgraph S5 ["05 / Pure Weighted Average Fusion Engine"]
+        Calc["Final Risk Score = 0.45*T1 + 0.25*T2 + 0.15*T3 + 0.15*T4"]
+        Verdicts["Severity Classifier: Clean (<20%) | Monitor (20-39%) | Review (40-69%) | Critical (>=70%)"]
+    end
+
+    subgraph S6 ["06 / Output Dispatch & Forensic Vault"]
+        HUD["OpenCV Camera Window HUD<br/>(Top Risk Bar + 4 Metric Cards)"]
+        Board["Test Text OpenCV Canvas<br/>(1380x720 5-Section Board)"]
+        WS["FastAPI WebSocket Stream<br/>(JSON Telemetry on :8000)"]
+        Vault["Forensic Vault Storage<br/>(results/ JSON + TXT + PNG)"]
+    end
+
+    Cam --> MP & PnP
+    Mic --> VAD
+    MP & PnP --> P1
+    VAD --> P2
+    Prompt & VAD --> P3
+    Mic & VAD --> P4
+
+    P1 & P2 & P3 & P4 --> G1 & G2 & G3
+    G1 & G2 & G3 --> Calc
+    Calc --> Verdicts
+    Verdicts --> HUD & Board & WS & Vault`;
+
+      navigator.clipboard.writeText(code).then(() => {
+        alert("Mermaid Architecture Diagram code copied to clipboard!");
+      });
+    }
+  </script>
+</body>
+</html>
