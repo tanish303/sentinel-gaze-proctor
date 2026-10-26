@@ -279,15 +279,21 @@ class LiveMicrophoneTracker:
             self.is_speaking = self.lip_moving
             return self.is_speaking
 
-        # If lips are NOT moving, candidate is NOT speaking words.
-        if not self.lip_moving:
-            if t > self.hangover_until:
-                self.is_speaking = False
-        else:
-            # Lips ARE actively moving: check if voice energy is detected
-            has_voice = (self.current_rms >= self.sensitive_threshold)
+        has_voice = (self.current_rms >= self.sensitive_threshold)
+
+        # Audio-Visual Fusion:
+        # 1. When lips are moving, sensitive low threshold detects speech immediately
+        # 2. When lips move subtly (e.g. robotic monotone delivery), clear voice confirms speech
+        if self.lip_moving:
             if has_voice:
-                self.hangover_until = t + 0.40
+                self.hangover_until = t + 0.45
+                self.is_speaking = True
+            else:
+                self.is_speaking = (t < self.hangover_until)
+        else:
+            # Subtle lip movement fallback: clear vocal sound above ambient noise floor
+            if self.current_rms >= max(0.004, self.ambient + 0.0025):
+                self.hangover_until = t + 0.35
                 self.is_speaking = True
             else:
                 self.is_speaking = (t < self.hangover_until)
@@ -962,43 +968,88 @@ def main():
     start       = None
     last_ts     = -1
 
-    # ── Build test-text canvas (Wide, long full-width lines) ──────────────────
+    # ── Build test-text canvas (Statements for all 4 tests + Guidelines) ──────
+    CANVAS_W, CANVAS_H = 1380, 720
+    canvas = np.full((CANVAS_H, CANVAS_W, 3), (248, 249, 252), np.uint8)
+
     LINES = [
-        "Line 1: When candidates take online technical assessments or live proctored interviews, eye gaze patterns reflect cognitive focus and visual attention across the screen.",
-        "Line 2: As your eyes read continuously across each written sentence from left to right, the ocular muscles maintain a steady horizontal sweep speed across the full window.",
-        "Line 3: Upon reaching the end of the line on the right side of the screen, the visual cortex initiates a rapid ballistic return saccade back to the beginning of the next sentence.",
-        "Line 4: This rapid return jump is accompanied by a coordinated downward vertical step of several pixels to precisely align your focus with the start of the next line.",
-        "Line 5: In contrast to natural conversational speaking where people look directly at the webcam, reading off an external script creates repeated consecutive staircase steps.",
-        "Line 6: When you pause or remain completely silent between thoughts, the anti-cheat confidence score is strictly frozen in place without any premature decrease.",
-        "Line 7: However, when you speak naturally and maintain direct conversational eye contact with the interviewer, the confidence score cools down safely over time.",
-        "Line 8: Once you complete your reading evaluation or interview session, press Q or ESC to immediately finalize the detailed audit report and forensic graphs.",
+        "When candidates take technical interviews, ocular gaze patterns maintain a steady horizontal sweep speed across the window.",
+        "At the end of each line, the eyes perform a rapid return saccade accompanied by a downward step to begin the next sentence.",
+        "Furthermore, it is important to note that in conclusion, delving deeper into the core nuances of this problem reveals significant aspects.",
+        "Let me repeat the question to make sure I understand correctly before providing my answer to your prompt.",
+        "The system architecture consists of a primary frontend client communicating over websockets in a continuous stream without vocal variation.",
     ]
-    canvas = np.full((520, 1320, 3), (250, 250, 250), np.uint8)
 
-    # Header banner
-    cv2.rectangle(canvas, (0, 0), (1320, 48), (235, 238, 245), -1)
-    cv2.line(canvas, (0, 48), (1320, 48), (200, 205, 215), 1)
-    cv2.putText(canvas, "AI TELEPROMPTER READ-ALOUD TEST (Cheating Daddy / Parakeet AI Proctoring Engine):",
-                (20, 32), cv2.FONT_HERSHEY_SIMPLEX, 0.58, (120, 30, 20), 2, cv2.LINE_AA)
+    # 1. Header Banner
+    cv2.rectangle(canvas, (0, 0), (CANVAS_W, 54), (24, 28, 38), -1)
+    cv2.putText(canvas, "SENTINEL-GAZE PROCTORING // 4-TEST INSTRUCTOR EVALUATION BOARD & STATEMENTS",
+                (20, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.62, (255, 255, 255), 2, cv2.LINE_AA)
 
-    for i, ln in enumerate(LINES):
-        y_pos = 92 + i * 48
-        if i % 2 == 1:
-            cv2.rectangle(canvas, (10, y_pos - 28), (1310, y_pos + 12), (242, 244, 248), -1)
-        cv2.putText(canvas, ln, (22, y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (25, 25, 25), 1, cv2.LINE_AA)
+    # 2. Section 1: TEST 1 — EYE READING
+    cv2.rectangle(canvas, (16, 64), (CANVAS_W - 16, 184), (255, 255, 255), -1)
+    cv2.rectangle(canvas, (16, 64), (CANVAS_W - 16, 184), (215, 220, 230), 1)
+    cv2.rectangle(canvas, (16, 64), (16 + 8, 184), (40, 160, 220), -1)
+    cv2.putText(canvas, "TEST 1: EYE READING (Screen Gaze Teleprompter Detection — Weight: 45%)",
+                (36, 88), cv2.FONT_HERSHEY_SIMPLEX, 0.50, (20, 30, 45), 2, cv2.LINE_AA)
+    cv2.putText(canvas, "• Line 1: When candidates take technical interviews, ocular gaze patterns maintain a steady horizontal sweep speed across the window.",
+                (36, 116), cv2.FONT_HERSHEY_SIMPLEX, 0.42, (35, 40, 50), 1, cv2.LINE_AA)
+    cv2.putText(canvas, "• Line 2: At the end of each line, the eyes perform a rapid return saccade accompanied by a downward step to begin the next sentence.",
+                (36, 142), cv2.FONT_HERSHEY_SIMPLEX, 0.42, (35, 40, 50), 1, cv2.LINE_AA)
+    cv2.putText(canvas, "[INSTRUCTION]: Read these 2 lines aloud with eyes sweeping Left->Right, then snap back left to trigger Test 1 (+10% per line).",
+                (36, 170), cv2.FONT_HERSHEY_SIMPLEX, 0.39, (0, 120, 200), 1, cv2.LINE_AA)
 
-    # Footer instructions
-    cv2.line(canvas, (0, 480), (1320, 480), (210, 215, 225), 1)
-    cv2.putText(canvas, "[READ ALOUD: Speak lines aloud into mic. Silent reading = FROZEN (0% up). Natural talk to webcam = COOLS DOWN.]",
-                (20, 504), cv2.FONT_HERSHEY_SIMPLEX, 0.44, (90, 90, 90), 1, cv2.LINE_AA)
+    # 3. Section 2: TEST 2 — AI PHRASES
+    cv2.rectangle(canvas, (16, 194), (CANVAS_W - 16, 304), (255, 255, 255), -1)
+    cv2.rectangle(canvas, (16, 194), (CANVAS_W - 16, 304), (215, 220, 230), 1)
+    cv2.rectangle(canvas, (16, 194), (16 + 8, 304), (140, 80, 240), -1)
+    cv2.putText(canvas, "TEST 2: AI PHRASES (ChatGPT / LLM Words Detection — Weight: 25%)",
+                (36, 218), cv2.FONT_HERSHEY_SIMPLEX, 0.50, (20, 30, 45), 2, cv2.LINE_AA)
+    cv2.putText(canvas, "• Statement: \"Furthermore, it is important to note that in conclusion, delving deeper into the core nuances of this problem reveals significant aspects.\"",
+                (36, 248), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (120, 20, 80), 1, cv2.LINE_AA)
+    cv2.putText(canvas, "[INSTRUCTION]: Speak this sentence into your mic, OR press keyboard '2' to instantly trigger Test 2 (+40%).",
+                (36, 282), cv2.FONT_HERSHEY_SIMPLEX, 0.39, (140, 60, 200), 1, cv2.LINE_AA)
 
-    print("\nDETECTOR LIVE. Rules:")
-    print("  • Audio-Visual VAD: Lip tracking + sensitive volume (no shouting needed)")
-    print("  • Score up (+10% per line) ONLY when reciting aloud with L->R sweep in continuous flow")
-    print("  • Silent candidate (thinking, browsing IDE, listening): Score 100% STRICTLY FROZEN (zero increase)")
-    print("  • Natural conversational speaking (looking at webcam): Score COOLS DOWN at ~1.0%/s")
-    print("  • [ / - = increase mic sensitivity;  ] / + = decrease")
-    print("  • Q / ESC / Ctrl-C to finish\n" + "="*65 + "\n")
+    # 4. Section 3: TEST 3 — QUESTION ECHO
+    cv2.rectangle(canvas, (16, 314), (CANVAS_W - 16, 424), (255, 255, 255), -1)
+    cv2.rectangle(canvas, (16, 314), (CANVAS_W - 16, 424), (215, 220, 230), 1)
+    cv2.rectangle(canvas, (16, 314), (16 + 8, 424), (230, 140, 30), -1)
+    cv2.putText(canvas, "TEST 3: QUESTION ECHO (Stalling / Prompt Repeating Delay — Weight: 15%)",
+                (36, 338), cv2.FONT_HERSHEY_SIMPLEX, 0.50, (20, 30, 45), 2, cv2.LINE_AA)
+    cv2.putText(canvas, "• Statement: \"Let me repeat the question to make sure I understand correctly... so you are asking about candidate eye gaze patterns during online tests...\"",
+                (36, 368), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (150, 60, 10), 1, cv2.LINE_AA)
+    cv2.putText(canvas, "[INSTRUCTION]: Speak this stalling sentence into your mic, OR press keyboard '3' to instantly trigger Test 3 (+40%).",
+                (36, 402), cv2.FONT_HERSHEY_SIMPLEX, 0.39, (200, 100, 0), 1, cv2.LINE_AA)
+
+    # 5. Section 4: TEST 4 — ROBOTIC VOICE
+    cv2.rectangle(canvas, (16, 434), (CANVAS_W - 16, 544), (255, 255, 255), -1)
+    cv2.rectangle(canvas, (16, 434), (CANVAS_W - 16, 544), (215, 220, 230), 1)
+    cv2.rectangle(canvas, (16, 434), (16 + 8, 544), (220, 50, 50), -1)
+    cv2.putText(canvas, "TEST 4: ROBOTIC VOICE (Monotone Tone / Flat Teleprompter Cadence — Weight: 15%)",
+                (36, 458), cv2.FONT_HERSHEY_SIMPLEX, 0.50, (20, 30, 45), 2, cv2.LINE_AA)
+    cv2.putText(canvas, "• Statement: \"The system architecture consists of a primary frontend client communicating over websockets in a continuous stream without vocal variation.\"",
+                (36, 488), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (30, 35, 45), 1, cv2.LINE_AA)
+    cv2.putText(canvas, "[INSTRUCTION]: Speak this in a flat robotic tone without pitch variance, OR press keyboard '4' to instantly trigger Test 4 (+40%).",
+                (36, 522), cv2.FONT_HERSHEY_SIMPLEX, 0.39, (180, 40, 40), 1, cv2.LINE_AA)
+
+    # 6. Section 5: INSTRUCTOR EVALUATION & COOLDOWN GUIDELINES
+    cv2.rectangle(canvas, (16, 554), (CANVAS_W - 16, 700), (238, 245, 240), -1)
+    cv2.rectangle(canvas, (16, 554), (CANVAS_W - 16, 700), (180, 215, 190), 1)
+    cv2.putText(canvas, "INSTRUCTOR EVALUATION & COOLDOWN GUIDELINES:",
+                (36, 580), cv2.FONT_HERSHEY_SIMPLEX, 0.48, (20, 110, 50), 2, cv2.LINE_AA)
+    cv2.putText(canvas, "• PURE WEIGHTED AVERAGE: Final Risk = 0.45*(Eye Reading) + 0.25*(AI Phrases) + 0.15*(Question Echo) + 0.15*(Robotic Voice).",
+                (36, 608), cv2.FONT_HERSHEY_SIMPLEX, 0.41, (30, 70, 40), 1, cv2.LINE_AA)
+    cv2.putText(canvas, "• ACTIVE COOLDOWN: Look directly into webcam & speak naturally or pause — all 4 test scores cool down smoothly (~2.5%/sec).",
+                (36, 636), cv2.FONT_HERSHEY_SIMPLEX, 0.41, (30, 70, 40), 1, cv2.LINE_AA)
+    cv2.putText(canvas, "• INSTANT HOTKEYS CHEATSHEET: [2]=AI Phrases | [3]=Question Echo | [4]=Robotic Voice | [C]=Force Cooldown | [Q]=Save Forensic Audit",
+                (36, 668), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (10, 40, 100), 2, cv2.LINE_AA)
+
+    print("\nDETECTOR LIVE. Easy Test Names & Rules:")
+    print("  • 1. EYE READING    (45%): Sweeping eyes across screen -> +10%/line confirmed")
+    print("  • 2. AI PHRASES     (25%): Reciting ChatGPT phrases    -> +40% (or press '2')")
+    print("  • 3. QUESTION ECHO  (15%): Repeating questions/stalling-> +40% (or press '3')")
+    print("  • 4. ROBOTIC VOICE  (15%): Speaking in flat monotone   -> +40% (or press '4')")
+    print("  • COOLDOWN          : Looking straight / natural speech-> Cools down smoothly to 0%")
+    print("  • Hotkeys           : [2] AI Phrases | [3] Echo | [4] Robot Voice | [C] Cooldown | [Q] Quit\n" + "="*65 + "\n")
 
     try:
         with vision.FaceLandmarker.create_from_options(opts) as lmk:
@@ -1093,7 +1144,7 @@ def main():
 
                 # 2. Horizontal 4-Parameter Grid Row (y: 28 to 98)
                 cw = (w - 20) // 4
-                p_keys = [("gaze", "1. GAZE"), ("llm", "2. LLM"), ("echo", "3. ECHO"), ("cadence", "4. CADENCE")]
+                p_keys = [("gaze", "1. EYE READING"), ("llm", "2. AI PHRASES"), ("echo", "3. QUESTION ECHO"), ("cadence", "4. ROBOTIC VOICE")]
 
                 for idx, (pkey, title) in enumerate(p_keys):
                     bx = 8 + idx * (cw + 2)
@@ -1122,7 +1173,7 @@ def main():
                     cv2.rectangle(disp, (bx, by), (bx + bw, by + bh), bcol, 1)
 
                     cv2.putText(disp, title, (bx + 6, by + 16),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.38, (220, 220, 220), 1, cv2.LINE_AA)
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (220, 220, 220), 1, cv2.LINE_AA)
                     cv2.putText(disp, f"{psc*100:.0f}%", (bx + bw - 36, by + 16),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.38, txtcol, 1, cv2.LINE_AA)
 
@@ -1145,7 +1196,7 @@ def main():
                 cv2.putText(disp, f"SPEECH: {vad_str} [LIPS: {lip_str} | MIC: {mic.current_rms:.3f}/{mic.sensitive_threshold:.3f}]",
                             (12, 118), cv2.FONT_HERSHEY_SIMPLEX, 0.34, vad_col, 1, cv2.LINE_AA)
 
-                bx, by, bw, bh = 290, 109, 90, 8
+                bx, by, bw, bh = 280, 109, 80, 8
                 cv2.rectangle(disp, (bx, by), (bx + bw, by + bh), (35, 40, 48), -1)
                 fr = int(bw * float(np.clip(mic.current_rms / 0.050, 0, 1)))
                 cv2.rectangle(disp, (bx, by), (bx + fr, by + bh), vad_col, -1)
@@ -1153,8 +1204,8 @@ def main():
                 cv2.line(disp, (tx, by - 2), (tx, by + bh + 2), (0, 0, 255), 2)
 
                 # Hotkeys instruction on HUD
-                cv2.putText(disp, "[2]LLM  [3]Echo  [4]Cadence  [C]Cool  [Q]Quit", (390, 118),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.31, (0, 215, 255), 1, cv2.LINE_AA)
+                cv2.putText(disp, "[2]AI Words [3]Echo [4]Robot [C]Cool [Q]Quit", (370, 118),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.30, (0, 215, 255), 1, cv2.LINE_AA)
 
                 # Show live transcript snippet on frame if available
                 if active_transcript:
@@ -1172,27 +1223,27 @@ def main():
                 elif k in (ord(']'), ord('+'), ord('=')):
                     mic.adjust(+0.001)
                 elif k in (ord('2'), ord('l'), ord('L')):
-                    # Test Pillar 2: LLM Stylometry
+                    # Test Pillar 2: AI Phrases
                     test_phrase = "Furthermore, it is important to note that in conclusion, delve deeper into the solution."
-                    print(f"\n>>> [TEST TRIGGER] Injected LLM Stylometry Phrase: \"{test_phrase}\" <<<")
+                    print(f"\n>>> [TEST TRIGGER] Injected AI Phrases: \"{test_phrase}\" <<<")
                     mic.inject_transcript(test_phrase)
                 elif k in (ord('3'), ord('e'), ord('E')):
                     # Test Pillar 3: Question Echoing
                     test_phrase = "Let me repeat the question to make sure I understand the question correctly."
-                    print(f"\n>>> [TEST TRIGGER] Injected Question Echoing Phrase: \"{test_phrase}\" <<<")
+                    print(f"\n>>> [TEST TRIGGER] Injected Question Echo: \"{test_phrase}\" <<<")
                     mic.inject_transcript(test_phrase)
                 elif k in (ord('4'), ord('m'), ord('M')):
-                    # Test Pillar 4: Voice Cadence / Monotone
-                    print(f"\n>>> [TEST TRIGGER] Injected Monotone Voice Cadence Event <<<")
+                    # Test Pillar 4: Robotic Voice
+                    print(f"\n>>> [TEST TRIGGER] Injected Robotic Voice Event <<<")
                     multi_engine.cadence.hit_count += 1
                     multi_engine.cadence.last_eval_t = t
                     multi_engine.cadence.last_incident_t = t
-                    multi_engine.cadence.score = min(1.0, multi_engine.cadence.score + 0.35)
+                    multi_engine.cadence.score = min(1.0, multi_engine.cadence.score + 0.40)
                     multi_engine.cadence.incidents.append({
                         "incident_number": multi_engine.cadence.hit_count,
                         "timestamp_seconds": round(t, 2),
-                        "duration_samples": 45,
-                        "cadence_variance_cv": 0.08,
+                        "duration_samples": 25,
+                        "cadence_variance_cv": 0.10,
                         "status": "CONFIRMED"
                     })
                 elif k in (ord('c'), ord('C')):

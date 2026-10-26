@@ -259,13 +259,14 @@ class QuestionEchoEvaluator:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Pillar 5: Speech Cadence & Prosody Uniformity Evaluator
+# ─────────────────────────────────────────────────────────────────────────────
+# Pillar 4: Speech Cadence & Robotic Voice Evaluator
 # ─────────────────────────────────────────────────────────────────────────────
 class CadenceProsodyEvaluator:
     """
-    Measures cadence and energy variation during active vocalization.
-    Spontaneous cognitive speech has natural pause variability & pitch inflection (CV >= 0.35).
-    AI Script teleprompter reading has unnaturally flat, metronomic volume envelope (CV <= 0.16).
+    Measures cadence and vocal energy variance during active speech.
+    Spontaneous cognitive speech has natural pause variability & pitch inflection (CV >= 0.45).
+    AI Script teleprompter reading has an unnaturally flat, metronomic volume envelope (CV <= 0.38).
     Cooldown: Enabled actively whenever candidate speaks normally or pauses/silent (smooth 2.5%/sec decay).
     """
     def __init__(self):
@@ -274,32 +275,33 @@ class CadenceProsodyEvaluator:
         self.hit_count: int = 0
         self.rms_window: List[float] = []
         self.last_eval_t: float = -999.0
-        self.monotone_streak: int = 0
         self.last_incident_t: float = -999.0
+        self.silence_frames: int = 0
 
     def update(self, t: float, dt: float, is_speaking: bool, rms: float) -> Tuple[float, Optional[str]]:
         # Active Cooldown: When not actively in a monotone incident, decay score smoothly
-        if (t - self.last_incident_t) > 2.5 and self.score > 0.0:
+        if (t - self.last_incident_t) > 2.0 and self.score > 0.0:
             self.score = max(0.0, self.score - 0.025 * dt)
 
-        # Only evaluate cadence during sustained vocalization with real volume (not background hum)
-        if is_speaking and rms >= 0.010:
+        # Voiced speech detection: voice from VAD or clear vocal energy above background
+        is_voiced = is_speaking or (rms > 0.0030)
+
+        if is_voiced and rms > 0.0018:
+            self.silence_frames = 0
             self.rms_window.append(rms)
-            if len(self.rms_window) > 75:
+            if len(self.rms_window) > 50:
                 self.rms_window.pop(0)
 
-            # Requires at least ~45 frames (~1.5s) of voiced audio to compute variance
-            if len(self.rms_window) >= 45:
+            # Requires ~14 frames (~0.45s) of voiced audio to evaluate cadence
+            if len(self.rms_window) >= 14:
                 arr = np.array(self.rms_window)
                 mean = float(np.mean(arr))
                 std = float(np.std(arr))
                 cv = (std / mean) if mean > 1e-4 else 1.0
 
-                # True robotic/metronomic flat delivery: CV <= 0.16
-                if cv <= 0.16:
-                    self.monotone_streak += 1
-                    # Require 2 consecutive flat evaluation windows (~3 seconds of sustained monotone)
-                    if self.monotone_streak >= 2 and (t - self.last_eval_t) > 4.0:
+                # Flat teleprompter / robotic drone delivery: CV <= 0.38
+                if cv <= 0.38:
+                    if (t - self.last_eval_t) > 2.0:
                         self.hit_count += 1
                         self.last_eval_t = t
                         self.last_incident_t = t
@@ -313,20 +315,19 @@ class CadenceProsodyEvaluator:
                         self.incidents.append(rec)
 
                         if self.hit_count == 1:
-                            self.score = min(1.0, self.score + 0.35)
-                            return self.score, f"Metronomic reading cadence detected (CV={cv:.2f})"
+                            self.score = min(1.0, self.score + 0.40)
+                            return self.score, f"Robotic monotone cadence detected (CV={cv:.2f})"
                         elif self.hit_count == 2:
-                            self.score = min(1.0, self.score + 0.30)
-                            return self.score, f"Sustained monotone teleprompter delivery (CV={cv:.2f})"
+                            self.score = min(1.0, self.score + 0.35)
+                            return self.score, f"Sustained robotic teleprompter delivery (CV={cv:.2f})"
                         else:
                             self.score = min(1.0, self.score + 0.20)
                             return self.score, f"Continued monotone cadence (CV={cv:.2f})"
-                else:
-                    self.monotone_streak = 0
         else:
-            if len(self.rms_window) > 0:
+            self.silence_frames += 1
+            # Only pop window when silence is sustained for several frames, preserving micro-pauses between words
+            if self.silence_frames > 6 and len(self.rms_window) > 0:
                 self.rms_window.pop(0)
-            self.monotone_streak = 0
 
         return self.score, None
 
@@ -463,8 +464,8 @@ class MultiPillarProctorEngine:
 
         pillar_details = {
             "gaze": {
-                "name": "1. Ocular Saccades",
-                "short_name": "Eye Gaze",
+                "name": "1. Eye Reading",
+                "short_name": "Eye Reading",
                 "weight": "45%",
                 "score": round(s_gaze, 3),
                 "score_pct": f"{s_gaze * 100:.0f}%",
@@ -474,8 +475,8 @@ class MultiPillarProctorEngine:
                 "hits": n_cheat,
             },
             "llm": {
-                "name": "2. AI Stylometry",
-                "short_name": "LLM Stylometry",
+                "name": "2. AI Phrases",
+                "short_name": "AI Phrases",
                 "weight": "25%",
                 "score": round(s_llm, 3),
                 "score_pct": f"{s_llm * 100:.0f}%",
@@ -486,7 +487,7 @@ class MultiPillarProctorEngine:
             },
             "echo": {
                 "name": "3. Question Echo",
-                "short_name": "Echo Stalling",
+                "short_name": "Question Echo",
                 "weight": "15%",
                 "score": round(s_echo, 3),
                 "score_pct": f"{s_echo * 100:.0f}%",
@@ -496,13 +497,13 @@ class MultiPillarProctorEngine:
                 "hits": len(self.echo.incidents),
             },
             "cadence": {
-                "name": "4. Voice Cadence",
-                "short_name": "Prosody Uniformity",
+                "name": "4. Robotic Voice",
+                "short_name": "Robotic Voice",
                 "weight": "15%",
                 "score": round(s_cadence, 3),
                 "score_pct": f"{s_cadence * 100:.0f}%",
                 "status": cadence_status,
-                "metric": f"{len(self.cadence.incidents)} Monotone Intervals" if self.cadence.incidents else "Natural Rhythm",
+                "metric": f"{len(self.cadence.incidents)} Monotone Intervals" if self.cadence.incidents else "Natural Pitch",
                 "severity": cadence_sev,
                 "hits": len(self.cadence.incidents),
             },
@@ -562,7 +563,7 @@ class MultiPillarProctorEngine:
                 "anti_false_positive_policy": "Strict multi-hit verification enforced (0% penalty on single events)"
             },
             "pillar_scorecard": {
-                "ocular_gaze_mechanics": {
+                "eye_reading_screen": {
                     "weight": "45%",
                     "sub_score": round(self.gaze.score, 4),
                     "sub_score_percentage": f"{self.gaze.score * 100:.1f}%",
@@ -570,21 +571,21 @@ class MultiPillarProctorEngine:
                     "clean_speaking_events": len(self.gaze.clean_speaking),
                     "status": "ALERT" if self.gaze.score >= 0.40 else "NORMAL"
                 },
-                "spoken_llm_stylometry": {
+                "chatgpt_ai_phrases": {
                     "weight": "25%",
                     "sub_score": round(self.llm.score, 4),
                     "sub_score_percentage": f"{self.llm.score * 100:.1f}%",
                     "markers_detected_count": len(self.llm.incidents),
                     "status": "ALERT" if self.llm.score >= 0.35 else "NORMAL"
                 },
-                "question_echoing_delay": {
+                "question_echo_stalling": {
                     "weight": "15%",
                     "sub_score": round(self.echo.score, 4),
                     "sub_score_percentage": f"{self.echo.score * 100:.1f}%",
                     "echo_incidents_count": len(self.echo.incidents),
                     "status": "ALERT" if self.echo.score >= 0.35 else "NORMAL"
                 },
-                "cadence_prosody_uniformity": {
+                "robotic_voice_cadence": {
                     "weight": "15%",
                     "sub_score": round(self.cadence.score, 4),
                     "sub_score_percentage": f"{self.cadence.score * 100:.1f}%",
@@ -611,7 +612,7 @@ class MultiPillarProctorEngine:
         items = []
         for r in self.gaze.cheating_lines:
             items.append({
-                "pillar": "Ocular Saccades",
+                "pillar": "Eye Reading",
                 "badge": "GAZE",
                 "timestamp_formatted": fmt(r["timestamp_seconds"]),
                 "timestamp_seconds": r["timestamp_seconds"],
@@ -619,20 +620,10 @@ class MultiPillarProctorEngine:
                 "metric": f"Span +{r['horizontal_span']:.3f} (Step {r['vertical_step']:+.3f})",
                 "severity": "CRITICAL"
             })
-        for r in self.wpm.incidents:
-            items.append({
-                "pillar": "Speech Pace / WPM",
-                "badge": "WPM",
-                "timestamp_formatted": fmt(r["timestamp_seconds"]),
-                "timestamp_seconds": r["timestamp_seconds"],
-                "description": f"Rapid reading burst at {r['wpm']} WPM",
-                "metric": f"{r['wpm']} WPM",
-                "severity": "HIGH" if r["status"] == "CONFIRMED" else "LOW"
-            })
         for r in self.llm.incidents:
             items.append({
-                "pillar": "LLM Stylometry",
-                "badge": "LLM",
+                "pillar": "AI Phrases",
+                "badge": "AI",
                 "timestamp_formatted": fmt(r["timestamp_seconds"]),
                 "timestamp_seconds": r["timestamp_seconds"],
                 "description": f"AI Phrasing matched [{r['category']}]: \"{r['matched_phrase']}\"",
@@ -641,7 +632,7 @@ class MultiPillarProctorEngine:
             })
         for r in self.echo.incidents:
             items.append({
-                "pillar": "Question Echoing",
+                "pillar": "Question Echo",
                 "badge": "ECHO",
                 "timestamp_formatted": fmt(r["timestamp_seconds"]),
                 "timestamp_seconds": r["timestamp_seconds"],
@@ -651,11 +642,11 @@ class MultiPillarProctorEngine:
             })
         for r in self.cadence.incidents:
             items.append({
-                "pillar": "Cadence Uniformity",
-                "badge": "CADENCE",
+                "pillar": "Robotic Voice",
+                "badge": "ROBOT",
                 "timestamp_formatted": fmt(r["timestamp_seconds"]),
                 "timestamp_seconds": r["timestamp_seconds"],
-                "description": f"Uniform reading cadence (CV={r['cadence_variance_cv']})",
+                "description": f"Robotic monotone delivery (CV={r['cadence_variance_cv']})",
                 "metric": f"CV={r['cadence_variance_cv']}",
                 "severity": "HIGH" if r["status"] == "CONFIRMED" else "LOW"
             })
