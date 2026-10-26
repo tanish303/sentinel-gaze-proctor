@@ -15,6 +15,7 @@ let audioDataArray = null;
 let faceMesh = null;
 let cameraLoop = null;
 let telemetryInterval = null;
+let timerInterval = null;
 let isRunning = false;
 let sessionStartTime = 0;
 
@@ -485,10 +486,10 @@ function drawProctoringHUD(ctx, width, height, t, testName) {
     scol = "#ffff00";
   }
 
-  // Row 1: Test Name & Live Clock [MM:SS.s]
+  // Row 1: Test Name & Live Clock [MM:SS]
   const sec = Math.max(0, t);
   const mm = String(Math.floor(sec / 60)).padStart(2, "0");
-  const ss = String((sec % 60).toFixed(1)).padStart(4, "0");
+  const ss = String(Math.floor(sec % 60)).padStart(2, "0");
   const timeStr = `${mm}:${ss}`;
 
   ctx.fillStyle = "#aaaaaa";
@@ -647,11 +648,6 @@ async function startSession() {
         el.liveSpeechVal.style.color = isSpeaking ? "var(--accent-blue)" : "var(--text-muted)";
         el.liveLipsVal.textContent = lipMoving ? "Active" : "Still";
         el.liveLinesVal.textContent = nCheat;
-
-        const sec = Math.max(0, t);
-        const mm = String(Math.floor(sec / 60)).padStart(2, "0");
-        const ss = String(Math.floor(sec % 60)).padStart(2, "0");
-        el.timerDisplay.textContent = `${mm}:${ss}`;
       });
     }
 
@@ -663,6 +659,20 @@ async function startSession() {
     ws.onopen = () => {
       isRunning = true;
       sessionStartTime = Date.now();
+
+      // Initialize sentence 1 prompt and highlight immediately
+      highlightSentence(0);
+
+      // Dedicated 1-second wall-clock timer
+      if (timerInterval) clearInterval(timerInterval);
+      el.timerDisplay.textContent = "00:00";
+      timerInterval = setInterval(() => {
+        if (!isRunning) return;
+        const elapsedSec = Math.floor((Date.now() - sessionStartTime) / 1000);
+        const mm = String(Math.floor(elapsedSec / 60)).padStart(2, "0");
+        const ss = String(elapsedSec % 60).padStart(2, "0");
+        el.timerDisplay.textContent = `${mm}:${ss}`;
+      }, 500);
 
       el.startBtn.style.display = "none";
       el.stopBtn.style.display = "inline-flex";
@@ -783,6 +793,11 @@ function stopSession() {
 
   el.stopBtn.disabled = true;
   el.stopBtn.innerHTML = `<span>Finalizing...</span>`;
+
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
 
   if (telemetryInterval) {
     clearInterval(telemetryInterval);
