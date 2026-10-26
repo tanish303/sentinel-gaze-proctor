@@ -265,9 +265,9 @@ class QuestionEchoEvaluator:
 class CadenceProsodyEvaluator:
     """
     Measures cadence and vocal energy variance during active speech.
-    Spontaneous cognitive speech has natural pause variability & pitch inflection (CV >= 0.45).
-    AI Script teleprompter reading has an unnaturally flat, metronomic volume envelope (CV <= 0.38).
-    Cooldown: Enabled actively whenever candidate speaks normally or pauses/silent (smooth 2.5%/sec decay).
+    Spontaneous cognitive speech has natural pause variability & pitch inflection (CV >= 0.32).
+    AI Script teleprompter reading has an unnaturally flat, metronomic volume envelope (CV <= 0.22).
+    Cooldown: Enabled actively whenever candidate speaks normally or pauses/silent (smooth 3.0%/sec decay).
     """
     def __init__(self):
         self.incidents: List[Dict[str, Any]] = []
@@ -277,31 +277,40 @@ class CadenceProsodyEvaluator:
         self.last_eval_t: float = -999.0
         self.last_incident_t: float = -999.0
         self.silence_frames: int = 0
+        self.speech_frames: int = 0
 
     def update(self, t: float, dt: float, is_speaking: bool, rms: float) -> Tuple[float, Optional[str]]:
         # Active Cooldown: When not actively in a monotone incident, decay score smoothly
-        if (t - self.last_incident_t) > 2.0 and self.score > 0.0:
-            self.score = max(0.0, self.score - 0.025 * dt)
+        if (t - self.last_incident_t) > 2.5 and self.score > 0.0:
+            self.score = max(0.0, self.score - 0.030 * dt)
 
-        # Voiced speech detection: voice from VAD or clear vocal energy above background
-        is_voiced = is_speaking or (rms > 0.0030)
-
-        if is_voiced and rms > 0.0018:
+        # STRICT Human Speech detection:
+        # Candidate MUST be actively speaking (VAD detected), and RMS must be real voice amplitude (rms >= 0.006)
+        # Background fan noise or room hum will NOT be treated as voiced frames.
+        if is_speaking and rms >= 0.006:
+            # If transitioning from silence into speech, start fresh window for this utterance
+            if self.silence_frames > 2:
+                self.rms_window.clear()
+                self.speech_frames = 0
             self.silence_frames = 0
+            self.speech_frames += 1
             self.rms_window.append(rms)
-            if len(self.rms_window) > 50:
+            if len(self.rms_window) > 60:
                 self.rms_window.pop(0)
 
-            # Requires ~14 frames (~0.45s) of voiced audio to evaluate cadence
-            if len(self.rms_window) >= 14:
+            # Requires at least 28 frames (~0.95s) of sustained voiced speech to evaluate prosody/cadence
+            if len(self.rms_window) >= 28 and self.speech_frames >= 28:
                 arr = np.array(self.rms_window)
                 mean = float(np.mean(arr))
                 std = float(np.std(arr))
                 cv = (std / mean) if mean > 1e-4 else 1.0
 
-                # Flat teleprompter / robotic drone delivery: CV <= 0.38
-                if cv <= 0.38:
-                    if (t - self.last_eval_t) > 2.0:
+                # Flat teleprompter / robotic drone delivery:
+                # Normal human speech has natural inflection (CV > 0.30)
+                # Pure monotone / robotic cadence has CV <= 0.22
+                if cv <= 0.22 and mean >= 0.008:
+                    # Rate limit to at least 4.5s between incident evaluations to prevent rapid score spiking
+                    if (t - self.last_eval_t) > 4.5:
                         self.hit_count += 1
                         self.last_eval_t = t
                         self.last_incident_t = t
@@ -314,20 +323,25 @@ class CadenceProsodyEvaluator:
                         }
                         self.incidents.append(rec)
 
+                        # Progressive, well-calibrated score increments (+12% -> +12% -> +10%)
                         if self.hit_count == 1:
-                            self.score = min(1.0, self.score + 0.40)
+                            self.score = min(1.0, self.score + 0.12)
                             return self.score, f"Robotic monotone cadence detected (CV={cv:.2f})"
                         elif self.hit_count == 2:
-                            self.score = min(1.0, self.score + 0.35)
+                            self.score = min(1.0, self.score + 0.12)
                             return self.score, f"Sustained robotic teleprompter delivery (CV={cv:.2f})"
                         else:
-                            self.score = min(1.0, self.score + 0.20)
+                            self.score = min(1.0, self.score + 0.10)
                             return self.score, f"Continued monotone cadence (CV={cv:.2f})"
+                elif cv >= 0.28:
+                    # Natural vocal modulation detected: actively cool down robotic score
+                    if self.score > 0.0:
+                        self.score = max(0.0, self.score - 0.035 * dt)
         else:
+            self.speech_frames = 0
             self.silence_frames += 1
-            # Only pop window when silence is sustained for several frames, preserving micro-pauses between words
-            if self.silence_frames > 6 and len(self.rms_window) > 0:
-                self.rms_window.pop(0)
+            if len(self.rms_window) > 0:
+                self.rms_window.clear()
 
         return self.score, None
 
@@ -452,11 +466,11 @@ class MultiPillarProctorEngine:
             echo_sev = "CLEAN"
 
         # 4. Cadence Status
-        if s_cadence >= 0.55:
-            cadence_status = "Metronomic Recitation"
-            cadence_sev = "CRITICAL"
-        elif s_cadence >= 0.30:
+        if s_cadence >= 0.28:
             cadence_status = "Robotic Drone Confirmed"
+            cadence_sev = "CRITICAL"
+        elif s_cadence >= 0.10:
+            cadence_status = "Monotone Detected"
             cadence_sev = "WARN"
         else:
             cadence_status = "Natural Pitch Variance"

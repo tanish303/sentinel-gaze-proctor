@@ -1,0 +1,545 @@
+{
+  "test_metadata": {
+    "test_name": "bu",
+    "duration_seconds": 1792913471.73,
+    "final_verdict": "LOW RISK (Isolated Behavioral Patterns)",
+    "risk_level": "LOW",
+    "composite_confidence_score": 0.0,
+    "composite_confidence_percentage": "0.0%",
+    "pillars_evaluated": 4,
+    "anti_false_positive_policy": "Strict multi-hit verification enforced (0% penalty on single events)"
+  },
+  "pillar_scorecard": {
+    "ocular_gaze_mechanics": {
+      "weight": "45%",
+      "sub_score": 0.0,
+      "sub_score_percentage": "0.0%",
+      "cheating_lines_count": 9,
+      "clean_speaking_events": 23,
+      "status": "NORMAL"
+    },
+    "spoken_llm_stylometry": {
+      "weight": "25%",
+      "sub_score": 0.0,
+      "sub_score_percentage": "0.0%",
+      "markers_detected_count": 5,
+      "status": "NORMAL"
+    },
+    "question_echoing_delay": {
+      "weight": "15%",
+      "sub_score": 0.0,
+      "sub_score_percentage": "0.0%",
+      "echo_incidents_count": 7,
+      "status": "NORMAL"
+    },
+    "cadence_prosody_uniformity": {
+      "weight": "15%",
+      "sub_score": 0.0,
+      "sub_score_percentage": "0.0%",
+      "cadence_incidents_count": 1,
+      "status": "NORMAL"
+    }
+  },
+  "detailed_incidents": {
+    "gaze_cheating_lines": [
+      {
+        "line_number": 2,
+        "timestamp_seconds": 39.23,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step +0.000, span 0.055)",
+        "horizontal_span": 0.0554,
+        "vertical_step": 0.0001,
+        "duration_seconds": 0.98,
+        "speaking": true
+      },
+      {
+        "line_number": 2,
+        "timestamp_seconds": 48.98,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step +0.015, span 0.045)",
+        "horizontal_span": 0.0447,
+        "vertical_step": 0.0152,
+        "duration_seconds": 1.16,
+        "speaking": true
+      },
+      {
+        "line_number": 3,
+        "timestamp_seconds": 57.4,
+        "description": "AI Teleprompter reading confirmed on Line #3 (step +0.065, span 0.180)",
+        "horizontal_span": 0.1801,
+        "vertical_step": 0.0645,
+        "duration_seconds": 1.33,
+        "speaking": true
+      },
+      {
+        "line_number": 4,
+        "timestamp_seconds": 59.42,
+        "description": "AI Teleprompter reading confirmed on Line #4 (step +0.023, span 0.135)",
+        "horizontal_span": 0.1345,
+        "vertical_step": 0.0234,
+        "duration_seconds": 1.13,
+        "speaking": true
+      },
+      {
+        "line_number": 5,
+        "timestamp_seconds": 61.02,
+        "description": "AI Teleprompter reading confirmed on Line #5 (step -0.008, span 0.038)",
+        "horizontal_span": 0.0376,
+        "vertical_step": -0.0078,
+        "duration_seconds": 1.39,
+        "speaking": true
+      },
+      {
+        "line_number": 2,
+        "timestamp_seconds": 85.19,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step -0.025, span 0.074)",
+        "horizontal_span": 0.0743,
+        "vertical_step": -0.0246,
+        "duration_seconds": 1.1,
+        "speaking": true
+      },
+      {
+        "line_number": 3,
+        "timestamp_seconds": 91.91,
+        "description": "AI Teleprompter reading confirmed on Line #3 (step +0.005, span 0.173)",
+        "horizontal_span": 0.1726,
+        "vertical_step": 0.0046,
+        "duration_seconds": 2.24,
+        "speaking": true
+      },
+      {
+        "line_number": 2,
+        "timestamp_seconds": 129.47,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step -0.005, span 0.176)",
+        "horizontal_span": 0.1758,
+        "vertical_step": -0.0054,
+        "duration_seconds": 2.7,
+        "speaking": true
+      },
+      {
+        "line_number": 3,
+        "timestamp_seconds": 142.96,
+        "description": "AI Teleprompter reading confirmed on Line #3 (step +0.012, span 0.184)",
+        "horizontal_span": 0.1844,
+        "vertical_step": 0.0117,
+        "duration_seconds": 1.99,
+        "speaking": true
+      }
+    ],
+    "llm_stylometry_markers": [
+      {
+        "incident_number": 1,
+        "timestamp_seconds": 47.88,
+        "matched_phrase": "furthermore",
+        "category": "List Enumeration [Connective]",
+        "context": "furthermore",
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 2,
+        "timestamp_seconds": 72.75,
+        "matched_phrase": "secondly",
+        "category": "List Enumeration [Connective]",
+        "context": "second secondly",
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 3,
+        "timestamp_seconds": 79.78,
+        "matched_phrase": "it is important to note that",
+        "category": "Formal AI Hedging",
+        "context": "it is important to note that in the summary developing deeper in the cone",
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 4,
+        "timestamp_seconds": 150.71,
+        "matched_phrase": "in summary",
+        "category": "List Enumeration [Conclusion]",
+        "context": "furthermore it is important to note that in summary developing Dee",
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 5,
+        "timestamp_seconds": 152.84,
+        "matched_phrase": "first and foremost",
+        "category": "List Enumeration [Firstly]",
+        "context": "first and foremost",
+        "status": "CONFIRMED"
+      }
+    ],
+    "question_echo_events": [
+      {
+        "incident_number": 1,
+        "timestamp_seconds": 104.02,
+        "matched_keywords": [],
+        "overlap_ratio": 0.0,
+        "delay_phrase": "let me repeat",
+        "prompt_snippet": "Line 8: Once you complete your reading evaluation or interview session",
+        "spoken_snippet": "let me repeat the question I don't understand let me think about the",
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 2,
+        "timestamp_seconds": 107.03,
+        "matched_keywords": [],
+        "overlap_ratio": 0.0,
+        "delay_phrase": "give me a second",
+        "prompt_snippet": "Line 8: Once you complete your reading evaluation or interview session",
+        "spoken_snippet": "give me a second",
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 3,
+        "timestamp_seconds": 110.04,
+        "matched_keywords": [],
+        "overlap_ratio": 0.0,
+        "delay_phrase": "give me a second",
+        "prompt_snippet": "Line 8: Once you complete your reading evaluation or interview session",
+        "spoken_snippet": "give me a second",
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 4,
+        "timestamp_seconds": 113.05,
+        "matched_keywords": [],
+        "overlap_ratio": 0.0,
+        "delay_phrase": "give me a second",
+        "prompt_snippet": "Line 8: Once you complete your reading evaluation or interview session",
+        "spoken_snippet": "give me a second",
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 5,
+        "timestamp_seconds": 116.07,
+        "matched_keywords": [],
+        "overlap_ratio": 0.0,
+        "delay_phrase": "give me a second",
+        "prompt_snippet": "Line 8: Once you complete your reading evaluation or interview session",
+        "spoken_snippet": "give me a second",
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 6,
+        "timestamp_seconds": 119.07,
+        "matched_keywords": [],
+        "overlap_ratio": 0.0,
+        "delay_phrase": "give me a second",
+        "prompt_snippet": "Line 8: Once you complete your reading evaluation or interview session",
+        "spoken_snippet": "give me a second",
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 7,
+        "timestamp_seconds": 122.09,
+        "matched_keywords": [],
+        "overlap_ratio": 0.0,
+        "delay_phrase": "give me a second",
+        "prompt_snippet": "Line 8: Once you complete your reading evaluation or interview session",
+        "spoken_snippet": "give me a second",
+        "status": "CONFIRMED"
+      }
+    ],
+    "cadence_uniformity_events": [
+      {
+        "incident_number": 1,
+        "timestamp_seconds": 45.25,
+        "duration_samples": 46,
+        "cadence_variance_cv": 0.142,
+        "status": "CONFIRMED"
+      }
+    ],
+    "clean_speaking_timeline": [
+      {
+        "timestamp_seconds": 79.59,
+        "description": "Gaze cooled to 49.9% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 163.66,
+        "description": "Gaze cooled to 86.6% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 183.25,
+        "description": "Gaze cooled to 86.6% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 186.49,
+        "description": "Gaze cooled to 85.4% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 189.54,
+        "description": "Gaze cooled to 78.4% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 198.59,
+        "description": "Gaze cooled to 76.5% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 201.62,
+        "description": "Gaze cooled to 70.4% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 206.05,
+        "description": "Gaze cooled to 66.8% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 209.06,
+        "description": "Gaze cooled to 60.3% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 214.1,
+        "description": "Gaze cooled to 57.2% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 222.7,
+        "description": "Gaze cooled to 51.6% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 229.55,
+        "description": "Gaze cooled to 48.7% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 236.9,
+        "description": "Gaze cooled to 46.2% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 239.91,
+        "description": "Gaze cooled to 40.2% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 246.33,
+        "description": "Gaze cooled to 36.2% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 249.34,
+        "description": "Gaze cooled to 30.1% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 255.06,
+        "description": "Gaze cooled to 24.2% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 270.77,
+        "description": "Gaze cooled to 24.1% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 278.3,
+        "description": "Gaze cooled to 20.3% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 293.3,
+        "description": "Gaze cooled to 19.1% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 296.31,
+        "description": "Gaze cooled to 13.1% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 299.31,
+        "description": "Gaze cooled to 7.1% (non-reading behavior)"
+      },
+      {
+        "timestamp_seconds": 302.39,
+        "description": "Gaze cooled to 1.0% (non-reading behavior)"
+      }
+    ]
+  },
+  "all_incidents": [
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "00:39.2",
+      "timestamp_seconds": 39.23,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step +0.000, span 0.055)",
+      "metric": "Span +0.055 (Step +0.000)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "00:45.2",
+      "timestamp_seconds": 45.25,
+      "description": "Uniform reading cadence (CV=0.142)",
+      "metric": "CV=0.142",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "LLM Stylometry",
+      "badge": "LLM",
+      "timestamp_formatted": "00:47.9",
+      "timestamp_seconds": 47.88,
+      "description": "AI Phrasing matched [List Enumeration [Connective]]: \"furthermore\"",
+      "metric": "furthermore",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "00:49.0",
+      "timestamp_seconds": 48.98,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step +0.015, span 0.045)",
+      "metric": "Span +0.045 (Step +0.015)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "00:57.4",
+      "timestamp_seconds": 57.4,
+      "description": "AI Teleprompter reading confirmed on Line #3 (step +0.065, span 0.180)",
+      "metric": "Span +0.180 (Step +0.065)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "00:59.4",
+      "timestamp_seconds": 59.42,
+      "description": "AI Teleprompter reading confirmed on Line #4 (step +0.023, span 0.135)",
+      "metric": "Span +0.135 (Step +0.023)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "01:01.0",
+      "timestamp_seconds": 61.02,
+      "description": "AI Teleprompter reading confirmed on Line #5 (step -0.008, span 0.038)",
+      "metric": "Span +0.038 (Step -0.008)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "LLM Stylometry",
+      "badge": "LLM",
+      "timestamp_formatted": "01:12.8",
+      "timestamp_seconds": 72.75,
+      "description": "AI Phrasing matched [List Enumeration [Connective]]: \"secondly\"",
+      "metric": "secondly",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "LLM Stylometry",
+      "badge": "LLM",
+      "timestamp_formatted": "01:19.8",
+      "timestamp_seconds": 79.78,
+      "description": "AI Phrasing matched [Formal AI Hedging]: \"it is important to note that\"",
+      "metric": "it is important to note that",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "01:25.2",
+      "timestamp_seconds": 85.19,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step -0.025, span 0.074)",
+      "metric": "Span +0.074 (Step -0.025)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "01:31.9",
+      "timestamp_seconds": 91.91,
+      "description": "AI Teleprompter reading confirmed on Line #3 (step +0.005, span 0.173)",
+      "metric": "Span +0.173 (Step +0.005)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Question Echoing",
+      "badge": "ECHO",
+      "timestamp_formatted": "01:44.0",
+      "timestamp_seconds": 104.02,
+      "description": "Question echoing stall: 0% keyword repetition",
+      "metric": "0% match",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Question Echoing",
+      "badge": "ECHO",
+      "timestamp_formatted": "01:47.0",
+      "timestamp_seconds": 107.03,
+      "description": "Question echoing stall: 0% keyword repetition",
+      "metric": "0% match",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Question Echoing",
+      "badge": "ECHO",
+      "timestamp_formatted": "01:50.0",
+      "timestamp_seconds": 110.04,
+      "description": "Question echoing stall: 0% keyword repetition",
+      "metric": "0% match",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Question Echoing",
+      "badge": "ECHO",
+      "timestamp_formatted": "01:53.0",
+      "timestamp_seconds": 113.05,
+      "description": "Question echoing stall: 0% keyword repetition",
+      "metric": "0% match",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Question Echoing",
+      "badge": "ECHO",
+      "timestamp_formatted": "01:56.1",
+      "timestamp_seconds": 116.07,
+      "description": "Question echoing stall: 0% keyword repetition",
+      "metric": "0% match",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Question Echoing",
+      "badge": "ECHO",
+      "timestamp_formatted": "01:59.1",
+      "timestamp_seconds": 119.07,
+      "description": "Question echoing stall: 0% keyword repetition",
+      "metric": "0% match",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Question Echoing",
+      "badge": "ECHO",
+      "timestamp_formatted": "02:02.1",
+      "timestamp_seconds": 122.09,
+      "description": "Question echoing stall: 0% keyword repetition",
+      "metric": "0% match",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "02:09.5",
+      "timestamp_seconds": 129.47,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step -0.005, span 0.176)",
+      "metric": "Span +0.176 (Step -0.005)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "02:23.0",
+      "timestamp_seconds": 142.96,
+      "description": "AI Teleprompter reading confirmed on Line #3 (step +0.012, span 0.184)",
+      "metric": "Span +0.184 (Step +0.012)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "LLM Stylometry",
+      "badge": "LLM",
+      "timestamp_formatted": "02:30.7",
+      "timestamp_seconds": 150.71,
+      "description": "AI Phrasing matched [List Enumeration [Conclusion]]: \"in summary\"",
+      "metric": "in summary",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "LLM Stylometry",
+      "badge": "LLM",
+      "timestamp_formatted": "02:32.8",
+      "timestamp_seconds": 152.84,
+      "description": "AI Phrasing matched [List Enumeration [Firstly]]: \"first and foremost\"",
+      "metric": "first and foremost",
+      "severity": "HIGH"
+    }
+  ]
+}

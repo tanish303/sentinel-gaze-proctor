@@ -1006,7 +1006,7 @@ def main():
                 (36, 218), cv2.FONT_HERSHEY_SIMPLEX, 0.50, (20, 30, 45), 2, cv2.LINE_AA)
     cv2.putText(canvas, "• Statement: \"Furthermore, it is important to note that in conclusion, delving deeper into the core nuances of this problem reveals significant aspects.\"",
                 (36, 248), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (120, 20, 80), 1, cv2.LINE_AA)
-    cv2.putText(canvas, "[INSTRUCTION]: Speak this sentence into your mic, OR press keyboard '2' to instantly trigger Test 2 (+40%).",
+    cv2.putText(canvas, "[INSTRUCTION]: Speak this sentence into your mic to test AI stylometry detection.",
                 (36, 282), cv2.FONT_HERSHEY_SIMPLEX, 0.39, (140, 60, 200), 1, cv2.LINE_AA)
 
     # 4. Section 3: TEST 3 — QUESTION ECHO
@@ -1017,7 +1017,7 @@ def main():
                 (36, 338), cv2.FONT_HERSHEY_SIMPLEX, 0.50, (20, 30, 45), 2, cv2.LINE_AA)
     cv2.putText(canvas, "• Statement: \"Let me repeat the question to make sure I understand correctly... so you are asking about candidate eye gaze patterns during online tests...\"",
                 (36, 368), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (150, 60, 10), 1, cv2.LINE_AA)
-    cv2.putText(canvas, "[INSTRUCTION]: Speak this stalling sentence into your mic, OR press keyboard '3' to instantly trigger Test 3 (+40%).",
+    cv2.putText(canvas, "[INSTRUCTION]: Speak this stalling sentence into your mic to test question echo detection.",
                 (36, 402), cv2.FONT_HERSHEY_SIMPLEX, 0.39, (200, 100, 0), 1, cv2.LINE_AA)
 
     # 5. Section 4: TEST 4 — ROBOTIC VOICE
@@ -1028,7 +1028,7 @@ def main():
                 (36, 458), cv2.FONT_HERSHEY_SIMPLEX, 0.50, (20, 30, 45), 2, cv2.LINE_AA)
     cv2.putText(canvas, "• Statement: \"The system architecture consists of a primary frontend client communicating over websockets in a continuous stream without vocal variation.\"",
                 (36, 488), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (30, 35, 45), 1, cv2.LINE_AA)
-    cv2.putText(canvas, "[INSTRUCTION]: Speak this in a flat robotic tone without pitch variance, OR press keyboard '4' to instantly trigger Test 4 (+40%).",
+    cv2.putText(canvas, "[INSTRUCTION]: Speak this in a flat robotic tone without pitch variance to test cadence prosody detection.",
                 (36, 522), cv2.FONT_HERSHEY_SIMPLEX, 0.39, (180, 40, 40), 1, cv2.LINE_AA)
 
     # 6. Section 5: INSTRUCTOR EVALUATION & COOLDOWN GUIDELINES
@@ -1038,18 +1038,18 @@ def main():
                 (36, 580), cv2.FONT_HERSHEY_SIMPLEX, 0.48, (20, 110, 50), 2, cv2.LINE_AA)
     cv2.putText(canvas, "• PURE WEIGHTED AVERAGE: Final Risk = 0.45*(Eye Reading) + 0.25*(AI Phrases) + 0.15*(Question Echo) + 0.15*(Robotic Voice).",
                 (36, 608), cv2.FONT_HERSHEY_SIMPLEX, 0.41, (30, 70, 40), 1, cv2.LINE_AA)
-    cv2.putText(canvas, "• ACTIVE COOLDOWN: Look directly into webcam & speak naturally or pause — all 4 test scores cool down smoothly (~2.5%/sec).",
+    cv2.putText(canvas, "• AUTOMATIC COOLDOWN: Look directly into webcam & speak naturally or pause — all 4 scores cool down smoothly (~3.0%/sec).",
                 (36, 636), cv2.FONT_HERSHEY_SIMPLEX, 0.41, (30, 70, 40), 1, cv2.LINE_AA)
-    cv2.putText(canvas, "• INSTANT HOTKEYS CHEATSHEET: [2]=AI Phrases | [3]=Question Echo | [4]=Robotic Voice | [C]=Force Cooldown | [Q]=Save Forensic Audit",
+    cv2.putText(canvas, "• SESSION CONTROLS: Pure real-time behavioral audit. Press [Q] at any time to finish test & save forensic report.",
                 (36, 668), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (10, 40, 100), 2, cv2.LINE_AA)
 
-    print("\nDETECTOR LIVE. Easy Test Names & Rules:")
-    print("  • 1. EYE READING    (45%): Sweeping eyes across screen -> +10%/line confirmed")
-    print("  • 2. AI PHRASES     (25%): Reciting ChatGPT phrases    -> +40% (or press '2')")
-    print("  • 3. QUESTION ECHO  (15%): Repeating questions/stalling-> +40% (or press '3')")
-    print("  • 4. ROBOTIC VOICE  (15%): Speaking in flat monotone   -> +40% (or press '4')")
-    print("  • COOLDOWN          : Looking straight / natural speech-> Cools down smoothly to 0%")
-    print("  • Hotkeys           : [2] AI Phrases | [3] Echo | [4] Robot Voice | [C] Cooldown | [Q] Quit\n" + "="*65 + "\n")
+    print("\nDETECTOR LIVE. 4 Active Proctoring Tests:")
+    print("  • 1. EYE READING    (45%): Sweeping eyes across screen  -> Saccadic reading pattern")
+    print("  • 2. AI PHRASES     (25%): Reciting ChatGPT phrases     -> AI stylometry detection")
+    print("  • 3. QUESTION ECHO  (15%): Repeating questions/stalling -> Acoustic prompt echo")
+    print("  • 4. ROBOTIC VOICE  (15%): Speaking in flat monotone    -> Cadence prosody variance")
+    print("  • AUTOMATIC COOLDOWN: Looking straight / natural speech -> Smooth decay down to 0%")
+    print("  • SESSION CONTROLS  : Press [Q] or [ESC] to complete session & export audit\n" + "="*65 + "\n")
 
     try:
         with vision.FaceLandmarker.create_from_options(opts) as lmk:
@@ -1203,9 +1203,9 @@ def main():
                 tx = int(bx + bw * float(np.clip(mic.sensitive_threshold / 0.050, 0, 1)))
                 cv2.line(disp, (tx, by - 2), (tx, by + bh + 2), (0, 0, 255), 2)
 
-                # Hotkeys instruction on HUD
-                cv2.putText(disp, "[2]AI Words [3]Echo [4]Robot [C]Cool [Q]Quit", (370, 118),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.30, (0, 215, 255), 1, cv2.LINE_AA)
+                # Session controls on HUD
+                cv2.putText(disp, "[Q] Finish & Save Audit", (440, 118),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.32, (0, 215, 255), 1, cv2.LINE_AA)
 
                 # Show live transcript snippet on frame if available
                 if active_transcript:
@@ -1222,38 +1222,6 @@ def main():
                     mic.adjust(-0.001)
                 elif k in (ord(']'), ord('+'), ord('=')):
                     mic.adjust(+0.001)
-                elif k in (ord('2'), ord('l'), ord('L')):
-                    # Test Pillar 2: AI Phrases
-                    test_phrase = "Furthermore, it is important to note that in conclusion, delve deeper into the solution."
-                    print(f"\n>>> [TEST TRIGGER] Injected AI Phrases: \"{test_phrase}\" <<<")
-                    mic.inject_transcript(test_phrase)
-                elif k in (ord('3'), ord('e'), ord('E')):
-                    # Test Pillar 3: Question Echoing
-                    test_phrase = "Let me repeat the question to make sure I understand the question correctly."
-                    print(f"\n>>> [TEST TRIGGER] Injected Question Echo: \"{test_phrase}\" <<<")
-                    mic.inject_transcript(test_phrase)
-                elif k in (ord('4'), ord('m'), ord('M')):
-                    # Test Pillar 4: Robotic Voice
-                    print(f"\n>>> [TEST TRIGGER] Injected Robotic Voice Event <<<")
-                    multi_engine.cadence.hit_count += 1
-                    multi_engine.cadence.last_eval_t = t
-                    multi_engine.cadence.last_incident_t = t
-                    multi_engine.cadence.score = min(1.0, multi_engine.cadence.score + 0.40)
-                    multi_engine.cadence.incidents.append({
-                        "incident_number": multi_engine.cadence.hit_count,
-                        "timestamp_seconds": round(t, 2),
-                        "duration_samples": 25,
-                        "cadence_variance_cv": 0.10,
-                        "status": "CONFIRMED"
-                    })
-                elif k in (ord('c'), ord('C')):
-                    # Test Cooldown: immediately cools down all pillars
-                    print(f"\n>>> [TEST TRIGGER] Force Cooldown across all 4 pillars <<<")
-                    engine.score = max(0.0, engine.score - 0.25)
-                    multi_engine.llm.score = max(0.0, multi_engine.llm.score - 0.25)
-                    multi_engine.echo.score = max(0.0, multi_engine.echo.score - 0.25)
-                    multi_engine.cadence.score = max(0.0, multi_engine.cadence.score - 0.25)
-                    mic.inject_transcript("")
 
     except KeyboardInterrupt:
         print("\nStopped by user.")

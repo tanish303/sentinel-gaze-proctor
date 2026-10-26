@@ -1,0 +1,1625 @@
+{
+  "test_metadata": {
+    "test_name": "kk",
+    "duration_seconds": 1792910498.93,
+    "final_verdict": "SUSPICIOUS ACTIVITY (Multiple Cheating Signals Detected)",
+    "risk_level": "HIGH",
+    "composite_confidence_score": 0.4465,
+    "composite_confidence_percentage": "44.6%",
+    "pillars_evaluated": 5,
+    "anti_false_positive_policy": "Strict multi-hit verification enforced (0% penalty on single events)"
+  },
+  "pillar_scorecard": {
+    "ocular_gaze_mechanics": {
+      "weight": "35%",
+      "sub_score": 0.99,
+      "sub_score_percentage": "99.0%",
+      "cheating_lines_count": 27,
+      "clean_speaking_events": 29,
+      "status": "ALERT"
+    },
+    "speech_wpm_reading_burst": {
+      "weight": "20%",
+      "sub_score": 0.0,
+      "sub_score_percentage": "0.0%",
+      "burst_incidents_count": 0,
+      "status": "NORMAL"
+    },
+    "spoken_llm_stylometry": {
+      "weight": "20%",
+      "sub_score": 0.0,
+      "sub_score_percentage": "0.0%",
+      "markers_detected_count": 0,
+      "status": "NORMAL"
+    },
+    "question_echoing_delay": {
+      "weight": "15%",
+      "sub_score": 0.0,
+      "sub_score_percentage": "0.0%",
+      "echo_incidents_count": 0,
+      "status": "NORMAL"
+    },
+    "cadence_prosody_uniformity": {
+      "weight": "10%",
+      "sub_score": 1.0,
+      "sub_score_percentage": "100.0%",
+      "cadence_incidents_count": 60,
+      "status": "ALERT"
+    }
+  },
+  "detailed_incidents": {
+    "gaze_cheating_lines": [
+      {
+        "line_number": 2,
+        "timestamp_seconds": 43.97,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step -0.013, span 0.186)",
+        "horizontal_span": 0.1865,
+        "vertical_step": -0.0134,
+        "duration_seconds": 1.01,
+        "speaking": true
+      },
+      {
+        "line_number": 3,
+        "timestamp_seconds": 46.57,
+        "description": "AI Teleprompter reading confirmed on Line #3 (step +0.011, span 0.039)",
+        "horizontal_span": 0.0391,
+        "vertical_step": 0.0107,
+        "duration_seconds": 1.53,
+        "speaking": true
+      },
+      {
+        "line_number": 4,
+        "timestamp_seconds": 50.1,
+        "description": "AI Teleprompter reading confirmed on Line #4 (step +0.003, span 0.063)",
+        "horizontal_span": 0.0626,
+        "vertical_step": 0.0031,
+        "duration_seconds": 2.59,
+        "speaking": true
+      },
+      {
+        "line_number": 2,
+        "timestamp_seconds": 120.76,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step +0.001, span 0.186)",
+        "horizontal_span": 0.1861,
+        "vertical_step": 0.001,
+        "duration_seconds": 1.1,
+        "speaking": true
+      },
+      {
+        "line_number": 3,
+        "timestamp_seconds": 125.41,
+        "description": "AI Teleprompter reading confirmed on Line #3 (step +0.000, span 0.148)",
+        "horizontal_span": 0.1475,
+        "vertical_step": 0.0001,
+        "duration_seconds": 1.15,
+        "speaking": true
+      },
+      {
+        "line_number": 4,
+        "timestamp_seconds": 130.35,
+        "description": "AI Teleprompter reading confirmed on Line #4 (step +0.008, span 0.147)",
+        "horizontal_span": 0.1469,
+        "vertical_step": 0.0081,
+        "duration_seconds": 1.7,
+        "speaking": true
+      },
+      {
+        "line_number": 5,
+        "timestamp_seconds": 133.06,
+        "description": "AI Teleprompter reading confirmed on Line #5 (step -0.014, span 0.037)",
+        "horizontal_span": 0.0373,
+        "vertical_step": -0.0142,
+        "duration_seconds": 2.34,
+        "speaking": true
+      },
+      {
+        "line_number": 2,
+        "timestamp_seconds": 219.52,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step +0.001, span 0.345)",
+        "horizontal_span": 0.3447,
+        "vertical_step": 0.0015,
+        "duration_seconds": 3.36,
+        "speaking": true
+      },
+      {
+        "line_number": 2,
+        "timestamp_seconds": 249.42,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step -0.004, span 0.072)",
+        "horizontal_span": 0.0723,
+        "vertical_step": -0.0037,
+        "duration_seconds": 2.08,
+        "speaking": true
+      },
+      {
+        "line_number": 2,
+        "timestamp_seconds": 300.67,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step -0.017, span 0.150)",
+        "horizontal_span": 0.15,
+        "vertical_step": -0.0165,
+        "duration_seconds": 1.37,
+        "speaking": true
+      },
+      {
+        "line_number": 2,
+        "timestamp_seconds": 318.16,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step +0.005, span 0.036)",
+        "horizontal_span": 0.0356,
+        "vertical_step": 0.0054,
+        "duration_seconds": 1.6,
+        "speaking": true
+      },
+      {
+        "line_number": 3,
+        "timestamp_seconds": 322.64,
+        "description": "AI Teleprompter reading confirmed on Line #3 (step -0.020, span 0.068)",
+        "horizontal_span": 0.0675,
+        "vertical_step": -0.0197,
+        "duration_seconds": 3.86,
+        "speaking": true
+      },
+      {
+        "line_number": 4,
+        "timestamp_seconds": 324.21,
+        "description": "AI Teleprompter reading confirmed on Line #4 (step +0.014, span 0.240)",
+        "horizontal_span": 0.2403,
+        "vertical_step": 0.0144,
+        "duration_seconds": 1.35,
+        "speaking": true
+      },
+      {
+        "line_number": 5,
+        "timestamp_seconds": 328.28,
+        "description": "AI Teleprompter reading confirmed on Line #5 (step -0.025, span 0.045)",
+        "horizontal_span": 0.0453,
+        "vertical_step": -0.0249,
+        "duration_seconds": 3.39,
+        "speaking": true
+      },
+      {
+        "line_number": 6,
+        "timestamp_seconds": 332.2,
+        "description": "AI Teleprompter reading confirmed on Line #6 (step +0.014, span 0.053)",
+        "horizontal_span": 0.0532,
+        "vertical_step": 0.0135,
+        "duration_seconds": 2.05,
+        "speaking": true
+      },
+      {
+        "line_number": 7,
+        "timestamp_seconds": 334.19,
+        "description": "AI Teleprompter reading confirmed on Line #7 (step -0.004, span 0.090)",
+        "horizontal_span": 0.0896,
+        "vertical_step": -0.0037,
+        "duration_seconds": 1.13,
+        "speaking": true
+      },
+      {
+        "line_number": 8,
+        "timestamp_seconds": 337.94,
+        "description": "AI Teleprompter reading confirmed on Line #8 (step -0.011, span 0.083)",
+        "horizontal_span": 0.0831,
+        "vertical_step": -0.0111,
+        "duration_seconds": 1.63,
+        "speaking": true
+      },
+      {
+        "line_number": 9,
+        "timestamp_seconds": 339.44,
+        "description": "AI Teleprompter reading confirmed on Line #9 (step -0.011, span 0.085)",
+        "horizontal_span": 0.0853,
+        "vertical_step": -0.0113,
+        "duration_seconds": 1.01,
+        "speaking": true
+      },
+      {
+        "line_number": 2,
+        "timestamp_seconds": 344.98,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step -0.011, span 0.046)",
+        "horizontal_span": 0.0459,
+        "vertical_step": -0.0108,
+        "duration_seconds": 1.06,
+        "speaking": true
+      },
+      {
+        "line_number": 2,
+        "timestamp_seconds": 385.77,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step +0.000, span 0.050)",
+        "horizontal_span": 0.0496,
+        "vertical_step": 0.0004,
+        "duration_seconds": 1.15,
+        "speaking": true
+      },
+      {
+        "line_number": 2,
+        "timestamp_seconds": 400.2,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step +0.011, span 0.147)",
+        "horizontal_span": 0.1465,
+        "vertical_step": 0.0106,
+        "duration_seconds": 8.68,
+        "speaking": true
+      },
+      {
+        "line_number": 2,
+        "timestamp_seconds": 434.26,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step +0.004, span 0.052)",
+        "horizontal_span": 0.0516,
+        "vertical_step": 0.004,
+        "duration_seconds": 2.29,
+        "speaking": true
+      },
+      {
+        "line_number": 2,
+        "timestamp_seconds": 468.47,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step +0.007, span 0.134)",
+        "horizontal_span": 0.1343,
+        "vertical_step": 0.007,
+        "duration_seconds": 2.16,
+        "speaking": true
+      },
+      {
+        "line_number": 2,
+        "timestamp_seconds": 921.12,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step +0.037, span 0.044)",
+        "horizontal_span": 0.0436,
+        "vertical_step": 0.0371,
+        "duration_seconds": 2.14,
+        "speaking": true
+      },
+      {
+        "line_number": 3,
+        "timestamp_seconds": 923.03,
+        "description": "AI Teleprompter reading confirmed on Line #3 (step -0.004, span 0.194)",
+        "horizontal_span": 0.1942,
+        "vertical_step": -0.0035,
+        "duration_seconds": 1.25,
+        "speaking": true
+      },
+      {
+        "line_number": 2,
+        "timestamp_seconds": 926.93,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step +0.005, span 0.038)",
+        "horizontal_span": 0.0379,
+        "vertical_step": 0.0048,
+        "duration_seconds": 1.22,
+        "speaking": true
+      },
+      {
+        "line_number": 3,
+        "timestamp_seconds": 930.76,
+        "description": "AI Teleprompter reading confirmed on Line #3 (step -0.013, span 0.096)",
+        "horizontal_span": 0.0965,
+        "vertical_step": -0.0127,
+        "duration_seconds": 1.59,
+        "speaking": true
+      }
+    ],
+    "wpm_reading_bursts": [],
+    "llm_stylometry_markers": [],
+    "question_echo_events": [],
+    "cadence_uniformity_events": [
+      {
+        "incident_number": 1,
+        "timestamp_seconds": 6.79,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.184,
+        "status": "MONITORING (Hit 1)"
+      },
+      {
+        "incident_number": 2,
+        "timestamp_seconds": 12.55,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.242,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 3,
+        "timestamp_seconds": 16.07,
+        "duration_samples": 49,
+        "cadence_variance_cv": 0.242,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 4,
+        "timestamp_seconds": 20.39,
+        "duration_samples": 34,
+        "cadence_variance_cv": 0.36,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 5,
+        "timestamp_seconds": 31.27,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.161,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 6,
+        "timestamp_seconds": 36.76,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.343,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 7,
+        "timestamp_seconds": 40.28,
+        "duration_samples": 30,
+        "cadence_variance_cv": 0.298,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 8,
+        "timestamp_seconds": 43.78,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.25,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 9,
+        "timestamp_seconds": 48.9,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.357,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 10,
+        "timestamp_seconds": 60.4,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.347,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 11,
+        "timestamp_seconds": 115.54,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.322,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 12,
+        "timestamp_seconds": 119.06,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.214,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 13,
+        "timestamp_seconds": 122.6,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.284,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 14,
+        "timestamp_seconds": 126.12,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.218,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 15,
+        "timestamp_seconds": 129.64,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.35,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 16,
+        "timestamp_seconds": 133.16,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.245,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 17,
+        "timestamp_seconds": 139.22,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.302,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 18,
+        "timestamp_seconds": 152.85,
+        "duration_samples": 26,
+        "cadence_variance_cv": 0.358,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 19,
+        "timestamp_seconds": 174.93,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.354,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 20,
+        "timestamp_seconds": 180.36,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.354,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 21,
+        "timestamp_seconds": 184.92,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.289,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 22,
+        "timestamp_seconds": 195.44,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.35,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 23,
+        "timestamp_seconds": 201.08,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.359,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 24,
+        "timestamp_seconds": 210.05,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.332,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 25,
+        "timestamp_seconds": 213.57,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.253,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 26,
+        "timestamp_seconds": 218.76,
+        "duration_samples": 28,
+        "cadence_variance_cv": 0.232,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 27,
+        "timestamp_seconds": 223.65,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.217,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 28,
+        "timestamp_seconds": 231.8,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.285,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 29,
+        "timestamp_seconds": 243.14,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.291,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 30,
+        "timestamp_seconds": 248.02,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.356,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 31,
+        "timestamp_seconds": 262.76,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.351,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 32,
+        "timestamp_seconds": 275.02,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.342,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 33,
+        "timestamp_seconds": 317.06,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.355,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 34,
+        "timestamp_seconds": 320.6,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.301,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 35,
+        "timestamp_seconds": 324.55,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.353,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 36,
+        "timestamp_seconds": 331.82,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.358,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 37,
+        "timestamp_seconds": 338.18,
+        "duration_samples": 28,
+        "cadence_variance_cv": 0.279,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 38,
+        "timestamp_seconds": 343.33,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.356,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 39,
+        "timestamp_seconds": 355.08,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.153,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 40,
+        "timestamp_seconds": 364.26,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.357,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 41,
+        "timestamp_seconds": 367.78,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.256,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 42,
+        "timestamp_seconds": 384.37,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.347,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 43,
+        "timestamp_seconds": 392.29,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.284,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 44,
+        "timestamp_seconds": 396.84,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.296,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 45,
+        "timestamp_seconds": 414.88,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.226,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 46,
+        "timestamp_seconds": 430.03,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.349,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 47,
+        "timestamp_seconds": 433.56,
+        "duration_samples": 38,
+        "cadence_variance_cv": 0.273,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 48,
+        "timestamp_seconds": 463.32,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.265,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 49,
+        "timestamp_seconds": 491.82,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.281,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 50,
+        "timestamp_seconds": 508.98,
+        "duration_samples": 26,
+        "cadence_variance_cv": 0.353,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 51,
+        "timestamp_seconds": 541.91,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.304,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 52,
+        "timestamp_seconds": 753.21,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.336,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 53,
+        "timestamp_seconds": 897.19,
+        "duration_samples": 38,
+        "cadence_variance_cv": 0.359,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 54,
+        "timestamp_seconds": 900.7,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.22,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 55,
+        "timestamp_seconds": 904.21,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.248,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 56,
+        "timestamp_seconds": 908.3,
+        "duration_samples": 31,
+        "cadence_variance_cv": 0.339,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 57,
+        "timestamp_seconds": 911.8,
+        "duration_samples": 50,
+        "cadence_variance_cv": 0.287,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 58,
+        "timestamp_seconds": 915.58,
+        "duration_samples": 41,
+        "cadence_variance_cv": 0.356,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 59,
+        "timestamp_seconds": 925.16,
+        "duration_samples": 25,
+        "cadence_variance_cv": 0.299,
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 60,
+        "timestamp_seconds": 928.7,
+        "duration_samples": 48,
+        "cadence_variance_cv": 0.313,
+        "status": "CONFIRMED"
+      }
+    ],
+    "clean_speaking_timeline": [
+      {
+        "timestamp_seconds": 6.44,
+        "description": "Natural conversational speech to interviewer"
+      },
+      {
+        "timestamp_seconds": 12.34,
+        "description": "Natural conversational speech to interviewer"
+      },
+      {
+        "timestamp_seconds": 30.74,
+        "description": "Natural conversational speech to interviewer"
+      },
+      {
+        "timestamp_seconds": 91.09,
+        "description": "Natural conversational speech (score cooled to 30.0%)"
+      },
+      {
+        "timestamp_seconds": 152.08,
+        "description": "Natural conversational speech (score cooled to 69.4%)"
+      },
+      {
+        "timestamp_seconds": 166.57,
+        "description": "Natural conversational speech (score cooled to 69.4%)"
+      },
+      {
+        "timestamp_seconds": 170.78,
+        "description": "Natural conversational speech (score cooled to 69.0%)"
+      },
+      {
+        "timestamp_seconds": 177.53,
+        "description": "Natural conversational speech (score cooled to 68.4%)"
+      },
+      {
+        "timestamp_seconds": 182.34,
+        "description": "Natural conversational speech (score cooled to 68.0%)"
+      },
+      {
+        "timestamp_seconds": 188.45,
+        "description": "Natural conversational speech (score cooled to 67.8%)"
+      },
+      {
+        "timestamp_seconds": 194.18,
+        "description": "Natural conversational speech (score cooled to 67.6%)"
+      },
+      {
+        "timestamp_seconds": 199.05,
+        "description": "Natural conversational speech (score cooled to 66.3%)"
+      },
+      {
+        "timestamp_seconds": 233.59,
+        "description": "Natural conversational speech (score cooled to 75.4%)"
+      },
+      {
+        "timestamp_seconds": 239.35,
+        "description": "Natural conversational speech (score cooled to 74.9%)"
+      },
+      {
+        "timestamp_seconds": 262.76,
+        "description": "Natural conversational speech (score cooled to 84.7%)"
+      },
+      {
+        "timestamp_seconds": 267.81,
+        "description": "Natural conversational speech (score cooled to 83.2%)"
+      },
+      {
+        "timestamp_seconds": 272.94,
+        "description": "Natural conversational speech (score cooled to 82.9%)"
+      },
+      {
+        "timestamp_seconds": 277.56,
+        "description": "Natural conversational speech (score cooled to 82.0%)"
+      },
+      {
+        "timestamp_seconds": 283.29,
+        "description": "Natural conversational speech (score cooled to 80.8%)"
+      },
+      {
+        "timestamp_seconds": 305.19,
+        "description": "Natural conversational speech (score cooled to 90.6%)"
+      },
+      {
+        "timestamp_seconds": 382.18,
+        "description": "Natural conversational speech (score cooled to 99.0%)"
+      },
+      {
+        "timestamp_seconds": 413.91,
+        "description": "Natural conversational speech (score cooled to 99.0%)"
+      },
+      {
+        "timestamp_seconds": 539.6,
+        "description": "Natural conversational speech (score cooled to 99.0%)"
+      },
+      {
+        "timestamp_seconds": 750.81,
+        "description": "Natural conversational speech (score cooled to 98.7%)"
+      },
+      {
+        "timestamp_seconds": 785.37,
+        "description": "Natural conversational speech (score cooled to 98.2%)"
+      },
+      {
+        "timestamp_seconds": 790.18,
+        "description": "Natural conversational speech (score cooled to 97.2%)"
+      },
+      {
+        "timestamp_seconds": 895.73,
+        "description": "Natural conversational speech (score cooled to 97.0%)"
+      },
+      {
+        "timestamp_seconds": 900.2,
+        "description": "Natural conversational speech (score cooled to 96.7%)"
+      },
+      {
+        "timestamp_seconds": 905.53,
+        "description": "Natural conversational speech (score cooled to 95.4%)"
+      }
+    ]
+  },
+  "all_incidents": [
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "00:06.8",
+      "timestamp_seconds": 6.79,
+      "description": "Uniform reading cadence (CV=0.184)",
+      "metric": "CV=0.184",
+      "severity": "LOW"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "00:12.6",
+      "timestamp_seconds": 12.55,
+      "description": "Uniform reading cadence (CV=0.242)",
+      "metric": "CV=0.242",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "00:16.1",
+      "timestamp_seconds": 16.07,
+      "description": "Uniform reading cadence (CV=0.242)",
+      "metric": "CV=0.242",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "00:20.4",
+      "timestamp_seconds": 20.39,
+      "description": "Uniform reading cadence (CV=0.36)",
+      "metric": "CV=0.36",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "00:31.3",
+      "timestamp_seconds": 31.27,
+      "description": "Uniform reading cadence (CV=0.161)",
+      "metric": "CV=0.161",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "00:36.8",
+      "timestamp_seconds": 36.76,
+      "description": "Uniform reading cadence (CV=0.343)",
+      "metric": "CV=0.343",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "00:40.3",
+      "timestamp_seconds": 40.28,
+      "description": "Uniform reading cadence (CV=0.298)",
+      "metric": "CV=0.298",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "00:43.8",
+      "timestamp_seconds": 43.78,
+      "description": "Uniform reading cadence (CV=0.25)",
+      "metric": "CV=0.25",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "00:44.0",
+      "timestamp_seconds": 43.97,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step -0.013, span 0.186)",
+      "metric": "Span +0.186 (Step -0.013)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "00:46.6",
+      "timestamp_seconds": 46.57,
+      "description": "AI Teleprompter reading confirmed on Line #3 (step +0.011, span 0.039)",
+      "metric": "Span +0.039 (Step +0.011)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "00:48.9",
+      "timestamp_seconds": 48.9,
+      "description": "Uniform reading cadence (CV=0.357)",
+      "metric": "CV=0.357",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "00:50.1",
+      "timestamp_seconds": 50.1,
+      "description": "AI Teleprompter reading confirmed on Line #4 (step +0.003, span 0.063)",
+      "metric": "Span +0.063 (Step +0.003)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "01:00.4",
+      "timestamp_seconds": 60.4,
+      "description": "Uniform reading cadence (CV=0.347)",
+      "metric": "CV=0.347",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "01:55.5",
+      "timestamp_seconds": 115.54,
+      "description": "Uniform reading cadence (CV=0.322)",
+      "metric": "CV=0.322",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "01:59.1",
+      "timestamp_seconds": 119.06,
+      "description": "Uniform reading cadence (CV=0.214)",
+      "metric": "CV=0.214",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "02:00.8",
+      "timestamp_seconds": 120.76,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step +0.001, span 0.186)",
+      "metric": "Span +0.186 (Step +0.001)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "02:02.6",
+      "timestamp_seconds": 122.6,
+      "description": "Uniform reading cadence (CV=0.284)",
+      "metric": "CV=0.284",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "02:05.4",
+      "timestamp_seconds": 125.41,
+      "description": "AI Teleprompter reading confirmed on Line #3 (step +0.000, span 0.148)",
+      "metric": "Span +0.147 (Step +0.000)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "02:06.1",
+      "timestamp_seconds": 126.12,
+      "description": "Uniform reading cadence (CV=0.218)",
+      "metric": "CV=0.218",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "02:09.6",
+      "timestamp_seconds": 129.64,
+      "description": "Uniform reading cadence (CV=0.35)",
+      "metric": "CV=0.35",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "02:10.3",
+      "timestamp_seconds": 130.35,
+      "description": "AI Teleprompter reading confirmed on Line #4 (step +0.008, span 0.147)",
+      "metric": "Span +0.147 (Step +0.008)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "02:13.1",
+      "timestamp_seconds": 133.06,
+      "description": "AI Teleprompter reading confirmed on Line #5 (step -0.014, span 0.037)",
+      "metric": "Span +0.037 (Step -0.014)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "02:13.2",
+      "timestamp_seconds": 133.16,
+      "description": "Uniform reading cadence (CV=0.245)",
+      "metric": "CV=0.245",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "02:19.2",
+      "timestamp_seconds": 139.22,
+      "description": "Uniform reading cadence (CV=0.302)",
+      "metric": "CV=0.302",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "02:32.8",
+      "timestamp_seconds": 152.85,
+      "description": "Uniform reading cadence (CV=0.358)",
+      "metric": "CV=0.358",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "02:54.9",
+      "timestamp_seconds": 174.93,
+      "description": "Uniform reading cadence (CV=0.354)",
+      "metric": "CV=0.354",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "03:00.4",
+      "timestamp_seconds": 180.36,
+      "description": "Uniform reading cadence (CV=0.354)",
+      "metric": "CV=0.354",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "03:04.9",
+      "timestamp_seconds": 184.92,
+      "description": "Uniform reading cadence (CV=0.289)",
+      "metric": "CV=0.289",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "03:15.4",
+      "timestamp_seconds": 195.44,
+      "description": "Uniform reading cadence (CV=0.35)",
+      "metric": "CV=0.35",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "03:21.1",
+      "timestamp_seconds": 201.08,
+      "description": "Uniform reading cadence (CV=0.359)",
+      "metric": "CV=0.359",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "03:30.1",
+      "timestamp_seconds": 210.05,
+      "description": "Uniform reading cadence (CV=0.332)",
+      "metric": "CV=0.332",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "03:33.6",
+      "timestamp_seconds": 213.57,
+      "description": "Uniform reading cadence (CV=0.253)",
+      "metric": "CV=0.253",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "03:38.8",
+      "timestamp_seconds": 218.76,
+      "description": "Uniform reading cadence (CV=0.232)",
+      "metric": "CV=0.232",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "03:39.5",
+      "timestamp_seconds": 219.52,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step +0.001, span 0.345)",
+      "metric": "Span +0.345 (Step +0.002)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "03:43.7",
+      "timestamp_seconds": 223.65,
+      "description": "Uniform reading cadence (CV=0.217)",
+      "metric": "CV=0.217",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "03:51.8",
+      "timestamp_seconds": 231.8,
+      "description": "Uniform reading cadence (CV=0.285)",
+      "metric": "CV=0.285",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "04:03.1",
+      "timestamp_seconds": 243.14,
+      "description": "Uniform reading cadence (CV=0.291)",
+      "metric": "CV=0.291",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "04:08.0",
+      "timestamp_seconds": 248.02,
+      "description": "Uniform reading cadence (CV=0.356)",
+      "metric": "CV=0.356",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "04:09.4",
+      "timestamp_seconds": 249.42,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step -0.004, span 0.072)",
+      "metric": "Span +0.072 (Step -0.004)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "04:22.8",
+      "timestamp_seconds": 262.76,
+      "description": "Uniform reading cadence (CV=0.351)",
+      "metric": "CV=0.351",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "04:35.0",
+      "timestamp_seconds": 275.02,
+      "description": "Uniform reading cadence (CV=0.342)",
+      "metric": "CV=0.342",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "05:00.7",
+      "timestamp_seconds": 300.67,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step -0.017, span 0.150)",
+      "metric": "Span +0.150 (Step -0.017)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "05:17.1",
+      "timestamp_seconds": 317.06,
+      "description": "Uniform reading cadence (CV=0.355)",
+      "metric": "CV=0.355",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "05:18.2",
+      "timestamp_seconds": 318.16,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step +0.005, span 0.036)",
+      "metric": "Span +0.036 (Step +0.005)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "05:20.6",
+      "timestamp_seconds": 320.6,
+      "description": "Uniform reading cadence (CV=0.301)",
+      "metric": "CV=0.301",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "05:22.6",
+      "timestamp_seconds": 322.64,
+      "description": "AI Teleprompter reading confirmed on Line #3 (step -0.020, span 0.068)",
+      "metric": "Span +0.068 (Step -0.020)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "05:24.2",
+      "timestamp_seconds": 324.21,
+      "description": "AI Teleprompter reading confirmed on Line #4 (step +0.014, span 0.240)",
+      "metric": "Span +0.240 (Step +0.014)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "05:24.6",
+      "timestamp_seconds": 324.55,
+      "description": "Uniform reading cadence (CV=0.353)",
+      "metric": "CV=0.353",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "05:28.3",
+      "timestamp_seconds": 328.28,
+      "description": "AI Teleprompter reading confirmed on Line #5 (step -0.025, span 0.045)",
+      "metric": "Span +0.045 (Step -0.025)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "05:31.8",
+      "timestamp_seconds": 331.82,
+      "description": "Uniform reading cadence (CV=0.358)",
+      "metric": "CV=0.358",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "05:32.2",
+      "timestamp_seconds": 332.2,
+      "description": "AI Teleprompter reading confirmed on Line #6 (step +0.014, span 0.053)",
+      "metric": "Span +0.053 (Step +0.013)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "05:34.2",
+      "timestamp_seconds": 334.19,
+      "description": "AI Teleprompter reading confirmed on Line #7 (step -0.004, span 0.090)",
+      "metric": "Span +0.090 (Step -0.004)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "05:37.9",
+      "timestamp_seconds": 337.94,
+      "description": "AI Teleprompter reading confirmed on Line #8 (step -0.011, span 0.083)",
+      "metric": "Span +0.083 (Step -0.011)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "05:38.2",
+      "timestamp_seconds": 338.18,
+      "description": "Uniform reading cadence (CV=0.279)",
+      "metric": "CV=0.279",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "05:39.4",
+      "timestamp_seconds": 339.44,
+      "description": "AI Teleprompter reading confirmed on Line #9 (step -0.011, span 0.085)",
+      "metric": "Span +0.085 (Step -0.011)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "05:43.3",
+      "timestamp_seconds": 343.33,
+      "description": "Uniform reading cadence (CV=0.356)",
+      "metric": "CV=0.356",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "05:45.0",
+      "timestamp_seconds": 344.98,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step -0.011, span 0.046)",
+      "metric": "Span +0.046 (Step -0.011)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "05:55.1",
+      "timestamp_seconds": 355.08,
+      "description": "Uniform reading cadence (CV=0.153)",
+      "metric": "CV=0.153",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "06:04.3",
+      "timestamp_seconds": 364.26,
+      "description": "Uniform reading cadence (CV=0.357)",
+      "metric": "CV=0.357",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "06:07.8",
+      "timestamp_seconds": 367.78,
+      "description": "Uniform reading cadence (CV=0.256)",
+      "metric": "CV=0.256",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "06:24.4",
+      "timestamp_seconds": 384.37,
+      "description": "Uniform reading cadence (CV=0.347)",
+      "metric": "CV=0.347",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "06:25.8",
+      "timestamp_seconds": 385.77,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step +0.000, span 0.050)",
+      "metric": "Span +0.050 (Step +0.000)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "06:32.3",
+      "timestamp_seconds": 392.29,
+      "description": "Uniform reading cadence (CV=0.284)",
+      "metric": "CV=0.284",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "06:36.8",
+      "timestamp_seconds": 396.84,
+      "description": "Uniform reading cadence (CV=0.296)",
+      "metric": "CV=0.296",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "06:40.2",
+      "timestamp_seconds": 400.2,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step +0.011, span 0.147)",
+      "metric": "Span +0.146 (Step +0.011)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "06:54.9",
+      "timestamp_seconds": 414.88,
+      "description": "Uniform reading cadence (CV=0.226)",
+      "metric": "CV=0.226",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "07:10.0",
+      "timestamp_seconds": 430.03,
+      "description": "Uniform reading cadence (CV=0.349)",
+      "metric": "CV=0.349",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "07:13.6",
+      "timestamp_seconds": 433.56,
+      "description": "Uniform reading cadence (CV=0.273)",
+      "metric": "CV=0.273",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "07:14.3",
+      "timestamp_seconds": 434.26,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step +0.004, span 0.052)",
+      "metric": "Span +0.052 (Step +0.004)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "07:43.3",
+      "timestamp_seconds": 463.32,
+      "description": "Uniform reading cadence (CV=0.265)",
+      "metric": "CV=0.265",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "07:48.5",
+      "timestamp_seconds": 468.47,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step +0.007, span 0.134)",
+      "metric": "Span +0.134 (Step +0.007)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "08:11.8",
+      "timestamp_seconds": 491.82,
+      "description": "Uniform reading cadence (CV=0.281)",
+      "metric": "CV=0.281",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "08:29.0",
+      "timestamp_seconds": 508.98,
+      "description": "Uniform reading cadence (CV=0.353)",
+      "metric": "CV=0.353",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "09:01.9",
+      "timestamp_seconds": 541.91,
+      "description": "Uniform reading cadence (CV=0.304)",
+      "metric": "CV=0.304",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "12:33.2",
+      "timestamp_seconds": 753.21,
+      "description": "Uniform reading cadence (CV=0.336)",
+      "metric": "CV=0.336",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "14:57.2",
+      "timestamp_seconds": 897.19,
+      "description": "Uniform reading cadence (CV=0.359)",
+      "metric": "CV=0.359",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "15:00.7",
+      "timestamp_seconds": 900.7,
+      "description": "Uniform reading cadence (CV=0.22)",
+      "metric": "CV=0.22",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "15:04.2",
+      "timestamp_seconds": 904.21,
+      "description": "Uniform reading cadence (CV=0.248)",
+      "metric": "CV=0.248",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "15:08.3",
+      "timestamp_seconds": 908.3,
+      "description": "Uniform reading cadence (CV=0.339)",
+      "metric": "CV=0.339",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "15:11.8",
+      "timestamp_seconds": 911.8,
+      "description": "Uniform reading cadence (CV=0.287)",
+      "metric": "CV=0.287",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "15:15.6",
+      "timestamp_seconds": 915.58,
+      "description": "Uniform reading cadence (CV=0.356)",
+      "metric": "CV=0.356",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "15:21.1",
+      "timestamp_seconds": 921.12,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step +0.037, span 0.044)",
+      "metric": "Span +0.044 (Step +0.037)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "15:23.0",
+      "timestamp_seconds": 923.03,
+      "description": "AI Teleprompter reading confirmed on Line #3 (step -0.004, span 0.194)",
+      "metric": "Span +0.194 (Step -0.004)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "15:25.2",
+      "timestamp_seconds": 925.16,
+      "description": "Uniform reading cadence (CV=0.299)",
+      "metric": "CV=0.299",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "15:26.9",
+      "timestamp_seconds": 926.93,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step +0.005, span 0.038)",
+      "metric": "Span +0.038 (Step +0.005)",
+      "severity": "CRITICAL"
+    },
+    {
+      "pillar": "Cadence Uniformity",
+      "badge": "CADENCE",
+      "timestamp_formatted": "15:28.7",
+      "timestamp_seconds": 928.7,
+      "description": "Uniform reading cadence (CV=0.313)",
+      "metric": "CV=0.313",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "15:30.8",
+      "timestamp_seconds": 930.76,
+      "description": "AI Teleprompter reading confirmed on Line #3 (step -0.013, span 0.096)",
+      "metric": "Span +0.097 (Step -0.013)",
+      "severity": "CRITICAL"
+    }
+  ]
+}

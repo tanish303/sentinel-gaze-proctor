@@ -245,8 +245,8 @@
       "lane": "l_07",
       "col": 1,
       "type": "backend",
-      "label": "14-Frame RMS",
-      "sublabel": "energy variance buffer",
+      "label": "30-Frame RMS",
+      "sublabel": "voiced energy buffer",
       "width": 140
     },
     {
@@ -255,7 +255,7 @@
       "col": 2,
       "type": "security",
       "label": "Monotone Drone?",
-      "sublabel": "CV = σ/μ <= 0.38",
+      "sublabel": "CV = σ/μ <= 0.22",
       "tag": "Weight 15%",
       "width": 140
     },
@@ -273,17 +273,8 @@
       "lane": "l_08",
       "col": 2,
       "type": "messagebus",
-      "label": "Active Cooldown",
-      "sublabel": "-2.5%/sec smooth decay",
-      "width": 140
-    },
-    {
-      "id": "n_hotkey",
-      "lane": "l_08",
-      "col": 3,
-      "type": "frontend",
-      "label": "Hotkey Override",
-      "sublabel": "[2],[3],[4],[C] triggers",
+      "label": "Automatic Decay",
+      "sublabel": "-3.0%/sec natural cooldown",
       "width": 140
     },
     {
@@ -495,7 +486,7 @@
       "id": "e_t4_fus",
       "from": "n_t4_gate",
       "to": "n_fusion",
-      "label": "drone hit (+40%)",
+      "label": "drone hit (+12%)",
       "variant": "emphasis"
     },
     {

@@ -1,0 +1,36 @@
+======================================================================
+       SENTINEL GAZE // 5-PILLAR FORENSIC AUDIT: test_5pillars_audit
+======================================================================
+Timestamp          : 2026-10-26 12:06:10
+Duration           : 0.2 seconds
+Final Verdict      : LOW RISK (Isolated Behavioral Patterns)
+Composite Confidence: 19.0% (LOW)
+
+----------------------------------------------------------------------
+MULTI-PILLAR SCORECARD BREAKDOWN:
+----------------------------------------------------------------------
+  • OCULAR GAZE MECHANICS (Weight: 35%):
+      Sub-score : 0.0% [NORMAL]
+  • SPEECH WPM READING BURST (Weight: 20%):
+      Sub-score : 35.0% [ALERT]
+  • SPOKEN LLM STYLOMETRY (Weight: 20%):
+      Sub-score : 60.0% [ALERT]
+  • QUESTION ECHOING DELAY (Weight: 15%):
+      Sub-score : 0.0% [NORMAL]
+  • CADENCE PROSODY UNIFORMITY (Weight: 10%):
+      Sub-score : 0.0% [NORMAL]
+
+----------------------------------------------------------------------
+DETAILED FORENSIC INCIDENTS LOGGED: 5
+----------------------------------------------------------------------
+  [ 1] @ 00:03.0 | [WPM] Rapid reading burst at 180 WPM (180 WPM)
+  [ 2] @ 00:03.0 | [LLM] AI Phrasing matched [List Enumeration [Firstly]]: "firstly" (firstly)
+  [ 3] @ 00:08.0 | [WPM] Rapid reading burst at 195 WPM (195 WPM)
+  [ 4] @ 00:08.0 | [LLM] AI Phrasing matched [List Enumeration [Connective]]: "secondly" (secondly)
+  [ 5] @ 00:08.0 | [LLM] AI Phrasing matched [List Enumeration [Conclusion]]: "in conclusion" (in conclusion)
+
+----------------------------------------------------------------------
+CLEAN CONVERSATIONAL SPEAKING INTERVALS: 1
+----------------------------------------------------------------------
+  @ 8.0s: Natural conversational speech to interviewer
+======================================================================

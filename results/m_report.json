@@ -1,0 +1,41 @@
+{
+  "test_metadata": {
+    "test_name": "m",
+    "timestamp": "2026-10-26T11:22:53.134513",
+    "duration_formatted": "29881828:34.6",
+    "duration_seconds": 1792909714.58,
+    "final_verdict": "CLEAN (Normal Conversational Speech)",
+    "confidence_score": 0.0,
+    "confidence_percentage": "0.0%",
+    "risk_level": "CLEAN",
+    "total_cheating_lines": 0,
+    "total_clean_speak_events": 6
+  },
+  "cheating_reading_lines": [],
+  "clean_speaking_timeline": [
+    {
+      "timestamp_seconds": 20.36,
+      "description": "Natural conversational speech to interviewer"
+    },
+    {
+      "timestamp_seconds": 41.11,
+      "description": "Natural conversational speech to interviewer"
+    },
+    {
+      "timestamp_seconds": 52.33,
+      "description": "Natural conversational speech to interviewer"
+    },
+    {
+      "timestamp_seconds": 107.24,
+      "description": "Natural conversational speech to interviewer"
+    },
+    {
+      "timestamp_seconds": 112.5,
+      "description": "Natural conversational speech to interviewer"
+    },
+    {
+      "timestamp_seconds": 120.1,
+      "description": "Natural conversational speech to interviewer"
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+======================================================================
+       SENTINEL GAZE // 4-PILLAR FORENSIC AUDIT: bu
+======================================================================
+Timestamp          : 2026-10-26 17:10:15
+Duration           : 1792913471.7 seconds
+Final Verdict      : LOW RISK (Isolated Behavioral Patterns)
+Composite Confidence: 0.0% (LOW)
+
+----------------------------------------------------------------------
+MULTI-PILLAR SCORECARD BREAKDOWN:
+----------------------------------------------------------------------
+  • OCULAR GAZE MECHANICS (Weight: 45%):
+      Sub-score : 0.0% [NORMAL]
+  • SPOKEN LLM STYLOMETRY (Weight: 25%):
+      Sub-score : 0.0% [NORMAL]
+  • QUESTION ECHOING DELAY (Weight: 15%):
+      Sub-score : 0.0% [NORMAL]
+  • CADENCE PROSODY UNIFORMITY (Weight: 15%):
+      Sub-score : 0.0% [NORMAL]
+
+----------------------------------------------------------------------
+DETAILED FORENSIC INCIDENTS LOGGED: 22
+----------------------------------------------------------------------
+  [ 1] @ 00:39.2 | [GAZE] AI Teleprompter reading confirmed on Line #2 (step +0.000, span 0.055) (Span +0.055 (Step +0.000))
+  [ 2] @ 00:45.2 | [CADENCE] Uniform reading cadence (CV=0.142) (CV=0.142)
+  [ 3] @ 00:47.9 | [LLM] AI Phrasing matched [List Enumeration [Connective]]: "furthermore" (furthermore)
+  [ 4] @ 00:49.0 | [GAZE] AI Teleprompter reading confirmed on Line #2 (step +0.015, span 0.045) (Span +0.045 (Step +0.015))
+  [ 5] @ 00:57.4 | [GAZE] AI Teleprompter reading confirmed on Line #3 (step +0.065, span 0.180) (Span +0.180 (Step +0.065))
+  [ 6] @ 00:59.4 | [GAZE] AI Teleprompter reading confirmed on Line #4 (step +0.023, span 0.135) (Span +0.135 (Step +0.023))
+  [ 7] @ 01:01.0 | [GAZE] AI Teleprompter reading confirmed on Line #5 (step -0.008, span 0.038) (Span +0.038 (Step -0.008))
+  [ 8] @ 01:12.8 | [LLM] AI Phrasing matched [List Enumeration [Connective]]: "secondly" (secondly)
+  [ 9] @ 01:19.8 | [LLM] AI Phrasing matched [Formal AI Hedging]: "it is important to note that" (it is important to note that)
+  [10] @ 01:25.2 | [GAZE] AI Teleprompter reading confirmed on Line #2 (step -0.025, span 0.074) (Span +0.074 (Step -0.025))
+  [11] @ 01:31.9 | [GAZE] AI Teleprompter reading confirmed on Line #3 (step +0.005, span 0.173) (Span +0.173 (Step +0.005))
+  [12] @ 01:44.0 | [ECHO] Question echoing stall: 0% keyword repetition (0% match)
+  [13] @ 01:47.0 | [ECHO] Question echoing stall: 0% keyword repetition (0% match)
+  [14] @ 01:50.0 | [ECHO] Question echoing stall: 0% keyword repetition (0% match)
+  [15] @ 01:53.0 | [ECHO] Question echoing stall: 0% keyword repetition (0% match)
+  [16] @ 01:56.1 | [ECHO] Question echoing stall: 0% keyword repetition (0% match)
+  [17] @ 01:59.1 | [ECHO] Question echoing stall: 0% keyword repetition (0% match)
+  [18] @ 02:02.1 | [ECHO] Question echoing stall: 0% keyword repetition (0% match)
+  [19] @ 02:09.5 | [GAZE] AI Teleprompter reading confirmed on Line #2 (step -0.005, span 0.176) (Span +0.176 (Step -0.005))
+  [20] @ 02:23.0 | [GAZE] AI Teleprompter reading confirmed on Line #3 (step +0.012, span 0.184) (Span +0.184 (Step +0.012))
+  [21] @ 02:30.7 | [LLM] AI Phrasing matched [List Enumeration [Conclusion]]: "in summary" (in summary)
+  [22] @ 02:32.8 | [LLM] AI Phrasing matched [List Enumeration [Firstly]]: "first and foremost" (first and foremost)
+
+----------------------------------------------------------------------
+CLEAN CONVERSATIONAL SPEAKING INTERVALS: 23
+----------------------------------------------------------------------
+  @ 79.6s: Gaze cooled to 49.9% (non-reading behavior)
+  @ 163.7s: Gaze cooled to 86.6% (non-reading behavior)
+  @ 183.2s: Gaze cooled to 86.6% (non-reading behavior)
+  @ 186.5s: Gaze cooled to 85.4% (non-reading behavior)
+  @ 189.5s: Gaze cooled to 78.4% (non-reading behavior)
+  @ 198.6s: Gaze cooled to 76.5% (non-reading behavior)
+  @ 201.6s: Gaze cooled to 70.4% (non-reading behavior)
+  @ 206.1s: Gaze cooled to 66.8% (non-reading behavior)
+  @ 209.1s: Gaze cooled to 60.3% (non-reading behavior)
+  @ 214.1s: Gaze cooled to 57.2% (non-reading behavior)
+  @ 222.7s: Gaze cooled to 51.6% (non-reading behavior)
+  @ 229.6s: Gaze cooled to 48.7% (non-reading behavior)
+  @ 236.9s: Gaze cooled to 46.2% (non-reading behavior)
+  @ 239.9s: Gaze cooled to 40.2% (non-reading behavior)
+  @ 246.3s: Gaze cooled to 36.2% (non-reading behavior)
+  @ 249.3s: Gaze cooled to 30.1% (non-reading behavior)
+  @ 255.1s: Gaze cooled to 24.2% (non-reading behavior)
+  @ 270.8s: Gaze cooled to 24.1% (non-reading behavior)
+  @ 278.3s: Gaze cooled to 20.3% (non-reading behavior)
+  @ 293.3s: Gaze cooled to 19.1% (non-reading behavior)
+======================================================================

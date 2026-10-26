@@ -1,0 +1,79 @@
+{
+  "test_metadata": {
+    "test_name": "test_accuracy",
+    "duration_seconds": 0.27,
+    "final_verdict": "LOW RISK (Isolated Behavioral Patterns)",
+    "risk_level": "LOW",
+    "composite_confidence_score": 0.0838,
+    "composite_confidence_percentage": "8.4%",
+    "pillars_evaluated": 5,
+    "anti_false_positive_policy": "Strict multi-hit verification enforced (0% penalty on single events)"
+  },
+  "pillar_scorecard": {
+    "ocular_gaze_mechanics": {
+      "weight": "35%",
+      "sub_score": 0.1,
+      "sub_score_percentage": "10.0%",
+      "cheating_lines_count": 1,
+      "clean_speaking_events": 0,
+      "status": "NORMAL"
+    },
+    "speech_wpm_reading_burst": {
+      "weight": "20%",
+      "sub_score": 0.0,
+      "sub_score_percentage": "0.0%",
+      "burst_incidents_count": 0,
+      "status": "NORMAL"
+    },
+    "spoken_llm_stylometry": {
+      "weight": "20%",
+      "sub_score": 0.0,
+      "sub_score_percentage": "0.0%",
+      "markers_detected_count": 0,
+      "status": "NORMAL"
+    },
+    "question_echoing_delay": {
+      "weight": "15%",
+      "sub_score": 0.0,
+      "sub_score_percentage": "0.0%",
+      "echo_incidents_count": 0,
+      "status": "NORMAL"
+    },
+    "cadence_prosody_uniformity": {
+      "weight": "10%",
+      "sub_score": 0.0,
+      "sub_score_percentage": "0.0%",
+      "cadence_incidents_count": 0,
+      "status": "NORMAL"
+    }
+  },
+  "detailed_incidents": {
+    "gaze_cheating_lines": [
+      {
+        "line_number": 2,
+        "timestamp_seconds": 7.56,
+        "description": "AI Teleprompter reading confirmed on Line #2 (step +0.020, span 0.188)",
+        "horizontal_span": 0.188,
+        "vertical_step": 0.02,
+        "duration_seconds": 2.04,
+        "speaking": true
+      }
+    ],
+    "wpm_reading_bursts": [],
+    "llm_stylometry_markers": [],
+    "question_echo_events": [],
+    "cadence_uniformity_events": [],
+    "clean_speaking_timeline": []
+  },
+  "all_incidents": [
+    {
+      "pillar": "Ocular Saccades",
+      "badge": "GAZE",
+      "timestamp_formatted": "00:07.6",
+      "timestamp_seconds": 7.56,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step +0.020, span 0.188)",
+      "metric": "Span +0.188 (Step +0.020)",
+      "severity": "CRITICAL"
+    }
+  ]
+}

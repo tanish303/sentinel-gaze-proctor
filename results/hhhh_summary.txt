@@ -1,0 +1,33 @@
+=================================================================
+       AUDIT SUMMARY: hhhh
+=================================================================
+Timestamp        : 2026-10-23 13:58:13
+Duration         : 29867341:47.2 (1792040507.2 s)
+Final Verdict    : LOW RISK (Isolated Pattern)
+Confidence       : 22.1% (LOW)
+
+-----------------------------------------------------------------
+CHEATING / READING LINES DETECTED: 3
+-----------------------------------------------------------------
+  Incident # 1 (Line # 2) @ 00:55.3 (t= 55.3s) | span=0.076  step=+0.009  read_dur=1.74s  [Aloud]
+  Incident # 2 (Line # 2) @ 01:15.0 (t= 75.0s) | span=0.062  step=-0.018  read_dur=2.01s  [Aloud]
+  Incident # 3 (Line # 2) @ 01:38.0 (t= 98.0s) | span=0.047  step=-0.011  read_dur=0.92s  [Aloud]
+
+-----------------------------------------------------------------
+CLEAN SPEAKING INTERVALS: 14
+-----------------------------------------------------------------
+  @ 00:13.0 (t= 13.0s): Natural conversational speech to interviewer
+  @ 00:16.9 (t= 16.9s): Natural conversational speech to interviewer
+  @ 00:38.3 (t= 38.3s): Natural conversational speech to interviewer
+  @ 00:43.0 (t= 43.0s): Natural conversational speech to interviewer
+  @ 00:46.6 (t= 46.6s): Natural conversational speech to interviewer
+  @ 01:08.8 (t= 68.8s): Natural conversational speech (score cooled to 10.0%)
+  @ 01:29.0 (t= 89.0s): Natural conversational speech (score cooled to 19.3%)
+  @ 01:42.5 (t=102.5s): Natural conversational speech (score cooled to 28.1%)
+  @ 01:54.8 (t=114.8s): Natural conversational speech (score cooled to 26.6%)
+  @ 01:59.2 (t=119.2s): Natural conversational speech (score cooled to 26.6%)
+  @ 02:03.0 (t=123.0s): Natural conversational speech (score cooled to 23.8%)
+  @ 05:44.3 (t=344.3s): Natural conversational speech (score cooled to 23.5%)
+  @ 06:00.3 (t=360.3s): Natural conversational speech (score cooled to 23.0%)
+  @ 06:06.6 (t=366.6s): Natural conversational speech (score cooled to 22.6%)
+=================================================================

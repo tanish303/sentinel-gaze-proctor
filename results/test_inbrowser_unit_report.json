@@ -1,0 +1,16 @@
+{
+  "test_metadata": {
+    "test_name": "test_inbrowser_unit",
+    "timestamp": "2026-10-16T17:20:45.112360",
+    "duration_formatted": "00:00.1",
+    "duration_seconds": 0.05,
+    "final_verdict": "CLEAN (Normal Conversational Speech)",
+    "confidence_score": 0.0,
+    "confidence_percentage": "0.0%",
+    "risk_level": "CLEAN",
+    "total_cheating_lines": 0,
+    "total_clean_speak_events": 0
+  },
+  "cheating_reading_lines": [],
+  "clean_speaking_timeline": []
+}

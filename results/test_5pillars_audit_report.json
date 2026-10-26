@@ -1,0 +1,150 @@
+{
+  "test_metadata": {
+    "test_name": "test_5pillars_audit",
+    "duration_seconds": 0.2,
+    "final_verdict": "LOW RISK (Isolated Behavioral Patterns)",
+    "risk_level": "LOW",
+    "composite_confidence_score": 0.19,
+    "composite_confidence_percentage": "19.0%",
+    "pillars_evaluated": 5,
+    "anti_false_positive_policy": "Strict multi-hit verification enforced (0% penalty on single events)"
+  },
+  "pillar_scorecard": {
+    "ocular_gaze_mechanics": {
+      "weight": "35%",
+      "sub_score": 0.0,
+      "sub_score_percentage": "0.0%",
+      "cheating_lines_count": 0,
+      "clean_speaking_events": 1,
+      "status": "NORMAL"
+    },
+    "speech_wpm_reading_burst": {
+      "weight": "20%",
+      "sub_score": 0.35,
+      "sub_score_percentage": "35.0%",
+      "burst_incidents_count": 2,
+      "status": "ALERT"
+    },
+    "spoken_llm_stylometry": {
+      "weight": "20%",
+      "sub_score": 0.6,
+      "sub_score_percentage": "60.0%",
+      "markers_detected_count": 3,
+      "status": "ALERT"
+    },
+    "question_echoing_delay": {
+      "weight": "15%",
+      "sub_score": 0.0,
+      "sub_score_percentage": "0.0%",
+      "echo_incidents_count": 0,
+      "status": "NORMAL"
+    },
+    "cadence_prosody_uniformity": {
+      "weight": "10%",
+      "sub_score": 0.0,
+      "sub_score_percentage": "0.0%",
+      "cadence_incidents_count": 0,
+      "status": "NORMAL"
+    }
+  },
+  "detailed_incidents": {
+    "gaze_cheating_lines": [],
+    "wpm_reading_bursts": [
+      {
+        "incident_number": 1,
+        "timestamp_seconds": 3.0,
+        "wpm": 180,
+        "snippet": "firstly this is just a quick thought",
+        "status": "ANCHORED (Monitoring)"
+      },
+      {
+        "incident_number": 2,
+        "timestamp_seconds": 8.0,
+        "wpm": 195,
+        "snippet": "secondly furthermore in conclusion here are the key steps",
+        "status": "CONFIRMED"
+      }
+    ],
+    "llm_stylometry_markers": [
+      {
+        "incident_number": 1,
+        "timestamp_seconds": 3.0,
+        "matched_phrase": "firstly",
+        "category": "List Enumeration [Firstly]",
+        "context": "firstly this is just a quick thought",
+        "status": "MONITORING (1st Hit)"
+      },
+      {
+        "incident_number": 2,
+        "timestamp_seconds": 8.0,
+        "matched_phrase": "secondly",
+        "category": "List Enumeration [Connective]",
+        "context": "secondly furthermore in conclusion here are the key steps",
+        "status": "CONFIRMED"
+      },
+      {
+        "incident_number": 3,
+        "timestamp_seconds": 8.0,
+        "matched_phrase": "in conclusion",
+        "category": "List Enumeration [Conclusion]",
+        "context": "secondly furthermore in conclusion here are the key steps",
+        "status": "CONFIRMED"
+      }
+    ],
+    "question_echo_events": [],
+    "cadence_uniformity_events": [],
+    "clean_speaking_timeline": [
+      {
+        "timestamp_seconds": 8.0,
+        "description": "Natural conversational speech to interviewer"
+      }
+    ]
+  },
+  "all_incidents": [
+    {
+      "pillar": "Speech Pace / WPM",
+      "badge": "WPM",
+      "timestamp_formatted": "00:03.0",
+      "timestamp_seconds": 3.0,
+      "description": "Rapid reading burst at 180 WPM",
+      "metric": "180 WPM",
+      "severity": "LOW"
+    },
+    {
+      "pillar": "LLM Stylometry",
+      "badge": "LLM",
+      "timestamp_formatted": "00:03.0",
+      "timestamp_seconds": 3.0,
+      "description": "AI Phrasing matched [List Enumeration [Firstly]]: \"firstly\"",
+      "metric": "firstly",
+      "severity": "LOW"
+    },
+    {
+      "pillar": "Speech Pace / WPM",
+      "badge": "WPM",
+      "timestamp_formatted": "00:08.0",
+      "timestamp_seconds": 8.0,
+      "description": "Rapid reading burst at 195 WPM",
+      "metric": "195 WPM",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "LLM Stylometry",
+      "badge": "LLM",
+      "timestamp_formatted": "00:08.0",
+      "timestamp_seconds": 8.0,
+      "description": "AI Phrasing matched [List Enumeration [Connective]]: \"secondly\"",
+      "metric": "secondly",
+      "severity": "HIGH"
+    },
+    {
+      "pillar": "LLM Stylometry",
+      "badge": "LLM",
+      "timestamp_formatted": "00:08.0",
+      "timestamp_seconds": 8.0,
+      "description": "AI Phrasing matched [List Enumeration [Conclusion]]: \"in conclusion\"",
+      "metric": "in conclusion",
+      "severity": "HIGH"
+    }
+  ]
+}

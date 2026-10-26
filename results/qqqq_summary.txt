@@ -1,0 +1,41 @@
+=================================================================
+       AUDIT SUMMARY: qqqq
+=================================================================
+Timestamp        : 2026-10-26 11:55:09
+Duration         : 29881828:36.5 (1792909716.5 s)
+Final Verdict    : CHEATING / READING DETECTED (High Confidence)
+Confidence       : 99.0% (CRITICAL)
+
+-----------------------------------------------------------------
+CHEATING / READING LINES DETECTED: 20
+-----------------------------------------------------------------
+  Incident # 1 (Line # 2) @ 00:31.0 (t= 31.0s) | span=0.037  step=-0.021  read_dur=1.65s  [Aloud]
+  Incident # 2 (Line # 3) @ 00:36.2 (t= 36.2s) | span=0.138  step=-0.004  read_dur=2.15s  [Aloud]
+  Incident # 3 (Line # 4) @ 00:37.6 (t= 37.6s) | span=0.097  step=+0.000  read_dur=0.96s  [Aloud]
+  Incident # 4 (Line # 5) @ 00:44.2 (t= 44.2s) | span=0.106  step=-0.019  read_dur=1.75s  [Aloud]
+  Incident # 5 (Line # 6) @ 00:46.0 (t= 46.0s) | span=0.049  step=+0.007  read_dur=1.06s  [Aloud]
+  Incident # 6 (Line # 7) @ 00:47.8 (t= 47.8s) | span=0.063  step=-0.000  read_dur=0.83s  [Aloud]
+  Incident # 7 (Line # 2) @ 00:50.8 (t= 50.8s) | span=0.082  step=-0.004  read_dur=0.88s  [Aloud]
+  Incident # 8 (Line # 3) @ 01:00.0 (t= 60.0s) | span=0.036  step=+0.024  read_dur=6.59s  [Aloud]
+  Incident # 9 (Line # 4) @ 01:04.5 (t= 64.5s) | span=0.075  step=+0.023  read_dur=0.96s  [Aloud]
+  Incident #10 (Line # 5) @ 01:06.9 (t= 66.9s) | span=0.158  step=+0.013  read_dur=1.76s  [Aloud]
+  Incident #11 (Line # 6) @ 01:13.9 (t= 73.9s) | span=0.038  step=+0.002  read_dur=6.02s  [Aloud]
+  Incident #12 (Line # 7) @ 01:21.0 (t= 81.0s) | span=0.086  step=-0.003  read_dur=1.43s  [Aloud]
+  Incident #13 (Line # 2) @ 01:39.7 (t= 99.7s) | span=0.072  step=+0.038  read_dur=1.88s  [Aloud]
+  Incident #14 (Line # 3) @ 01:44.3 (t=104.3s) | span=0.090  step=-0.013  read_dur=1.44s  [Aloud]
+  Incident #15 (Line # 4) @ 01:48.5 (t=108.5s) | span=0.087  step=+0.000  read_dur=0.78s  [Aloud]
+  Incident #16 (Line # 5) @ 01:52.9 (t=112.9s) | span=0.079  step=-0.017  read_dur=2.78s  [Aloud]
+  Incident #17 (Line # 6) @ 01:59.7 (t=119.7s) | span=0.036  step=+0.053  read_dur=1.64s  [Aloud]
+  Incident #18 (Line # 2) @ 02:18.9 (t=138.9s) | span=0.036  step=-0.000  read_dur=6.24s  [Aloud]
+  Incident #19 (Line # 3) @ 02:21.2 (t=141.2s) | span=0.069  step=-0.014  read_dur=1.79s  [Aloud]
+  Incident #20 (Line # 4) @ 02:29.5 (t=149.5s) | span=0.038  step=-0.015  read_dur=7.22s  [Aloud]
+
+-----------------------------------------------------------------
+CLEAN SPEAKING INTERVALS: 5
+-----------------------------------------------------------------
+  @ 01:25.4 (t= 85.4s): Natural conversational speech (score cooled to 99.0%)
+  @ 01:34.9 (t= 94.9s): Natural conversational speech (score cooled to 96.7%)
+  @ 02:02.2 (t=122.2s): Natural conversational speech (score cooled to 99.0%)
+  @ 02:06.2 (t=126.2s): Natural conversational speech (score cooled to 98.0%)
+  @ 02:09.8 (t=129.8s): Natural conversational speech (score cooled to 96.4%)
+=================================================================

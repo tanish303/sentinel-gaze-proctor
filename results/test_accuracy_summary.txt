@@ -1,0 +1,31 @@
+======================================================================
+       SENTINEL GAZE // 5-PILLAR FORENSIC AUDIT: test_accuracy
+======================================================================
+Timestamp          : 2026-10-22 12:22:51
+Duration           : 0.3 seconds
+Final Verdict      : LOW RISK (Isolated Behavioral Patterns)
+Composite Confidence: 8.4% (LOW)
+
+----------------------------------------------------------------------
+MULTI-PILLAR SCORECARD BREAKDOWN:
+----------------------------------------------------------------------
+  • OCULAR GAZE MECHANICS (Weight: 35%):
+      Sub-score : 10.0% [NORMAL]
+  • SPEECH WPM READING BURST (Weight: 20%):
+      Sub-score : 0.0% [NORMAL]
+  • SPOKEN LLM STYLOMETRY (Weight: 20%):
+      Sub-score : 0.0% [NORMAL]
+  • QUESTION ECHOING DELAY (Weight: 15%):
+      Sub-score : 0.0% [NORMAL]
+  • CADENCE PROSODY UNIFORMITY (Weight: 10%):
+      Sub-score : 0.0% [NORMAL]
+
+----------------------------------------------------------------------
+DETAILED FORENSIC INCIDENTS LOGGED: 1
+----------------------------------------------------------------------
+  [ 1] @ 00:07.6 | [GAZE] AI Teleprompter reading confirmed on Line #2 (step +0.020, span 0.188) (Span +0.188 (Step +0.020))
+
+----------------------------------------------------------------------
+CLEAN CONVERSATIONAL SPEAKING INTERVALS: 0
+----------------------------------------------------------------------
+======================================================================

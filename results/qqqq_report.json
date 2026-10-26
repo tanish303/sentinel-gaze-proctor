@@ -1,0 +1,258 @@
+{
+  "test_metadata": {
+    "test_name": "qqqq",
+    "timestamp": "2026-10-26T11:55:09.314054",
+    "duration_formatted": "29881828:36.5",
+    "duration_seconds": 1792909716.49,
+    "final_verdict": "CHEATING / READING DETECTED (High Confidence)",
+    "confidence_score": 0.99,
+    "confidence_percentage": "99.0%",
+    "risk_level": "CRITICAL",
+    "total_cheating_lines": 20,
+    "total_clean_speak_events": 5
+  },
+  "cheating_reading_lines": [
+    {
+      "incident_number": 1,
+      "line_number": 2,
+      "timestamp_formatted": "00:31.0",
+      "timestamp_seconds": 31.03,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step -0.021, span 0.037)",
+      "horizontal_span": 0.0367,
+      "vertical_step": -0.0208,
+      "duration_seconds": 1.65,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 2,
+      "line_number": 3,
+      "timestamp_formatted": "00:36.2",
+      "timestamp_seconds": 36.16,
+      "description": "AI Teleprompter reading confirmed on Line #3 (step -0.004, span 0.138)",
+      "horizontal_span": 0.1382,
+      "vertical_step": -0.0041,
+      "duration_seconds": 2.15,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 3,
+      "line_number": 4,
+      "timestamp_formatted": "00:37.6",
+      "timestamp_seconds": 37.63,
+      "description": "AI Teleprompter reading confirmed on Line #4 (step +0.000, span 0.097)",
+      "horizontal_span": 0.0968,
+      "vertical_step": 0.0003,
+      "duration_seconds": 0.96,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 4,
+      "line_number": 5,
+      "timestamp_formatted": "00:44.2",
+      "timestamp_seconds": 44.16,
+      "description": "AI Teleprompter reading confirmed on Line #5 (step -0.019, span 0.106)",
+      "horizontal_span": 0.1065,
+      "vertical_step": -0.0193,
+      "duration_seconds": 1.75,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 5,
+      "line_number": 6,
+      "timestamp_formatted": "00:46.0",
+      "timestamp_seconds": 46.01,
+      "description": "AI Teleprompter reading confirmed on Line #6 (step +0.007, span 0.049)",
+      "horizontal_span": 0.0492,
+      "vertical_step": 0.0069,
+      "duration_seconds": 1.06,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 6,
+      "line_number": 7,
+      "timestamp_formatted": "00:47.8",
+      "timestamp_seconds": 47.77,
+      "description": "AI Teleprompter reading confirmed on Line #7 (step -0.000, span 0.063)",
+      "horizontal_span": 0.0633,
+      "vertical_step": -0.0003,
+      "duration_seconds": 0.83,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 7,
+      "line_number": 2,
+      "timestamp_formatted": "00:50.8",
+      "timestamp_seconds": 50.81,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step -0.004, span 0.082)",
+      "horizontal_span": 0.0819,
+      "vertical_step": -0.0039,
+      "duration_seconds": 0.88,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 8,
+      "line_number": 3,
+      "timestamp_formatted": "01:00.0",
+      "timestamp_seconds": 60.01,
+      "description": "AI Teleprompter reading confirmed on Line #3 (step +0.024, span 0.036)",
+      "horizontal_span": 0.0363,
+      "vertical_step": 0.0243,
+      "duration_seconds": 6.59,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 9,
+      "line_number": 4,
+      "timestamp_formatted": "01:04.5",
+      "timestamp_seconds": 64.5,
+      "description": "AI Teleprompter reading confirmed on Line #4 (step +0.023, span 0.075)",
+      "horizontal_span": 0.0751,
+      "vertical_step": 0.0229,
+      "duration_seconds": 0.96,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 10,
+      "line_number": 5,
+      "timestamp_formatted": "01:06.9",
+      "timestamp_seconds": 66.88,
+      "description": "AI Teleprompter reading confirmed on Line #5 (step +0.013, span 0.158)",
+      "horizontal_span": 0.1584,
+      "vertical_step": 0.0133,
+      "duration_seconds": 1.76,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 11,
+      "line_number": 6,
+      "timestamp_formatted": "01:13.9",
+      "timestamp_seconds": 73.86,
+      "description": "AI Teleprompter reading confirmed on Line #6 (step +0.002, span 0.038)",
+      "horizontal_span": 0.0381,
+      "vertical_step": 0.0021,
+      "duration_seconds": 6.02,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 12,
+      "line_number": 7,
+      "timestamp_formatted": "01:21.0",
+      "timestamp_seconds": 80.97,
+      "description": "AI Teleprompter reading confirmed on Line #7 (step -0.003, span 0.086)",
+      "horizontal_span": 0.0856,
+      "vertical_step": -0.0027,
+      "duration_seconds": 1.43,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 13,
+      "line_number": 2,
+      "timestamp_formatted": "01:39.7",
+      "timestamp_seconds": 99.69,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step +0.038, span 0.072)",
+      "horizontal_span": 0.072,
+      "vertical_step": 0.0384,
+      "duration_seconds": 1.88,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 14,
+      "line_number": 3,
+      "timestamp_formatted": "01:44.3",
+      "timestamp_seconds": 104.3,
+      "description": "AI Teleprompter reading confirmed on Line #3 (step -0.013, span 0.090)",
+      "horizontal_span": 0.0905,
+      "vertical_step": -0.0131,
+      "duration_seconds": 1.44,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 15,
+      "line_number": 4,
+      "timestamp_formatted": "01:48.5",
+      "timestamp_seconds": 108.52,
+      "description": "AI Teleprompter reading confirmed on Line #4 (step +0.000, span 0.087)",
+      "horizontal_span": 0.0866,
+      "vertical_step": 0.0003,
+      "duration_seconds": 0.78,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 16,
+      "line_number": 5,
+      "timestamp_formatted": "01:52.9",
+      "timestamp_seconds": 112.88,
+      "description": "AI Teleprompter reading confirmed on Line #5 (step -0.017, span 0.079)",
+      "horizontal_span": 0.0791,
+      "vertical_step": -0.0174,
+      "duration_seconds": 2.78,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 17,
+      "line_number": 6,
+      "timestamp_formatted": "01:59.7",
+      "timestamp_seconds": 119.67,
+      "description": "AI Teleprompter reading confirmed on Line #6 (step +0.053, span 0.036)",
+      "horizontal_span": 0.0356,
+      "vertical_step": 0.0534,
+      "duration_seconds": 1.64,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 18,
+      "line_number": 2,
+      "timestamp_formatted": "02:18.9",
+      "timestamp_seconds": 138.88,
+      "description": "AI Teleprompter reading confirmed on Line #2 (step -0.000, span 0.036)",
+      "horizontal_span": 0.0356,
+      "vertical_step": -0.0001,
+      "duration_seconds": 6.24,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 19,
+      "line_number": 3,
+      "timestamp_formatted": "02:21.2",
+      "timestamp_seconds": 141.21,
+      "description": "AI Teleprompter reading confirmed on Line #3 (step -0.014, span 0.069)",
+      "horizontal_span": 0.069,
+      "vertical_step": -0.0137,
+      "duration_seconds": 1.79,
+      "candidate_speaking": true
+    },
+    {
+      "incident_number": 20,
+      "line_number": 4,
+      "timestamp_formatted": "02:29.5",
+      "timestamp_seconds": 149.47,
+      "description": "AI Teleprompter reading confirmed on Line #4 (step -0.015, span 0.038)",
+      "horizontal_span": 0.0383,
+      "vertical_step": -0.0149,
+      "duration_seconds": 7.22,
+      "candidate_speaking": true
+    }
+  ],
+  "clean_speaking_timeline": [
+    {
+      "timestamp_seconds": 85.39,
+      "description": "Natural conversational speech (score cooled to 99.0%)"
+    },
+    {
+      "timestamp_seconds": 94.89,
+      "description": "Natural conversational speech (score cooled to 96.7%)"
+    },
+    {
+      "timestamp_seconds": 122.21,
+      "description": "Natural conversational speech (score cooled to 99.0%)"
+    },
+    {
+      "timestamp_seconds": 126.24,
+      "description": "Natural conversational speech (score cooled to 98.0%)"
+    },
+    {
+      "timestamp_seconds": 129.75,
+      "description": "Natural conversational speech (score cooled to 96.4%)"
+    }
+  ]
+}

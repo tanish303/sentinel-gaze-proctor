@@ -1,8 +1,8 @@
 =================================================================
        AUDIT SUMMARY: q
 =================================================================
-Timestamp        : 2026-10-15 15:56:10
-Duration         : 00:21.2 (21.2 s)
+Timestamp        : 2026-10-26 11:38:28
+Duration         : 29881827:49.6 (1792909669.6 s)
 Final Verdict    : CLEAN (Normal Conversational Speech)
 Confidence       : 0.0% (CLEAN)
 
@@ -12,12 +12,11 @@ CHEATING / READING LINES DETECTED: 0
   None detected.
 
 -----------------------------------------------------------------
-CLEAN SPEAKING INTERVALS: 6
+CLEAN SPEAKING INTERVALS: 5
 -----------------------------------------------------------------
-  @ 00:02.7 (t=  2.7s): Natural conversational speech (score cooled to 0.0%)
-  @ 00:04.7 (t=  4.7s): Natural conversational speech (score cooled to 0.0%)
-  @ 00:06.7 (t=  6.7s): Natural conversational speech (score cooled to 0.0%)
-  @ 00:08.8 (t=  8.8s): Natural conversational speech (score cooled to 0.0%)
-  @ 00:10.8 (t= 10.8s): Natural conversational speech (score cooled to 0.0%)
-  @ 00:17.0 (t= 17.0s): Natural conversational speech (score cooled to 0.0%)
+  @ 00:50.2 (t= 50.2s): Natural conversational speech to interviewer
+  @ 00:53.8 (t= 53.8s): Natural conversational speech to interviewer
+  @ 01:08.2 (t= 68.2s): Natural conversational speech to interviewer
+  @ 01:33.5 (t= 93.5s): Natural conversational speech to interviewer
+  @ 01:38.5 (t= 98.5s): Natural conversational speech to interviewer
 =================================================================
