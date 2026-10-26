@@ -81,14 +81,6 @@ const el = {
       fill: document.getElementById("liveFillGaze"),
       metric: document.getElementById("liveMetricGaze"),
     },
-    wpm: {
-      card: document.getElementById("liveCardWpm"),
-      pill: document.getElementById("livePillWpm"),
-      score: document.getElementById("liveScoreWpm"),
-      status: document.getElementById("liveStatusWpm"),
-      fill: document.getElementById("liveFillWpm"),
-      metric: document.getElementById("liveMetricWpm"),
-    },
     llm: {
       card: document.getElementById("liveCardLlm"),
       pill: document.getElementById("livePillLlm"),
@@ -870,13 +862,12 @@ function resetLiveDashboard() {
 
   const defaults = {
     gaze: { status: "Direct Eye Contact", metric: "0 Saccade Lines" },
-    wpm: { status: "Conversational Flow", metric: "0 WPM (0 Bursts)" },
     llm: { status: "Natural Phrasing", metric: "0 AI Markers" },
     echo: { status: "Direct Response", metric: "0 Stalling Events" },
     cadence: { status: "Natural Prosody", metric: "Natural Pitch Variance" },
   };
 
-  ["gaze", "wpm", "llm", "echo", "cadence"].forEach((key) => {
+  ["gaze", "llm", "echo", "cadence"].forEach((key) => {
     const pDom = el.livePillars && el.livePillars[key];
     if (!pDom) return;
     if (pDom.score) pDom.score.textContent = "0%";
@@ -943,9 +934,9 @@ function updateLiveDashboard(data) {
     }
   }
 
-  // 2. Update Live Horizontal 5-Parameter Detection Grid (All 5 Separate Parameters Live)
+  // 2. Update Live Horizontal 4-Parameter Detection Grid
   const details = data.pillar_details || {};
-  const pKeys = ["gaze", "wpm", "llm", "echo", "cadence"];
+  const pKeys = ["gaze", "llm", "echo", "cadence"];
 
   pKeys.forEach((key) => {
     const pDom = el.livePillars && el.livePillars[key];

@@ -66,6 +66,14 @@ try:
 except (ImportError, OSError, Exception):
     AUDIO_AVAILABLE = False
 
+SPEECH_REC_AVAILABLE = False
+try:
+    import speech_recognition as sr
+    import threading
+    SPEECH_REC_AVAILABLE = True
+except (ImportError, Exception):
+    SPEECH_REC_AVAILABLE = False
+
 
 def fmt_time(seconds):
     """Formats seconds into MM:SS.s (e.g. 01:23.4) human-readable format."""
@@ -183,13 +191,19 @@ class LiveMicrophoneTracker:
         self.hangover_until = 0.0
         self.stream = None
 
+        self.audio_speech_buf = []
+        self.latest_transcript = ""
+        self.recognizer = sr.Recognizer() if SPEECH_REC_AVAILABLE else None
+        self._is_transcribing = False
+
         if AUDIO_AVAILABLE:
             try:
                 self.stream = sd.InputStream(
                     samplerate=16000, channels=1, blocksize=1600,
                     callback=self._cb)
                 self.stream.start()
-                print("[MIC] Microphone live. Audio-Visual Multimodal VAD active.")
+                rec_status = "Google Speech Recognition active" if SPEECH_REC_AVAILABLE else "No STT engine"
+                print(f"[MIC] Microphone live. Audio-Visual Multimodal VAD active. ({rec_status})")
             except Exception as e:
                 print(f"[MIC] Warning: {e}")
 
@@ -206,6 +220,11 @@ class LiveMicrophoneTracker:
         self.current_rms = rms
         self._noise_buf.append(rms)
 
+        if self.is_speaking:
+            self.audio_speech_buf.append(indata.copy())
+            if len(self.audio_speech_buf) >= 40:  # ~4 seconds buffer limit
+                self._dispatch_transcription()
+
         # Calibrate for initial 1.5s: 20th percentile captures true quiet floor
         if not self.calibrated:
             self.cal_samples.append(rms)
@@ -221,6 +240,30 @@ class LiveMicrophoneTracker:
             quiet_p15 = float(np.percentile(self._noise_buf, 15))
             self.ambient = float(np.clip(0.98 * self.ambient + 0.02 * quiet_p15, 0.001, 0.025))
 
+    def _dispatch_transcription(self):
+        if not SPEECH_REC_AVAILABLE or not self.audio_speech_buf or self._is_transcribing:
+            return
+        chunks = list(self.audio_speech_buf)
+        self.audio_speech_buf = []
+
+        def _worker():
+            self._is_transcribing = True
+            try:
+                audio_np = np.concatenate(chunks, axis=0).flatten()
+                audio_int16 = (np.clip(audio_np, -1.0, 1.0) * 32767).astype(np.int16)
+                audio_bytes = audio_int16.tobytes()
+                audio_data = sr.AudioData(audio_bytes, 16000, 2)
+                text = self.recognizer.recognize_google(audio_data, language="en-US")
+                if text:
+                    self.latest_transcript = text
+                    print(f"\n[MIC TRANSCRIPT] Recognized: '{text}'\n")
+            except Exception:
+                pass
+            finally:
+                self._is_transcribing = False
+
+        threading.Thread(target=_worker, daemon=True).start()
+
     def evaluate_speech(self, lip_moving, t):
         """
         Multimodal Audio-Visual Fusion VAD:
@@ -230,28 +273,36 @@ class LiveMicrophoneTracker:
         - Hangover (400ms) bridges natural pauses between syllables/words.
         """
         self.lip_moving = bool(lip_moving)
+        prev_speaking = self.is_speaking
 
         if not AUDIO_AVAILABLE or self.stream is None:
             self.is_speaking = self.lip_moving
             return self.is_speaking
 
         # If lips are NOT moving, candidate is NOT speaking words.
-        # Zero noise can trigger speech when lips are closed/resting!
         if not self.lip_moving:
             if t > self.hangover_until:
                 self.is_speaking = False
-            return self.is_speaking
-
-        # Lips ARE actively moving: check if voice energy is detected
-        has_voice = (self.current_rms >= self.sensitive_threshold)
-
-        if has_voice:
-            self.hangover_until = t + 0.40
-            self.is_speaking = True
         else:
-            self.is_speaking = (t < self.hangover_until)
+            # Lips ARE actively moving: check if voice energy is detected
+            has_voice = (self.current_rms >= self.sensitive_threshold)
+            if has_voice:
+                self.hangover_until = t + 0.40
+                self.is_speaking = True
+            else:
+                self.is_speaking = (t < self.hangover_until)
+
+        # Speech pause detected: trigger background transcription of finished phrase
+        if prev_speaking and not self.is_speaking and len(self.audio_speech_buf) >= 8:
+            self._dispatch_transcription()
 
         return self.is_speaking
+
+    def get_transcript(self):
+        return self.latest_transcript
+
+    def inject_transcript(self, text):
+        self.latest_transcript = text
 
     def adjust(self, delta):
         self.margin = float(np.clip(self.margin + delta, 0.0008, 0.025))
@@ -673,44 +724,40 @@ class ReadingPatternEngine:
                 self._reset_sweep(self.sacc_trough_x, self.sacc_trough_y or sy, t)
 
         # ═════════════════════════════════════════════════════════════════════
-        # SCORING DYNAMICS
+        # SCORING DYNAMICS & ACTIVE COOLDOWN
         # ═════════════════════════════════════════════════════════════════════
+        is_reading_active = (
+            (label in ["SWEEP", "LINE_ANCHORED", "VERIFYING_FLOW", "FLOW_TRACKING", "READING_CONFIRMED", "SACCADE_RETURN"]) or
+            (self.in_saccade) or
+            (t < self.confirmed_hold_until) or
+            ((t - self.last_read_t) < 2.5)
+        )
+
         if label == "READING_CONFIRMED":
             pass
 
-        elif not speaking:
-            # ── SILENT: score is 100% STRICTLY FROZEN (zero decay, zero increase) ─
-            if label not in ["LINE_ANCHORED", "VERIFYING_FLOW", "FLOW_TRACKING", "SWEEP", "SACCADE_RETURN"]:
-                label  = "SILENT (Score frozen)"
-                status = f"Candidate silent — score frozen at {self.score*100:.0f}%"
-
-        else:
-            # ── SPEAKING NATURALLY: candidate looking at camera/interviewer ─
-            # Reading sweeps, pending lines, and return saccades are actively protected from decay!
-            is_reading_active = (
-                (label in ["SWEEP", "LINE_ANCHORED", "VERIFYING_FLOW", "FLOW_TRACKING", "READING_CONFIRMED", "SACCADE_RETURN"]) or
-                (self.pending_line is not None) or
-                (self.drift_x >= 0.025) or
-                (t < self.confirmed_hold_until)
-            )
-            gaze_central = abs(sx - 0.50) < 0.18 and abs(sy - 0.50) < 0.20
-
-            # Natural speaking: candidate looking directly at camera without reading sweeps
-            if not is_reading_active and gaze_central:
+        elif not is_reading_active:
+            # Active Cooldown: Candidate is not reading sentences!
+            # Decay score smoothly towards 0.0 (2.0%/s when silent, 3.0%/s when speaking)
+            if self.score > 0.0:
+                decay_rate = 0.030 if speaking else 0.020
                 old_score = self.score
-                if self.score > 0.0:
-                    talk_decay = 0.010 * dt   # ~1.0%/sec
-                    self.score = max(0.0, self.score - talk_decay)
-                label  = "SPEAKING_NATURAL (Normal Conversational Speech)"
-                status = f"Speaking naturally to interviewer (score {self.score*100:.0f}%)"
-
-                if (t - self.last_clean_t) > 3.5:
+                self.score = max(0.0, self.score - decay_rate * dt)
+                if (t - self.last_clean_t) > 3.0:
                     self.last_clean_t = t
-                    desc = f"Natural conversational speech (score cooled to {self.score*100:.1f}%)" if old_score > 0 else "Natural conversational speech to interviewer"
                     self.clean_speaking.append({
                         "timestamp_seconds": round(t, 2),
-                        "description": desc
+                        "description": f"Gaze cooled to {self.score*100:.1f}% (non-reading behavior)"
                     })
+
+            if speaking:
+                label  = "SPEAKING_NATURAL"
+                status = f"Speaking naturally (Gaze cooled to {self.score*100:.0f}%)"
+            else:
+                label  = "NORMAL_POSTURE"
+                status = f"Conversational eye posture (Gaze {self.score*100:.0f}%)"
+        else:
+            status = f"Reading activity monitored (Gaze {self.score*100:.0f}%)"
 
         # Retain confirmed alert on HUD for 2.5 seconds
         if t < self.confirmed_hold_until and self.confirmed_msg:
@@ -886,8 +933,13 @@ def main():
 
     default = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     raw     = input(f"Enter Test Name (Enter='{default}'): ").strip()
-    test_name = (raw.replace(" ", "_") if raw else default)
     print(f"\n[CONFIG] Test: '{test_name}'  ->  Results: {RESULTS_DIR.resolve()}\n")
+    print("[HOTKEYS]")
+    print("  • Press '2': Trigger LLM Stylometry test phrase")
+    print("  • Press '3': Trigger Question Echo delay tactic test")
+    print("  • Press '4': Trigger Monotone Voice Cadence event")
+    print("  • Press 'C': Force Cooldown across all 4 pillars")
+    print("  • Press 'Q': Finish test & save forensic audit reports\n")
 
     setup_model()
 
@@ -993,10 +1045,11 @@ def main():
                 active_line_idx = min(len(LINES) - 1, max(0, cur_cheat_lines))
                 active_prompt_text = LINES[active_line_idx]
 
-                # Update 5-Pillar Engine
+                # Update 4-Pillar Engine with live transcript & prompt
+                active_transcript = mic.get_transcript()
                 tel_res = multi_engine.update(
                     t, gx, gy, is_speaking,
-                    transcript="", wpm=0, active_prompt=active_prompt_text, rms=mic.current_rms
+                    transcript=active_transcript, active_prompt=active_prompt_text, rms=mic.current_rms
                 )
 
                 comp_score = tel_res["composite_score"]
@@ -1007,8 +1060,8 @@ def main():
                 n_clean = tel_res["n_clean"]
                 pillar_details = tel_res.get("pillar_details", {})
 
-                # ── Multi-Pillar HUD (Top Composite + 5 Separate Horizontal Cards) ──
-                hud_h = 135
+                # ── Multi-Pillar HUD (Top Composite + 4 Horizontal Cards) ──
+                hud_h = 138
                 cv2.rectangle(disp, (0, 0), (w, hud_h), (14, 17, 23), -1)
                 cv2.line(disp, (0, hud_h), (w, hud_h), (45, 52, 64), 1)
 
@@ -1037,9 +1090,9 @@ def main():
                 fill_w = int(mb_w * float(np.clip(comp_score, 0.0, 1.0)))
                 cv2.rectangle(disp, (mb_x, mb_y), (mb_x + fill_w, mb_y + mb_h), comp_col, -1)
 
-                # 2. Horizontal 5-Parameter Grid Row (y: 28 to 98)
-                cw = (w - 18) // 5
-                p_keys = [("gaze", "1. GAZE"), ("wpm", "2. WPM"), ("llm", "3. LLM"), ("echo", "4. ECHO"), ("cadence", "5. CADENCE")]
+                # 2. Horizontal 4-Parameter Grid Row (y: 28 to 98)
+                cw = (w - 20) // 4
+                p_keys = [("gaze", "1. GAZE"), ("llm", "2. LLM"), ("echo", "3. ECHO"), ("cadence", "4. CADENCE")]
 
                 for idx, (pkey, title) in enumerate(p_keys):
                     bx = 8 + idx * (cw + 2)
@@ -1049,8 +1102,8 @@ def main():
                     pdata = pillar_details.get(pkey, {})
                     psc = pdata.get("score", 0.0)
                     psev = pdata.get("severity", "CLEAN")
-                    pstat = pdata.get("status", "Normal")[:13]
-                    pmetric = pdata.get("metric", "")[:14]
+                    pstat = pdata.get("status", "Normal")[:16]
+                    pmetric = pdata.get("metric", "")[:18]
 
                     bcol = (50, 60, 75)
                     txtcol = (0, 220, 0)
@@ -1067,38 +1120,45 @@ def main():
                     cv2.rectangle(disp, (bx, by), (bx + bw, by + bh), (22, 26, 34), -1)
                     cv2.rectangle(disp, (bx, by), (bx + bw, by + bh), bcol, 1)
 
-                    cv2.putText(disp, title, (bx + 5, by + 16),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (220, 220, 220), 1, cv2.LINE_AA)
-                    cv2.putText(disp, f"{psc*100:.0f}%", (bx + bw - 32, by + 16),
+                    cv2.putText(disp, title, (bx + 6, by + 16),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.38, (220, 220, 220), 1, cv2.LINE_AA)
+                    cv2.putText(disp, f"{psc*100:.0f}%", (bx + bw - 36, by + 16),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.38, txtcol, 1, cv2.LINE_AA)
 
                     mbar_y = by + 22
-                    mbar_w = bw - 10
-                    cv2.rectangle(disp, (bx + 5, mbar_y), (bx + 5 + mbar_w, mbar_y + 4), (35, 40, 50), -1)
+                    mbar_w = bw - 12
+                    cv2.rectangle(disp, (bx + 6, mbar_y), (bx + 6 + mbar_w, mbar_y + 4), (35, 40, 50), -1)
                     mbar_fill = int(mbar_w * float(np.clip(psc, 0.0, 1.0)))
                     if mbar_fill > 0:
-                        cv2.rectangle(disp, (bx + 5, mbar_y), (bx + 5 + mbar_fill, mbar_y + 4), txtcol, -1)
+                        cv2.rectangle(disp, (bx + 6, mbar_y), (bx + 6 + mbar_fill, mbar_y + 4), txtcol, -1)
 
-                    cv2.putText(disp, pstat, (bx + 5, by + 44),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.31, (180, 180, 180), 1, cv2.LINE_AA)
-                    cv2.putText(disp, pmetric, (bx + 5, by + 60),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.28, (130, 140, 155), 1, cv2.LINE_AA)
+                    cv2.putText(disp, pstat, (bx + 6, by + 44),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.32, (180, 180, 180), 1, cv2.LINE_AA)
+                    cv2.putText(disp, pmetric, (bx + 6, by + 60),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.29, (130, 140, 155), 1, cv2.LINE_AA)
 
-                # 3. Row 3: Speech, Lips, Mic VU meter (y: 104 to 132)
+                # 3. Row 3: Speech, Lips, Mic VU meter (y: 104 to 135)
                 vad_col = (0, 240, 255) if mic.is_speaking else (160, 160, 160)
                 vad_str = "TALKING" if mic.is_speaking else "SILENT"
                 lip_str = "ACTIVE" if lip_moving else "STILL"
                 cv2.putText(disp, f"SPEECH: {vad_str} [LIPS: {lip_str} | MIC: {mic.current_rms:.3f}/{mic.sensitive_threshold:.3f}]",
-                            (12, 122), cv2.FONT_HERSHEY_SIMPLEX, 0.36, vad_col, 1, cv2.LINE_AA)
+                            (12, 118), cv2.FONT_HERSHEY_SIMPLEX, 0.34, vad_col, 1, cv2.LINE_AA)
 
-                bx, by, bw, bh = 320, 112, 110, 10
+                bx, by, bw, bh = 290, 109, 90, 8
                 cv2.rectangle(disp, (bx, by), (bx + bw, by + bh), (35, 40, 48), -1)
                 fr = int(bw * float(np.clip(mic.current_rms / 0.050, 0, 1)))
                 cv2.rectangle(disp, (bx, by), (bx + fr, by + bh), vad_col, -1)
                 tx = int(bx + bw * float(np.clip(mic.sensitive_threshold / 0.050, 0, 1)))
                 cv2.line(disp, (tx, by - 2), (tx, by + bh + 2), (0, 0, 255), 2)
-                cv2.putText(disp, "[-/+] Sens", (bx + bw + 8, 121),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.31, (130, 130, 130), 1, cv2.LINE_AA)
+
+                # Hotkeys instruction on HUD
+                cv2.putText(disp, "[2]LLM  [3]Echo  [4]Cadence  [C]Cool  [Q]Quit", (390, 118),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.31, (0, 215, 255), 1, cv2.LINE_AA)
+
+                # Show live transcript snippet on frame if available
+                if active_transcript:
+                    cv2.putText(disp, f"TEXT: \"{active_transcript[-45:]}\"", (12, 133),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.29, (200, 200, 200), 1, cv2.LINE_AA)
 
                 cv2.imshow("Anti-Cheat Proctoring", disp)
                 cv2.imshow("Test Text", canvas)
@@ -1110,6 +1170,38 @@ def main():
                     mic.adjust(-0.001)
                 elif k in (ord(']'), ord('+'), ord('=')):
                     mic.adjust(+0.001)
+                elif k in (ord('2'), ord('l'), ord('L')):
+                    # Test Pillar 2: LLM Stylometry
+                    test_phrase = "Furthermore, it is important to note that in conclusion, delve deeper into the solution."
+                    print(f"\n>>> [TEST TRIGGER] Injected LLM Stylometry Phrase: \"{test_phrase}\" <<<")
+                    mic.inject_transcript(test_phrase)
+                elif k in (ord('3'), ord('e'), ord('E')):
+                    # Test Pillar 3: Question Echoing
+                    test_phrase = "Let me repeat the question to make sure I understand the question correctly."
+                    print(f"\n>>> [TEST TRIGGER] Injected Question Echoing Phrase: \"{test_phrase}\" <<<")
+                    mic.inject_transcript(test_phrase)
+                elif k in (ord('4'), ord('m'), ord('M')):
+                    # Test Pillar 4: Voice Cadence / Monotone
+                    print(f"\n>>> [TEST TRIGGER] Injected Monotone Voice Cadence Event <<<")
+                    multi_engine.cadence.hit_count += 1
+                    multi_engine.cadence.last_eval_t = t
+                    multi_engine.cadence.last_incident_t = t
+                    multi_engine.cadence.score = min(1.0, multi_engine.cadence.score + 0.35)
+                    multi_engine.cadence.incidents.append({
+                        "incident_number": multi_engine.cadence.hit_count,
+                        "timestamp_seconds": round(t, 2),
+                        "duration_samples": 45,
+                        "cadence_variance_cv": 0.08,
+                        "status": "CONFIRMED"
+                    })
+                elif k in (ord('c'), ord('C')):
+                    # Test Cooldown: immediately cools down all pillars
+                    print(f"\n>>> [TEST TRIGGER] Force Cooldown across all 4 pillars <<<")
+                    engine.score = max(0.0, engine.score - 0.25)
+                    multi_engine.llm.score = max(0.0, multi_engine.llm.score - 0.25)
+                    multi_engine.echo.score = max(0.0, multi_engine.echo.score - 0.25)
+                    multi_engine.cadence.score = max(0.0, multi_engine.cadence.score - 0.25)
+                    mic.inject_transcript("")
 
     except KeyboardInterrupt:
         print("\nStopped by user.")
@@ -1122,7 +1214,7 @@ def main():
 
         # Terminal scorecard
         print("\n" + "="*65)
-        print(f"          FINAL 5-PILLAR SCORECARD — {test_name}")
+        print(f"          FINAL 4-PILLAR SCORECARD — {test_name}")
         print("="*65)
         print(f"  Duration          : {fmt_time(duration)} ({duration:.1f} s)")
         print(f"  Final Verdict     : {verdict}")

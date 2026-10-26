@@ -119,9 +119,9 @@ class LlmStylometryEvaluator:
         self.last_hit_t: float = -999.0
 
     def update(self, t: float, dt: float, transcript: str, is_speaking: bool) -> Tuple[float, Optional[str]]:
-        # Cooldown: Clean speech without new AI markers cools down score
-        if is_speaking and (t - self.last_hit_t) > 6.0 and self.score > 0.0:
-            self.score = max(0.0, self.score - 0.015 * dt)
+        # Active Cooldown: When not triggering new AI markers, decay score smoothly
+        if (t - self.last_hit_t) > 2.5 and self.score > 0.0:
+            self.score = max(0.0, self.score - 0.025 * dt)
 
         if not transcript:
             return self.score, None
@@ -148,18 +148,19 @@ class LlmStylometryEvaluator:
                     "matched_phrase": phrase,
                     "category": category,
                     "context": transcript[-120:],
-                    "status": "CONFIRMED" if self.hit_count >= 2 else "MONITORING (1st Hit)"
+                    "status": "CONFIRMED"
                 }
                 self.incidents.append(rec)
 
                 if self.hit_count == 1:
-                    alert_msg = f"LLM marker observed ('{phrase}') — monitoring for second occurrence"
+                    self.score = min(1.0, self.score + 0.40)
+                    alert_msg = f"LLM marker detected ('{phrase}')"
                 elif self.hit_count == 2:
                     self.score = min(1.0, self.score + 0.35)
-                    alert_msg = f"Pillar 3 Confirmed: Multiple LLM markers detected ('{phrase}')"
+                    alert_msg = f"Multiple LLM markers detected ('{phrase}')"
                 else:
                     self.score = min(1.0, self.score + 0.25)
-                    alert_msg = f"Pillar 3 Confirmed: Continued LLM stylometry ('{phrase}')"
+                    alert_msg = f"Continued LLM stylometry ('{phrase}')"
 
         return self.score, alert_msg
 
@@ -171,7 +172,7 @@ class QuestionEchoEvaluator:
     """
     Detects candidates repeating prompt keywords or using verbal stalling framing
     to buy 4 - 7 seconds while an external AI generates the answer.
-    Cooldown: Direct answering without echoes cools down score.
+    Cooldown: Active decay whenever not echoing questions (smooth 2.5%/sec decay).
     """
     STOPWORDS = {
         "what", "when", "where", "which", "while", "this", "that", "these", "those",
@@ -180,7 +181,7 @@ class QuestionEchoEvaluator:
     }
 
     DELAY_PATTERNS = [
-        r"\b(let me repeat|to repeat the question|repeating the question|so the question asks|the question is asking|to rephrase the question|so you are asking)\b"
+        r"\b(let me repeat|to repeat the question|repeating the question|so the question asks|the question is asking|to rephrase the question|so you are asking|let me think about that|give me a second|let me read the question|let me understand the question|good question let me think)\b"
     ]
 
     def __init__(self):
@@ -190,9 +191,9 @@ class QuestionEchoEvaluator:
         self.last_echo_t: float = -999.0
 
     def update(self, t: float, dt: float, spoken_text: str, active_prompt: str, is_speaking: bool) -> Tuple[float, Optional[str]]:
-        # Cooldown: Clean speaking without echo delay cools down score
-        if is_speaking and (t - self.last_echo_t) > 6.0 and self.score > 0.0:
-            self.score = max(0.0, self.score - 0.015 * dt)
+        # Active Cooldown: When not echoing prompt, decay score smoothly
+        if (t - self.last_echo_t) > 2.5 and self.score > 0.0:
+            self.score = max(0.0, self.score - 0.025 * dt)
 
         if not spoken_text:
             return self.score, None
@@ -213,22 +214,22 @@ class QuestionEchoEvaluator:
         overlap_keywords = []
         ratio = 0.0
 
-        if active_prompt and len(active_prompt) >= 15:
+        if active_prompt and len(active_prompt) >= 12:
             prompt_words = [
                 w for w in re.findall(r"[a-z]{4,}", active_prompt.lower())
                 if w not in self.STOPWORDS
             ]
-            if len(prompt_words) >= 3:
+            if len(prompt_words) >= 2:
                 # Check recent spoken window (last ~40 words)
                 spoken_words = set(re.findall(r"[a-z]{4,}", lower_spoken[-250:]))
                 overlap_keywords = [w for w in prompt_words if w in spoken_words]
                 ratio = len(overlap_keywords) / float(len(prompt_words))
-                if len(overlap_keywords) >= 3 and ratio >= 0.35:
+                if len(overlap_keywords) >= 2 and ratio >= 0.25:
                     is_keyword_echo = True
 
         triggered = (matched_phrase is not None) or is_keyword_echo
 
-        if triggered and (t - self.last_echo_t) > 3.5:
+        if triggered and (t - self.last_echo_t) > 3.0:
             self.echo_count += 1
             self.last_echo_t = t
 
@@ -240,18 +241,19 @@ class QuestionEchoEvaluator:
                 "delay_phrase": matched_phrase,
                 "prompt_snippet": active_prompt[:70] if active_prompt else "Verbal delay tactic",
                 "spoken_snippet": spoken_text[-90:],
-                "status": "CONFIRMED" if self.echo_count >= 2 else "MONITORING (Single Echo)"
+                "status": "CONFIRMED"
             }
             self.incidents.append(rec)
 
             if self.echo_count == 1:
-                alert_msg = "Question echo observed (single instance — monitoring for repetition)"
+                self.score = min(1.0, self.score + 0.40)
+                alert_msg = f"Question echo delay tactic detected"
             elif self.echo_count == 2:
                 self.score = min(1.0, self.score + 0.35)
-                alert_msg = f"Pillar 4 Confirmed: Repeated question echoing delay tactic (#{self.echo_count})"
+                alert_msg = f"Repeated question echoing delay tactic (#{self.echo_count})"
             else:
                 self.score = min(1.0, self.score + 0.25)
-                alert_msg = f"Pillar 4 Confirmed: Sustained delay tactic (#{self.echo_count})"
+                alert_msg = f"Sustained delay tactic (#{self.echo_count})"
 
         return self.score, alert_msg
 
@@ -261,10 +263,10 @@ class QuestionEchoEvaluator:
 # ─────────────────────────────────────────────────────────────────────────────
 class CadenceProsodyEvaluator:
     """
-    Measures cadence variation during active vocalization.
-    Spontaneous cognitive speech has natural pause variability & pitch inflection (CV >= 0.44).
-    AI Script teleprompter reading has low variability / metronomic tempo (CV <= 0.36).
-    Cooldown: Speaking with natural pause/pitch variance cools down score.
+    Measures cadence and energy variation during active vocalization.
+    Spontaneous cognitive speech has natural pause variability & pitch inflection (CV >= 0.35).
+    AI Script teleprompter reading has unnaturally flat, metronomic volume envelope (CV <= 0.16).
+    Cooldown: Enabled actively whenever candidate speaks normally or pauses/silent (smooth 2.5%/sec decay).
     """
     def __init__(self):
         self.incidents: List[Dict[str, Any]] = []
@@ -272,49 +274,59 @@ class CadenceProsodyEvaluator:
         self.hit_count: int = 0
         self.rms_window: List[float] = []
         self.last_eval_t: float = -999.0
+        self.monotone_streak: int = 0
+        self.last_incident_t: float = -999.0
 
     def update(self, t: float, dt: float, is_speaking: bool, rms: float) -> Tuple[float, Optional[str]]:
-        if is_speaking and rms > 0.005:
+        # Active Cooldown: When not actively in a monotone incident, decay score smoothly
+        if (t - self.last_incident_t) > 2.5 and self.score > 0.0:
+            self.score = max(0.0, self.score - 0.025 * dt)
+
+        # Only evaluate cadence during sustained vocalization with real volume (not background hum)
+        if is_speaking and rms >= 0.010:
             self.rms_window.append(rms)
-            if len(self.rms_window) > 50:
+            if len(self.rms_window) > 75:
                 self.rms_window.pop(0)
 
-            # Continuous live evaluation every ~2 seconds of speech
-            if len(self.rms_window) >= 25:
+            # Requires at least ~45 frames (~1.5s) of voiced audio to compute variance
+            if len(self.rms_window) >= 45:
                 arr = np.array(self.rms_window)
                 mean = float(np.mean(arr))
                 std = float(np.std(arr))
                 cv = (std / mean) if mean > 1e-4 else 1.0
 
-                # Low cadence variance during sustained speech indicates teleprompter reading
-                if cv <= 0.36:
-                    if (t - self.last_eval_t) > 3.5:
+                # True robotic/metronomic flat delivery: CV <= 0.16
+                if cv <= 0.16:
+                    self.monotone_streak += 1
+                    # Require 2 consecutive flat evaluation windows (~3 seconds of sustained monotone)
+                    if self.monotone_streak >= 2 and (t - self.last_eval_t) > 4.0:
                         self.hit_count += 1
                         self.last_eval_t = t
+                        self.last_incident_t = t
                         rec = {
                             "incident_number": self.hit_count,
                             "timestamp_seconds": round(t, 2),
                             "duration_samples": len(self.rms_window),
                             "cadence_variance_cv": round(cv, 3),
-                            "status": "CONFIRMED" if self.hit_count >= 2 else "MONITORING (Hit 1)"
+                            "status": "CONFIRMED"
                         }
                         self.incidents.append(rec)
 
                         if self.hit_count == 1:
-                            return self.score, "Uniform reading cadence observed — monitoring for repetition"
+                            self.score = min(1.0, self.score + 0.35)
+                            return self.score, f"Metronomic reading cadence detected (CV={cv:.2f})"
                         elif self.hit_count == 2:
                             self.score = min(1.0, self.score + 0.30)
-                            return self.score, f"Pillar 5 Confirmed: Metronomic script cadence detected (CV={cv:.2f})"
+                            return self.score, f"Sustained monotone teleprompter delivery (CV={cv:.2f})"
                         else:
-                            self.score = min(1.0, self.score + 0.25)
-                            return self.score, f"Pillar 5 Confirmed: Sustained reading rhythm (CV={cv:.2f})"
-                elif cv >= 0.44:
-                    # Natural conversational prosody cools down cadence score
-                    if (t - self.last_eval_t) > 3.0 and self.score > 0.0:
-                        self.score = max(0.0, self.score - 0.018 * dt)
+                            self.score = min(1.0, self.score + 0.20)
+                            return self.score, f"Continued monotone cadence (CV={cv:.2f})"
+                else:
+                    self.monotone_streak = 0
         else:
             if len(self.rms_window) > 0:
                 self.rms_window.pop(0)
+            self.monotone_streak = 0
 
         return self.score, None
 
@@ -324,19 +336,17 @@ class CadenceProsodyEvaluator:
 # ─────────────────────────────────────────────────────────────────────────────
 class MultiPillarProctorEngine:
     """
-    Orchestrates all 5 Anti-Cheat Proctoring Pillars using Pure Weighted Average:
-      - Pillar 1: Ocular Reading Mechanics (Gaze)      [Weight: 35%]
-      - Pillar 2: Cognitive Latency / WPM Burst Rate  [Weight: 20%]
-      - Pillar 3: Spoken LLM Stylometry & Artifacts   [Weight: 20%]
-      - Pillar 4: Question Echoing Delay Tactic        [Weight: 15%]
-      - Pillar 5: Cadence & Prosody Uniformity         [Weight: 10%]
+    Orchestrates all 4 Anti-Cheat Proctoring Pillars using Pure Weighted Average:
+      - Pillar 1: Ocular Reading Mechanics (Gaze)      [Weight: 45%]
+      - Pillar 2: Spoken LLM Stylometry & Artifacts   [Weight: 25%]
+      - Pillar 3: Question Echoing Delay Tactic        [Weight: 15%]
+      - Pillar 4: Cadence & Prosody Uniformity         [Weight: 15%]
     """
     WEIGHTS = {
-        "gaze": 0.35,
-        "wpm": 0.20,
-        "llm": 0.20,
+        "gaze": 0.45,
+        "llm": 0.25,
         "echo": 0.15,
-        "cadence": 0.10,
+        "cadence": 0.15,
     }
 
     def __init__(self, gaze_engine):
@@ -367,22 +377,18 @@ class MultiPillarProctorEngine:
         # 1. Update Gaze Engine (Pillar 1) — has its own natural speaking cooldown
         n_cheat, s_gaze, status, label, tel = self.gaze.update(t, screen_x, screen_y, is_speaking)
 
-        # 2. Update WPM Burst (Pillar 2) with dt cooldown
-        s_wpm, wpm_alert = self.wpm.update(t, dt, wpm, is_speaking, transcript)
-
-        # 3. Update LLM Stylometry (Pillar 3) with dt cooldown
+        # 2. Update LLM Stylometry (Pillar 2) with active cooldown
         s_llm, llm_alert = self.llm.update(t, dt, transcript, is_speaking)
 
-        # 4. Update Question Echoing (Pillar 4) with dt cooldown
+        # 3. Update Question Echoing (Pillar 3) with active cooldown
         s_echo, echo_alert = self.echo.update(t, dt, transcript, active_prompt, is_speaking)
 
-        # 5. Update Cadence Uniformity (Pillar 5) with dt cooldown
+        # 4. Update Cadence Uniformity (Pillar 4) with active cooldown
         s_cadence, cadence_alert = self.cadence.update(t, dt, is_speaking, rms)
 
-        # Calculate True PURE WEIGHTED AVERAGE of all 5 scores
+        # Calculate True PURE WEIGHTED AVERAGE of 4 pillars (Gaze 45%, LLM 25%, Echo 15%, Cadence 15%)
         weighted_avg = (
             self.WEIGHTS["gaze"] * s_gaze +
-            self.WEIGHTS["wpm"] * s_wpm +
             self.WEIGHTS["llm"] * s_llm +
             self.WEIGHTS["echo"] * s_echo +
             self.WEIGHTS["cadence"] * s_cadence
@@ -392,13 +398,13 @@ class MultiPillarProctorEngine:
 
         # Collect newest alert
         latest_alert = None
-        for a in [wpm_alert, llm_alert, echo_alert, cadence_alert]:
+        for a in [llm_alert, echo_alert, cadence_alert]:
             if a:
                 latest_alert = a
                 self.active_alerts.append(f"[{t:.1f}s] {a}")
 
         # Derive composite status label
-        active_pillars = sum(1 for s in [s_gaze, s_wpm, s_llm, s_echo, s_cadence] if s >= 0.25)
+        active_pillars = sum(1 for s in [s_gaze, s_llm, s_echo, s_cadence] if s >= 0.25)
         display_status = status
         display_label = label
         if latest_alert:
@@ -422,95 +428,55 @@ class MultiPillarProctorEngine:
             gaze_status = "Direct Contact"
             gaze_sev = "CLEAN"
 
-        # 2. WPM Status
-        if s_wpm >= 0.60:
-            wpm_status = f"Teleprompter Burst ({wpm} WPM)"
-            wpm_sev = "CRITICAL"
-        elif s_wpm >= 0.25:
-            wpm_status = f"Reading Rate ({wpm} WPM)"
-            wpm_sev = "WARN"
-        elif self.wpm.burst_count == 1:
-            wpm_status = f"Rapid Burst ({wpm} WPM)"
-            wpm_sev = "MONITOR"
-        elif wpm >= 165:
-            wpm_status = f"High Speed ({wpm} WPM)"
-            wpm_sev = "MONITOR"
-        elif wpm > 0:
-            wpm_status = f"Conversational ({wpm} WPM)"
-            wpm_sev = "CLEAN"
-        else:
-            wpm_status = "Silent / Paused"
-            wpm_sev = "CLEAN"
-
-        # 3. LLM Stylometry Status
+        # 2. LLM Stylometry Status
         if s_llm >= 0.60:
             llm_status = "Sustained AI Phrasing"
             llm_sev = "CRITICAL"
         elif s_llm >= 0.35:
             llm_status = "Confirmed AI Markers"
             llm_sev = "WARN"
-        elif self.llm.hit_count == 1:
-            llm_status = "1 AI Marker (Grace 0%)"
-            llm_sev = "MONITOR"
         else:
             llm_status = "Natural Candidate Speech"
             llm_sev = "CLEAN"
 
-        # 4. Question Echo Status
+        # 3. Question Echo Status
         if s_echo >= 0.60:
             echo_status = "Sustained Stalling"
             echo_sev = "CRITICAL"
         elif s_echo >= 0.35:
             echo_status = "Question Echo Confirmed"
             echo_sev = "WARN"
-        elif self.echo.echo_count == 1:
-            echo_status = "1 Echo (Benign 0%)"
-            echo_sev = "MONITOR"
         else:
             echo_status = "Direct Response"
             echo_sev = "CLEAN"
 
-        # 5. Cadence Status
+        # 4. Cadence Status
         if s_cadence >= 0.55:
             cadence_status = "Metronomic Recitation"
             cadence_sev = "CRITICAL"
         elif s_cadence >= 0.30:
             cadence_status = "Robotic Drone Confirmed"
             cadence_sev = "WARN"
-        elif self.cadence.hit_count == 1:
-            cadence_status = "Uniform Rhythm (Grace 0%)"
-            cadence_sev = "MONITOR"
         else:
-            cadence_status = "Natural Conversational Pitch"
+            cadence_status = "Natural Pitch Variance"
             cadence_sev = "CLEAN"
 
         pillar_details = {
             "gaze": {
                 "name": "1. Ocular Saccades",
-                "short_name": "Gaze Saccades",
-                "weight": "35%",
+                "short_name": "Eye Gaze",
+                "weight": "45%",
                 "score": round(s_gaze, 3),
                 "score_pct": f"{s_gaze * 100:.0f}%",
                 "status": gaze_status,
-                "metric": f"{n_cheat} Saccade Lines",
+                "metric": f"{n_cheat} Saccade Lines" if n_cheat else "Direct Contact",
                 "severity": gaze_sev,
                 "hits": n_cheat,
             },
-            "wpm": {
-                "name": "2. Speech Pace",
-                "short_name": "Speech Pace (WPM)",
-                "weight": "20%",
-                "score": round(s_wpm, 3),
-                "score_pct": f"{s_wpm * 100:.0f}%",
-                "status": wpm_status,
-                "metric": f"{wpm} WPM ({len(self.wpm.incidents)} Bursts)",
-                "severity": wpm_sev,
-                "hits": len(self.wpm.incidents),
-            },
             "llm": {
-                "name": "3. AI Stylometry",
+                "name": "2. AI Stylometry",
                 "short_name": "LLM Stylometry",
-                "weight": "20%",
+                "weight": "25%",
                 "score": round(s_llm, 3),
                 "score_pct": f"{s_llm * 100:.0f}%",
                 "status": llm_status,
@@ -519,7 +485,7 @@ class MultiPillarProctorEngine:
                 "hits": len(self.llm.incidents),
             },
             "echo": {
-                "name": "4. Question Echo",
+                "name": "3. Question Echo",
                 "short_name": "Echo Stalling",
                 "weight": "15%",
                 "score": round(s_echo, 3),
@@ -530,13 +496,13 @@ class MultiPillarProctorEngine:
                 "hits": len(self.echo.incidents),
             },
             "cadence": {
-                "name": "5. Voice Cadence",
+                "name": "4. Voice Cadence",
                 "short_name": "Prosody Uniformity",
-                "weight": "10%",
+                "weight": "15%",
                 "score": round(s_cadence, 3),
                 "score_pct": f"{s_cadence * 100:.0f}%",
                 "status": cadence_status,
-                "metric": f"{len(self.cadence.incidents)} Drone Intervals" if self.cadence.incidents else "Natural Rhythm",
+                "metric": f"{len(self.cadence.incidents)} Monotone Intervals" if self.cadence.incidents else "Natural Rhythm",
                 "severity": cadence_sev,
                 "hits": len(self.cadence.incidents),
             },
@@ -553,14 +519,12 @@ class MultiPillarProctorEngine:
             "n_clean": len(self.gaze.clean_speaking),
             "pillar_scores": {
                 "gaze": round(s_gaze, 3),
-                "wpm": round(s_wpm, 3),
                 "llm": round(s_llm, 3),
                 "echo": round(s_echo, 3),
                 "cadence": round(s_cadence, 3),
             },
             "pillar_hits": {
                 "gaze_lines": n_cheat,
-                "wpm_bursts": len(self.wpm.incidents),
                 "llm_markers": len(self.llm.incidents),
                 "echo_events": len(self.echo.incidents),
                 "cadence_intervals": len(self.cadence.incidents),
@@ -570,7 +534,7 @@ class MultiPillarProctorEngine:
 
     def get_full_deliverables(self, test_name: str, duration: float) -> Dict[str, Any]:
         """
-        Builds the 100% comprehensive forensic audit JSON containing all 5 checks.
+        Builds the 100% comprehensive forensic audit JSON containing all 4 checks.
         """
         score = self.composite_score
         if score >= 0.70:
@@ -579,7 +543,7 @@ class MultiPillarProctorEngine:
         elif score >= 0.40:
             verdict = "SUSPICIOUS ACTIVITY (Multiple Cheating Signals Detected)"
             risk = "HIGH"
-        elif any(len(x.incidents) > 0 for x in [self.wpm, self.llm, self.echo]) or len(self.gaze.cheating_lines) > 0:
+        elif any(len(x.incidents) > 0 for x in [self.llm, self.echo, self.cadence]) or len(self.gaze.cheating_lines) > 0:
             verdict = "LOW RISK (Isolated Behavioral Patterns)"
             risk = "LOW"
         else:
@@ -594,27 +558,20 @@ class MultiPillarProctorEngine:
                 "risk_level": risk,
                 "composite_confidence_score": round(score, 4),
                 "composite_confidence_percentage": f"{score * 100:.1f}%",
-                "pillars_evaluated": 5,
+                "pillars_evaluated": 4,
                 "anti_false_positive_policy": "Strict multi-hit verification enforced (0% penalty on single events)"
             },
             "pillar_scorecard": {
                 "ocular_gaze_mechanics": {
-                    "weight": "35%",
+                    "weight": "45%",
                     "sub_score": round(self.gaze.score, 4),
                     "sub_score_percentage": f"{self.gaze.score * 100:.1f}%",
                     "cheating_lines_count": len(self.gaze.cheating_lines),
                     "clean_speaking_events": len(self.gaze.clean_speaking),
                     "status": "ALERT" if self.gaze.score >= 0.40 else "NORMAL"
                 },
-                "speech_wpm_reading_burst": {
-                    "weight": "20%",
-                    "sub_score": round(self.wpm.score, 4),
-                    "sub_score_percentage": f"{self.wpm.score * 100:.1f}%",
-                    "burst_incidents_count": len(self.wpm.incidents),
-                    "status": "ALERT" if self.wpm.score >= 0.35 else "NORMAL"
-                },
                 "spoken_llm_stylometry": {
-                    "weight": "20%",
+                    "weight": "25%",
                     "sub_score": round(self.llm.score, 4),
                     "sub_score_percentage": f"{self.llm.score * 100:.1f}%",
                     "markers_detected_count": len(self.llm.incidents),
@@ -628,7 +585,7 @@ class MultiPillarProctorEngine:
                     "status": "ALERT" if self.echo.score >= 0.35 else "NORMAL"
                 },
                 "cadence_prosody_uniformity": {
-                    "weight": "10%",
+                    "weight": "15%",
                     "sub_score": round(self.cadence.score, 4),
                     "sub_score_percentage": f"{self.cadence.score * 100:.1f}%",
                     "cadence_incidents_count": len(self.cadence.incidents),
@@ -637,7 +594,6 @@ class MultiPillarProctorEngine:
             },
             "detailed_incidents": {
                 "gaze_cheating_lines": self.gaze.cheating_lines,
-                "wpm_reading_bursts": self.wpm.incidents,
                 "llm_stylometry_markers": self.llm.incidents,
                 "question_echo_events": self.echo.incidents,
                 "cadence_uniformity_events": self.cadence.incidents,
@@ -730,7 +686,7 @@ def save_multi_pillar_deliverables(test_name: str, duration: float, multi_engine
     with open(txt_path, "w", encoding="utf-8") as f:
         sep = "=" * 70
         f.write(sep + "\n")
-        f.write(f"       SENTINEL GAZE // 5-PILLAR FORENSIC AUDIT: {test_name}\n")
+        f.write(f"       SENTINEL GAZE // 4-PILLAR FORENSIC AUDIT: {test_name}\n")
         f.write(sep + "\n")
         f.write(f"Timestamp          : {datetime.now():%Y-%m-%d %H:%M:%S}\n")
         f.write(f"Duration           : {duration:.1f} seconds\n")
